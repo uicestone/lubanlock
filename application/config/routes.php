@@ -38,8 +38,18 @@
 |
 */
 
-$route['default_controller'] = "welcome";
+$route['default_controller'] = "index";
 $route['404_override'] = '';
+
+$route['login']='user/login';
+$route['logout']='user/logout';
+$route['profile']='user/profile';
+$route['signup']='user/signup';
+$route['browser']='index/browser';
+$route['reception']='index/reception';
+
+$route['objects']='object/getlist';
+$route['object/(:num)']='object/fetch/$1';
 
 
 /* End of file routes.php */

@@ -69,7 +69,7 @@ $config['url_suffix'] = '';
 | than english.
 |
 */
-$config['language']	= 'english';
+$config['language']	= 'chinese';
 
 /*
 |--------------------------------------------------------------------------
@@ -106,7 +106,7 @@ $config['enable_hooks'] = FALSE;
 | http://codeigniter.com/user_guide/general/creating_libraries.html
 |
 */
-$config['subclass_prefix'] = 'MY_';
+$config['subclass_prefix'] = 'SS_';
 
 
 /*
@@ -180,7 +180,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = 1;
 
 /*
 |--------------------------------------------------------------------------
@@ -224,7 +224,7 @@ $config['cache_path'] = '';
 | MUST set an encryption key.  See the user guide for info.
 |
 */
-$config['encryption_key'] = '';
+$config['encryption_key'] = 'a9Jks1&im!m90(en';
 
 /*
 |--------------------------------------------------------------------------
@@ -244,14 +244,14 @@ $config['encryption_key'] = '';
 | 'sess_time_to_update'		= how many seconds between CI refreshing Session Information
 |
 */
-$config['sess_cookie_name']		= 'ci_session';
+$config['sess_cookie_name']		= 'ss_session';
 $config['sess_expiration']		= 7200;
 $config['sess_expire_on_close']	= FALSE;
 $config['sess_encrypt_cookie']	= FALSE;
 $config['sess_use_database']	= FALSE;
-$config['sess_table_name']		= 'ci_sessions';
+$config['sess_table_name']		= 'sessions';
 $config['sess_match_ip']		= FALSE;
-$config['sess_match_useragent']	= TRUE;
+$config['sess_match_useragent']	= FALSE;
 $config['sess_time_to_update']	= 300;
 
 /*
@@ -315,7 +315,7 @@ $config['csrf_expire'] = 7200;
 | by the output class.  Do not 'echo' any values with compression enabled.
 |
 */
-$config['compress_output'] = FALSE;
+$config['compress_output'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -356,6 +356,28 @@ $config['rewrite_short_tags'] = FALSE;
 |
 */
 $config['proxy_ips'] = '';
+
+//定义时区，windows系统中php不能识别到系统时区
+date_default_timezone_set('Asia/Shanghai');
+
+/**
+ * 启用php5风格的autoloader
+ */
+function __autoload($class) {
+	
+	if(preg_match('/_model$/', $class) && file_exists(APPPATH.'models/'.strtolower($class).EXT)){
+		require_once APPPATH.'models/'.strtolower($class).EXT;
+	}
+	
+	elseif(file_exists(APPPATH.'libraries/.'.strtolower($class).EXT)){
+		require_once APPPATH.'libraries/'.strtolower($class).EXT;
+	}
+
+	elseif(file_exists(APPPATH.'controllers/'.strtolower($class).EXT)){
+		require_once APPPATH.'controllers/'.strtolower($class).EXT;
+	}
+	
+}
 
 
 /* End of file config.php */

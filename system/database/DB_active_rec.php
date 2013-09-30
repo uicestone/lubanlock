@@ -307,7 +307,8 @@ class CI_DB_active_record extends CI_DB_driver {
 	 * @param	string	the type of join
 	 * @return	object
 	 */
-	public function join($table, $cond, $type = '')
+	//public function join($table, $cond, $type = '')	//uicestone enable subquery in (join)
+	public function join($table, $cond, $type = '', $escape_cond = TRUE)
 	{
 		if ($type != '')
 		{
@@ -328,7 +329,7 @@ class CI_DB_active_record extends CI_DB_driver {
 		$this->_track_aliases($table);
 
 		// Strip apart the condition and protect the identifiers
-		if (preg_match('/([\w\.]+)([\W\s]+)(.+)/', $cond, $match))
+		if ($escape_cond && preg_match('/([\w\.]+)([\W\s]+)(.+)/', $cond, $match))//add condition to support unescaped join, useful when join subqueries uicestone 2013/3/20
 		{
 			$match[1] = $this->_protect_identifiers($match[1]);
 			$match[3] = $this->_protect_identifiers($match[3]);
@@ -538,7 +539,12 @@ class CI_DB_active_record extends CI_DB_driver {
 			return;
 		}
 
-		if ( ! is_array($values))
+		//uicestone 2013/5/24 work around with empty input
+		if(is_null($values) || $values === array())
+		{
+			$values = array(NULL);
+		}
+		elseif ( ! is_array($values))
 		{
 			$values = array($values);
 		}
@@ -703,7 +709,7 @@ class CI_DB_active_record extends CI_DB_driver {
 	 * @param	string
 	 * @return	object
 	 */
-	public function group_by($by)
+	public function group_by($by, $escape=true)//增加不转义选项 uicestone 2013/4/8
 	{
 		if (is_string($by))
 		{
@@ -716,11 +722,11 @@ class CI_DB_active_record extends CI_DB_driver {
 
 			if ($val != '')
 			{
-				$this->ar_groupby[] = $this->_protect_identifiers($val);
+				$this->ar_groupby[] = $escape ? $this->_protect_identifiers($val) : $val;//增加不转义选项 uicestone 2013/4/8
 
 				if ($this->ar_caching === TRUE)
 				{
-					$this->ar_cache_groupby[] = $this->_protect_identifiers($val);
+					$this->ar_cache_groupby[] = $escape ? $this->_protect_identifiers($val) : $val;//增加不转义选项 uicestone 2013/4/8
 					$this->ar_cache_exists[] = 'groupby';
 				}
 			}

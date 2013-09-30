@@ -1404,6 +1404,56 @@ class CI_DB_driver {
 	{
 	}
 
+	/**
+	 * uicestone 2013/5/19
+	 * 接受一个整数，或一些整数构成的数组
+	 * 输出SQL中条件字段后的语句" = x"或" IN (x,y,z)"
+	 * @param array or int $value
+	 * @return string
+	 */
+	function escape_int_array($value){
+		if(is_array($value)){
+			if(empty($value)){
+				$value='NULL';
+			}else{
+				array_walk($value,function(&$v){
+					$v=intval($v);
+				});
+				$value=implode(', ',$value);
+			}
+			return " IN ($value)";
+		}
+		else{
+			$value=intval($value);
+			return " = $value";
+		}
+	}
+	
+	/**
+	 * uicestone 2013/7/15
+	 * 接受一个数组或一个值
+	 * 输出SQL中条件字段后的语句" = x"或" IN (x,y,z)"
+	 * @param array or int $value
+	 * @return string
+	 */
+	function escape_array($value){
+		if(is_array($value)){
+			if(empty($value)){
+				$value='NULL';
+			}else{
+				array_walk($value,function(&$v){
+					$v=$this->escape($v);
+				});
+				$value=implode(', ',$value);
+			}
+			return " IN ($value)";
+		}
+		else{
+			$value=$this->escape($value);
+			return " = $value";
+		}
+	}
+
 }
 
 /* End of file DB_driver.php */

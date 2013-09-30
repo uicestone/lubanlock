@@ -305,7 +305,12 @@
 	// Mark a start point so we can benchmark the controller
 	$BM->mark('controller_execution_time_( '.$class.' / '.$method.' )_start');
 
-	$CI = new $class();
+	//uicestone 2013/7/25 在整个控制器外加一层异常捕获
+	try{
+		$CI = new $class();
+	}catch(Exception $exception){
+		show_error($exception->getMessage());
+	}
 
 /*
  * ------------------------------------------------------
@@ -356,7 +361,12 @@
 
 		// Call the requested method.
 		// Any URI segments present (besides the class/function) will be passed to the method for convenience
-		call_user_func_array(array(&$CI, $method), array_slice($URI->rsegments, 2));
+		//uicestone 2013/7/25 在整个控制器外加一层异常捕获
+		try{
+			call_user_func_array(array(&$CI, $method), array_slice($URI->rsegments, 2));
+		}catch(Exception $exception){
+			show_error($exception->getMessage());
+		}
 	}
 
 

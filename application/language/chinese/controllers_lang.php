@@ -1,0 +1,19 @@
+<?php
+$lang=array(
+	''=>'',
+	'contact'=>'联系人',
+	'document'=>'文档',
+	'evaluation'=>'评价',
+	'index'=>'',
+	'label'=>'标签',
+	'mail'=>'邮件',
+	'message'=>'消息',
+	'people'=>'人员',
+	'polling'=>'轮询',
+	'project'=>'事务',
+	'schedule'=>'日程',
+	'staff'=>'职员',
+	'team'=>'团队',
+	'user'=>'用户'
+);
+?>
