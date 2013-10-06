@@ -1,5 +1,5 @@
 /**
- * 后端api
+ * server api
  */
 var api = [
 	{
@@ -7,7 +7,7 @@ var api = [
 		"request":{
 			"method":"GET",
 			"uri":"/object/{id}",
-			"contentType":["application/json","application/x-www-form-urlencoded","multipart/form-data"],
+			"contentType":"application/json",
 			"query":{
 				"get_meta":true,
 				"get_mod":true,
@@ -28,7 +28,7 @@ var api = [
 		"request":{
 			"method":"POST",
 			"uri":"/object/{id}",
-			"contentType":["application/json","application/x-www-form-urlencoded","multipart/form-data"],
+			"contentType":"application/json",
 			"query":objectData
 		}
 	},
@@ -37,7 +37,7 @@ var api = [
 		"request":{
 			"method":"PUT",
 			"uri":"/object",
-			"contentType":["application/json","application/x-www-form-urlencoded","multipart/form-data"],
+			"contentType":"application/json",
 			"query":objectData
 		},
 		response:"{id}"
@@ -45,27 +45,41 @@ var api = [
 	{
 		"name":"获取对象列表",
 		"request":{
-			"uri":"/objects",
+			"uri":"/object",
 			"query":listArgs
 		},
 		"response":{
-			"body":[
-				objectData,
-				objectData
-			]
+			"body":{
+				"total":1000,//去处分页参数后的对象数目
+				"data":[
+					objectData,
+					objectData
+				]
+			}
+		}
+	},
+	{
+		"name":"用户登录",
+		"request":{
+			"method":"POST",
+			"uri":"/login",
+			"contentType":"application/json",
+			"query":{
+				"username":"",
+				"password":"",//开发阶段，明文
+				"remember":FALSE,
+			}
+		}
+	},
+	{
+		"name":"用户登出",
+		"request":{
+			"method":"GET",
+			"uri":"/logout"
 		}
 	},
 	{
 		"name":"页面框架",
-		"request":{
-			"uri":"/"
-		},
-		"response":{
-			"body":""
-		}
-	},
-	{
-		"name":"页面模版",
 		"request":{
 			"uri":"/"
 		}
@@ -78,20 +92,32 @@ var api = [
 		"response":{
 			"body":[
 				{
-					"name":"",
-					"href":"",
-					"add_href":"",
+					"id":"1",
+					"name":"客户",
+					"href":'/object?query=%7Btype:%22%E5%AE%A2%E6%88%B7%22%7D',
 					"sub":[
 						{
-							"name":"",
-							"href":"",
-							"add_href":"",
+							"id":"2",
+							"name":"潜在客户",
+							"href":"/object?query=%7Btype:%22%E5%AE%A2%E6%88%B7%22,tag:%5B%22%E6%BD%9C%E5%9C%A8%E5%AE%A2%E6%88%B7%22%5D%7D",
 						}
 					]
 				}
 			]
 		}
 	},
+	{
+		"name":"菜单存储",
+		"request":{
+			"method":"PUT",
+			"uri":"/nav",
+			"query":{
+				"name":"潜在客户",//菜单的显示名称
+				"uri":"/object?query=%7Btype:%22%E5%AE%A2%E6%88%B7%22,tag:%5B%22%E6%BD%9C%E5%9C%A8%E5%AE%A2%E6%88%B7%22%5D%7D",
+				"parent":"1"
+			}
+		}
+	}
 ];
 
 /**
