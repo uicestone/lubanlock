@@ -51,6 +51,13 @@ $route['reception']='index/reception';
 $route['object']='object/getlist';
 $route['object/(:num)']='object/fetch/$1';
 
+$route['object/(:num)/meta']='object/meta/$1';
+$route['object/(:num)/mod']='object/mod/$1';
+$route['object/(:num)/relative']='object/relative/$1';
+$route['object/(:num)/relative/(:num)/mod']='object/relative/mod/$1/$2';
+$route['object/(:num)/status']='object/status/$1';
+$route['object/(:num)/tag']='object/tag/$1';
+
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

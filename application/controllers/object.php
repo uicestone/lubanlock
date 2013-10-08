@@ -21,6 +21,9 @@ class Object extends SS_Controller{
 				$this->add();
 				break;
 			
+			case 'DELETE':
+				break;
+			
 			default:
 				show_error('input method error: '.$this->input->method);
 		}
@@ -55,21 +58,118 @@ class Object extends SS_Controller{
 		$this->output->set_output(json_encode($this->object->getList($args)));
 	}
 	
-	function removeTag($item_id){
-		
-		$controller=CONTROLLER;
-		
-		$label_name=$this->input->post('label');
-		
-		$this->$controller->removeTag($item_id, $label_name);
+	function meta($object_id){
+		switch ($this->input->method) {
+			case 'GET':
+				break;
+			
+			case 'POST':
+				break;
+			
+			case 'PUT':
+				break;
+			
+			case 'DELETE':
+				break;
+			
+			default:
+				show_error('input method error: '.$this->input->method);
+		}
 	}
 	
-	function addTag($item_id){
-		$controller=CONTROLLER;
-		
-		$label_name=$this->input->post('label');
-		
-		$this->$controller->addTag($item_id, $label_name);
+	function mod($object_id){
+		switch ($this->input->method) {
+			case 'GET':
+				break;
+			
+			case 'POST':
+				break;
+			
+			case 'PUT':
+				break;
+			
+			case 'DELETE':
+				break;
+			
+			default:
+				show_error('input method error: '.$this->input->method);
+		}
+	}
+	
+	function relative($object_id){
+		switch ($this->input->method) {
+			case 'GET':
+				break;
+			
+			case 'POST':
+				break;
+			
+			case 'PUT':
+				break;
+			
+			case 'DELETE':
+				break;
+			
+			default:
+				show_error('input method error: '.$this->input->method);
+		}
+	}
+	
+	function relativeMod($object_id, $relative_id){
+		switch ($this->input->method) {
+			case 'GET':
+				break;
+			
+			case 'POST':
+				break;
+			
+			case 'PUT':
+				break;
+			
+			case 'DELETE':
+				break;
+			
+			default:
+				show_error('input method error: '.$this->input->method);
+		}
+	}
+	
+	function status($object_id){
+		switch ($this->input->method) {
+			case 'GET':
+				break;
+			
+			case 'POST':
+				break;
+			
+			case 'PUT':
+				break;
+			
+			case 'DELETE':
+				break;
+			
+			default:
+				show_error('input method error: '.$this->input->method);
+		}
+	}
+	
+	function tag($object_id){
+		switch ($this->input->method) {
+			case 'GET':
+				break;
+			
+			case 'POST':
+				break;
+			
+			case 'PUT':
+				break;
+			
+			case 'DELETE':
+				break;
+			
+			default:
+				show_error('input method error: '.$this->input->method);
+		}
 	}
 	
 }
