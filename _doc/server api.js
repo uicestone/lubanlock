@@ -2,11 +2,12 @@
  * server api
  */
 var api = [
+	/*整个对象的CURD*/
 	{
 		"name":"获取单个对象",
 		"request":{
 			"method":"GET",
-			"uri":"/object/{id}",
+			"path":"/object/{id}",
 			"contentType":"application/json",
 			"query":{
 				"get_meta":true,
@@ -27,7 +28,7 @@ var api = [
 		"name":"更新单个对象",
 		"request":{
 			"method":"POST",
-			"uri":"/object/{id}",
+			"path":"/object/{id}",
 			"contentType":"application/json",
 			"query":objectData
 		}
@@ -36,33 +37,203 @@ var api = [
 		"name":"创建单个对象",
 		"request":{
 			"method":"PUT",
-			"uri":"/object",
+			"path":"/object",
 			"contentType":"application/json",
-			"query":objectData
+			"query":objectData//without id, uid, time, timeinsert attributes
 		},
-		response:"{id}"
+		response:{
+			"body":objectData.id
+		}
 	},
 	{
 		"name":"获取对象列表",
 		"request":{
-			"uri":"/object",
+			"path":"/object",
 			"query":listArgs
 		},
 		"response":{
+			"header":{
+				"contentType":"application/json"
+			},
 			"body":{
-				"total":1000,//去处分页参数后的对象数目
+				"total":1000,//去除分页参数后的对象数目
 				"data":[
-					objectData,
 					objectData
 				]
 			}
 		}
 	},
+	
+	/*
+	 * 对象属性的CURD
+	 */
+	
+	/*
+	 * meta
+	 */
+	{
+		"name":"为一个对象添加一个元数据",
+		"request":{
+			"method":"PUT",
+			"path":"/object/{id}/meta",
+			"contentType":"application/json",
+			"query":meta//without "id" attribute
+		},
+		"response":{
+			"body":meta.id
+		}
+	},
+	{
+		"name":"更新对象的一个元数据",
+		"request":{
+			"method":"POST",
+			"path":"/object/{id}/meta",
+			"contentType":"application/json",
+			"query":meta
+		}
+	},
+	{
+		"name":"删除一个对象的一个元数据",
+		"request":{
+			"method":" DELETE",
+			"path":"/object/{id}/meta",
+			"contentType":"application/json",
+			"query":meta//with "id" attribute only
+		}
+	},
+	
+	/*
+	 * mod
+	 */
+	{
+		"name":"为一个对象(针对一个用户)添加一个权限/状态(设为肯定)",
+		"request":{
+			"method":"PUT",
+			"path":"/object/{id}/mod",
+			"contentType":"application/json",
+			"query":{
+				name:"",//开关量的名称
+				uid:0//optional
+			}
+		}
+	},
+	{
+		"name":"删除一个对象(针对一个用户)的一个权限/状态(设为否定)",
+		"request":{
+			"method":" DELETE",
+			"path":"/object/{id}/mod",
+			"contentType":"application/json",
+			"query":{
+				name:"",//开关量的名称
+				uid:0//optional
+			}
+		}
+	},
+	
+	/*
+	 * relative
+	 */
+	{
+		"name":"为一个对象添加一个相关对象",
+		"request":{
+			"method":"PUT",
+			"path":"/object/{id}/relative",
+			"contentType":"application/json",
+			"query":relative//without "id","name" and "type" attribute
+		},
+		"response":relative.id
+
+	},
+	{
+		"name":"更新对象的一个相关对象",
+		"request":{
+			"method":"POST",
+			"path":"/object/{id}/relative",
+			"contentType":"application/json",
+			"query":relative//without "name" and "type" attribute
+		}
+	},
+	{
+		"name":"删除一个对象的一个相关对象",
+		"request":{
+			"method":" DELETE",
+			"path":"/object/{id}/relative",
+			"contentType":"application/json",
+			"query":relative//with "id" attribute only
+		}
+	},
+	
+	/*
+	 * mod of relative
+	 */
+	{
+		"name":"为一个对象和另一个对象的关系添加一个状态(设为肯定)",
+		"request":{
+			"method":"PUT",
+			"path":"/object/{id}/relative/{relative.id}/mod",
+			"contentType":"application/json",
+			"query":{
+				name:"",//开关量的名称
+				uid:0//optional
+			}
+		}
+	},
+	{
+		"name":"删除一个对象和另一个对象的关系的状态(设为否定)",
+		"request":{
+			"method":" DELETE",
+			"path":"/object/{id}/relative/{relative.id}/mod",
+			"contentType":"application/json",
+			"query":{
+				name:"",//开关量的名称
+				uid:0//optional
+			}
+		}
+	},
+	
+	/*
+	 * tag
+	 */
+	{
+		"name":"为一个对象添加一个标签",
+		"request":{
+			"method":"PUT",
+			"path":"/object/{id}/tag",
+			"contentType":"application/json",
+			"query":tag//without "id" attribute
+		},
+		"response":{
+			"body":tag.id
+		}
+
+	},
+	{
+		"name":"更新对象的一个标签",
+		"request":{
+			"method":"POST",
+			"path":"/object/{id}/tag",
+			"contentType":"application/json",
+			"query":tag
+		}
+	},
+	{
+		"name":"删除一个对象的一个标签",
+		"request":{
+			"method":" DELETE",
+			"path":"/object/{id}/tag",
+			"contentType":"application/json",
+			"query":tag//with "id" attribute only
+		}
+	},
+	
+	/*
+	 * 其他api
+	 */
 	{
 		"name":"用户登录",
 		"request":{
 			"method":"POST",
-			"uri":"/login",
+			"path":"/login",
 			"contentType":"application/json",
 			"query":{
 				"username":"",
@@ -75,21 +246,24 @@ var api = [
 		"name":"用户登出",
 		"request":{
 			"method":"GET",
-			"uri":"/logout"
+			"path":"/logout"
 		}
 	},
 	{
 		"name":"页面框架",
 		"request":{
-			"uri":"/"
+			"path":"/"
 		}
 	},
 	{
 		"name":"导航菜单",
 		"request":{
-			"uri":"/nav",
+			"path":"/nav",
 		},
 		"response":{
+			"header":{
+				"contentType":"application/json"
+			},
 			"body":[
 				{
 					"id":"1",
@@ -110,10 +284,10 @@ var api = [
 		"name":"菜单存储",
 		"request":{
 			"method":"PUT",
-			"uri":"/nav",
+			"path":"/nav",
 			"query":{
 				"name":"潜在客户",//菜单的显示名称
-				"uri":"/object?query=%7Btype:%22%E5%AE%A2%E6%88%B7%22,tag:%5B%22%E6%BD%9C%E5%9C%A8%E5%AE%A2%E6%88%B7%22%5D%7D",
+				"path":"/object?query=%7Btype:%22%E5%AE%A2%E6%88%B7%22,tag:%5B%22%E6%BD%9C%E5%9C%A8%E5%AE%A2%E6%88%B7%22%5D%7D",
 				"parent":"1"
 			}
 		}
@@ -125,52 +299,89 @@ var api = [
  */
 var objectData={
 	"id":0,
-	"type":"",//对象类型如people,contact,cases,project
+	"type":"",//对象类型如"人员", "联系人", "案件", "事务"
 	"num":"",//对象的编号，字符串
 	"name":"",//对象的显示名称
-	"additional_fields":"",//非必有，根据不同type的对象，可能有些额外的根字段
+	"{additional_fields}":"",//非必有，根据不同type的对象，可能有些额外的根字段（考虑一律去处这些字段）
 	"meta":[//非必有，获得对象时get_meta参数决定
-		{
-			"id":0,
-			"name":"",
-			"content":"",
-			"comment":""
-		}
+		meta
 	],
-	"mod":{//非必有，获得对象时get_mod参数决定
-		"6343":{"read":true,"write":true}//一组可变权限/状态名
-	},
+	"mod":[
+		mod//非必有，获得对象时get_mod参数决定
+	],
 	"relative":[//非必有，获得对象时get_relative参数决定
-		{
-			"id":0,//关系id
-			"num":"",//关系编号，比如一个学生在一个班级中的学号
-			"relation":"",
-			"mod":{"people":{"deleted":false,"read":false}},//与一类对象的一组可变权限/状态名
-			"weight":0.00,//比重，同relation的比重之和不应超过1
-			"till":"1970-01-01",//关系结束时间
-			"relative":0,//关联对象id
-			"type":"",//关连对象类型
-			"name":""//关连对象显示名称
-		}
+		relative
 	],
 	"status":[//非必有，获得对象时get_status参数决定
-		{
-			"id":0,
-			"name":"",
-			"type":"",
-			"datetime":"",
-			"content":"",
-			"comment":""
-		}
+		status
 	],
 	"tag":[//非必有，获得对象时get_tag参数决定
-		{
-			"id":0,
-			"name":"",
-			"type":"",//标签类型，分类的分类，如“阶段”，“领域”,
-			"color":"#000"
-		}
+		tag
 	]
+};
+
+/*
+ * 元数据
+ * 存放对象的普通属性，如人员的电话，案件的简介，考试的参与人数、班级的教室等
+ */
+var meta={
+	"id":0,
+	"name":"",
+	"content":"",
+	"comment":""
+};
+
+/*
+ * 开关量
+ * 在数据库中以整数存放，转换成二进制后每一位表示一个开关量
+ * 开关量的名称在后端定义，因此只有“是”和“否”，并没有“未知”，因此只有增删，没有改
+ * 对象有开关量，对象与对象的关联也有开关量
+ * 如一个对象的读, 写权限, 又如一个日程对于某用户的“删除”状态
+ */
+var mod={
+	"id":0,
+	"uid":0,//不为null的时候表示此(组)开关量针对于此用户
+	"username":"",
+	"read":true,//一组可变权限/状态名，可以逐个添加，但抓取时是按用户分组合并的
+	"write":true
+};
+
+/**
+ * 关连对象
+ * 描述与本对象关联的对象的简要信息，以及关系
+ */
+var relative={
+	"id":0,//关系id
+	"num":"",//关系编号，比如一个学生在一个班级中的学号
+	"relation":"",
+	"mod":[mod],//与一类对象的一组可变权限/状态名
+	"weight":0.00,//比重，同relation的比重之和不应超过1
+	"relative":0,//关联对象id
+	"type":"",//关连对象类型
+	"name":""//关连对象显示名称
+};
+
+/*
+ * 一个对象的各种与时间有关的状态
+ * 如，案件的立案时间，帐目的应收帐款时间，日程的底线时间
+ */
+var status={
+	"id":0,
+	"name":"",
+	"type":"",
+	"datetime":"",
+	"content":"",
+	"comment":""
+};
+
+/*
+ * 一个对象的标签，用于搜索和分类
+ */
+var tag={
+	"id":0,
+	"name":"",
+	"type":"",//标签类型，分类的分类，如“阶段”，“领域”,
+	"color":"#000"
 };
 
 /**
