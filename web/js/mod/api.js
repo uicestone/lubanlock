@@ -1,4 +1,5 @@
-/**
+define(function(require,exports,module){
+	/**
  * 后端api
  */
 var api = [
@@ -140,9 +141,13 @@ var objectData={
 	"tag":[//非必有，获得对象时get_tag参数决定
 		{
 			"id":0,
-			"name":"",
-			"type":"",//标签类型，分类的分类，如“阶段”，“领域”,
+			"name":"vasdqw",
+			"type":"qw",//标签类型，分类的分类，如“阶段”，“领域”,
 			"color":"#000"
+		},{
+			"id":1,
+			"name":"asd",
+			"color":"#21"
 		}
 	]
 };
@@ -206,3 +211,7 @@ var listArgs={
 		[10,20]//需要的行数, 起点偏移
 	]
 };
+
+
+
+});
