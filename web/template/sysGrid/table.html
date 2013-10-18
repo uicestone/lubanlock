@@ -1,0 +1,22 @@
+<h4>{{title}}</h4>
+<table class="table table-bordered">
+    <tr>
+        <!-- <td ng-repeat="(k,v) in data[0] track by $index" width="{{tdwidth}}">{{k}}</td>   -->
+        <td ng-repeat="v in fields track by $index" width="{{tdwidth}}">{{v}}</td>  
+        <td>
+            <i class="icon-plus bigger-200" ng-click="addrow()"></i>
+        </td>
+    </tr>
+    
+    <tr ng-repeat="(index,row) in data">
+
+        <!-- <td ng-repeat="(key,value) in row track by $index | filter:{id:1}" ng-class="editing?'editing':''"> -->
+        <td ng-repeat="field in fields track by $index" ng-class="editing?'editing':''">
+            <div ng-bind-html-unsafe="(render&&render[field]) ? render[field](row[field]) : row[field]" ng-dblclick="editcell($event)" ng-hide="editing" class="grid-content"></div>
+            <input type="text" ng-model="row[field]" class="grid-edting" ng-blur="exitedit($event,row)" ng-show="editing" />
+        </td>
+        <td>
+            <i class="icon-trash bigger-200" ng-click="removerow(row)"></i>
+        </td>
+    </tr>
+</table>
