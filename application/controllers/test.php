@@ -4,6 +4,10 @@ class Test extends SS_Controller{
 		parent::__construct();
 	}
 	
+	function index(){
+		print_r($this->input->get('a'));
+	}
+	
 	function session(){
 		print_r($this->session->all_userdata());
 	}

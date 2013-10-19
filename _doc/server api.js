@@ -36,7 +36,7 @@ var api = [
 	{
 		"name":"创建单个对象",
 		"request":{
-			"method":"PUT",
+			"method":"PUT/POST",
 			"path":"/object",
 			"contentType":"application/json",
 			"query":objectData//without id, uid, time, timeinsert attributes

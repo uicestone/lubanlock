@@ -9,6 +9,26 @@ class SS_input extends CI_Input{
 	}
 	
 	/**
+	* @access	public
+	* @param	string
+	* @param	bool
+	* @return	string
+	*/
+	function get($index = NULL, $xss_clean = FALSE){
+		
+		$get = parent::get($index, $xss_clean);
+		
+		if($get === FALSE && isset($_GET['query'])){
+			$get_temp = $_GET;
+			$_GET = json_decode($_GET['query'],JSON_OBJECT_AS_ARRAY);
+			$get = parent::get($index, $xss_clean);
+			$_GET = $get_temp;
+		}
+		
+		return $get;
+	}
+	
+	/**
 	 * 继承post方法，处理post数组
 	 * 现可如下访问：
 	 * $this->input->post('submit/newcase')

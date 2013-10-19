@@ -13,12 +13,13 @@ class Object extends SS_Controller{
 				$this->fetch($id);
 				break;
 			
-			case 'POST':
-				$this->update($id);
-				break;
-			
+			case 'POST' && is_null($id):
 			case 'PUT':
 				$this->add();
+				break;
+			
+			case 'POST':
+				$this->update($id);
 				break;
 			
 			case 'DELETE':
@@ -40,6 +41,7 @@ class Object extends SS_Controller{
 	}
 	
 	function update($id){
+		$this->object->id=$id;
 		$this->object->update($this->input->post());
 	}
 	
