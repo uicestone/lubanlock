@@ -69,32 +69,11 @@ class SS_input extends CI_Input{
 	
 	function delete(){
 		
-		if($this->server('REQUEST_METHOD')!=='PUT'){
-			return false;
+		if($this->server('REQUEST_METHOD')==='DELETE'){
+			return true;
 		}
 		
-		return true;
-	}
-	
-	/**
-	 * @param string 一个变量名或数组变量路径
-	 * @return array 返回储存于$_SESSION的post()值和$this->input->post()值取并集的结果
-	 * 对于交集键，取$_SESSION的post()中的值
-	 */
-	function sessionPost($index){
-		$post=array();
-		
-		$session_post=post($index);
-		if(is_array($session_post)){
-			$post+=$session_post;
-		}
-		
-		$http_post=$this->post($index);
-		if(is_array($http_post)){
-			$post+=$http_post;
-		}
-		
-		return $post;
+		return false;
 	}
 	
 	function _clean_input_keys($str){   
@@ -105,17 +84,5 @@ class SS_input extends CI_Input{
 		return $str;   
 	}
 	
-	function header($name=NULL){
-		$headers=getallheaders();
-		if(isset($name)){
-			if(isset($headers[$name])){
-				return $headers[$name];
-			}else{
-				return false;
-			}
-		}else{
-			return $headers;
-		}
-	}
 }
 ?>

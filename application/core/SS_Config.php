@@ -7,7 +7,6 @@ class SS_Config extends CI_Config{
 	
 	var $company;
 	var $user;
-	var $session;
 	
 	function __construct() {
 		parent::__construct();
@@ -24,7 +23,7 @@ class SS_Config extends CI_Config{
 		is_null($controller) && $controller=CONTROLLER;
 		is_null($method) && $method=METHOD;
 		
-		$plain_config = array_merge($this->company,$this->user,$this->session);
+		$plain_config = array_merge($this->company,$this->user);
 		
 		$method = array_prefix($plain_config, $controller.'/'.$method.'/'.$item);
 		

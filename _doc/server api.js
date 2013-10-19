@@ -232,7 +232,7 @@ var api = [
 	{
 		"name":"用户登录",
 		"request":{
-			"method":"POST",
+			"method":"POST / GET",
 			"path":"/login",
 			"contentType":"application/json",
 			"query":{

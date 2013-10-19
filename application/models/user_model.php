@@ -23,7 +23,7 @@ class User_model extends People_model{
 		isset($id) && $this->id=$id;
 		
 		if(is_null($this->id)){
-			$this->id=$this->session->userdata('user/id');
+			$this->id=$this->session->userdata('user_id');
 		}
 		
 		if(!$this->id){
@@ -101,12 +101,7 @@ class User_model extends People_model{
 				
 		$user=$this->db->get()->row_array();
 		
-		if(empty($user)){
-			return false;
-	
-		}else{
-			return $user;
-		}
+		return $user;
 	}
 	
 	function updateLoginTime(){

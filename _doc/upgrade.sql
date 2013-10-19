@@ -410,3 +410,15 @@ insert into object_meta (object,name,content,comment)
 SELECT team,'教室',name,capacity FROM `school_room` WHERE 1;
 
 DROP TABLE school_room;
+
+-- structure exported
+
+ALTER TABLE `company`
+  DROP `ucenter`;
+
+ALTER TABLE  `user` DROP FOREIGN KEY  `user_ibfk_1` ,
+ADD FOREIGN KEY (  `id` ) REFERENCES  `sys`.`object` (
+`id`
+) ON DELETE NO ACTION ON UPDATE CASCADE ;
+
+drop table people;

@@ -80,12 +80,6 @@ class SS_Controller extends CI_Controller{
 			$this->load->language($this->company->syscode);
 		}
 		
-		if(CONTROLLER==='index' && METHOD!=='browser' && $this->agent->browser()==='Internet Explorer' && $this->agent->version()<8){
-			redirect('browser');
-		}
-		
-		$this->config->session=$this->session->all_userdata('config');
-		
 	}
 	
 }

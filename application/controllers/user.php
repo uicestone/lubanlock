@@ -2,61 +2,26 @@
 class user extends SS_controller{
 	
 	function __construct(){
-		
-		$this->permission=array(
-			'signup'=>true,
-			'login'=>true,
-			'logout'=>array(),
-			'submit'=>true,
-			'setfields'=>true,
-			'profile'=>array()
-		);
-		
 		parent::__construct();
-		
 	}
 	
 	function logout(){
 		$this->user->sessionLogout();
-		redirect('login');
 	}
 	
 	function login(){
 		
-		if($this->user->isLogged()){
-			//用户已登陆，则不显示登录界面
-			redirect();
+		$user=$this->user->verify($this->input->get_post('username'), $this->input->get_post('password'));
+
+		if($user){
+			$this->session->set_userdata('user_id', intval($user['id']));
+			$this->user->updateLoginTime();
+			$this->output->set_output(json_encode($user));
+		}
+		else{
+			$this->output->set_status_header(403, lang('login_info_error'));
 		}
 		
-		if($this->input->post('username')){
-			
-			$user=array();
-			
-			$user=$this->user->verify($this->input->post('username'),$this->input->post('password'));
-
-			if($user){
-
-				$this->session->set_userdata('user/id', intval($user['id']));
-
-				$this->user->__construct($user['id']);
-
-				$this->user->updateLoginTime();
-
-				if(!isset($user['password'])){
-					redirect('#user/profile');
-				}else{
-					redirect();
-				}
-
-			}else{
-				$this->load->addViewData('warning','用户名或密码错');
-			}
-		}
-		
-		$this->load->view('head');
-		$this->load->view('user/login');
-		$this->load->view('foot');
-
 	}
 	
 	function signUp(){

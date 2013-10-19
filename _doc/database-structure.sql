@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `company` (
   `sysname` varchar(255) NOT NULL,
   `ucenter` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='公司列表（系统表）' AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='公司列表（系统表）' AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `company_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `company_config` (
   PRIMARY KEY (`id`),
   KEY `company` (`company`),
   KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=25 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `dialog` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `dialog` (
   KEY `time` (`time`),
   KEY `company` (`company`),
   KEY `users` (`users`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=922 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `dialog_message` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `dialog_message` (
   PRIMARY KEY (`id`),
   KEY `dialog` (`dialog`),
   KEY `message` (`message`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2655 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `dialog_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `dialog_user` (
   PRIMARY KEY (`id`),
   KEY `dialog` (`dialog`),
   KEY `user` (`user`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2136 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `document` (
   `id` int(11) NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_indicator` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `project` (`project`,`indicator`),
   KEY `indicator` (`indicator`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `evaluation_model` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_model` (
   `company` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `company` (`company`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `evaluation_model_indicator` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -146,14 +146,14 @@ CREATE TABLE IF NOT EXISTS `holidays` (
   `staff` int(11) DEFAULT NULL COMMENT 'NULL为全体行为，否则为单名员工行为',
   PRIMARY KEY (`id`),
   KEY `staff` (`staff`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `idcard_region` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `num` int(6) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='身份证地域区段（资源表）' AUTO_INCREMENT=3466 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='身份证地域区段（资源表）' AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `indicator` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS `indicator` (
   KEY `company` (`company`),
   KEY `candidates` (`candidates`),
   KEY `judges` (`judges`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='考核指标' AUTO_INCREMENT=648 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='考核指标' AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS `message` (
   PRIMARY KEY (`id`),
   KEY `uid` (`uid`),
   KEY `time` (`time`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='公告（主表）' AUTO_INCREMENT=2320 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='公告（主表）' AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `message_document` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS `message_document` (
   PRIMARY KEY (`id`),
   KEY `message` (`message`),
   KEY `document` (`document`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=114 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `message_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `message_user` (
   PRIMARY KEY (`id`),
   KEY `user` (`user`),
   KEY `message` (`message`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17864 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `nav` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -232,7 +232,7 @@ CREATE TABLE IF NOT EXISTS `nav` (
   KEY `href` (`href`),
   KEY `company_type` (`company_type`),
   KEY `order` (`order`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=76 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `object` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS `object` (
   KEY `name` (`name`),
   KEY `type` (`type`),
   KEY `num` (`num`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=56829 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `object_meta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS `object_meta` (
   KEY `time` (`time`),
   KEY `name` (`name`),
   KEY `object` (`object`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='客户联系方式' AUTO_INCREMENT=52676 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='客户联系方式' AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `object_mod` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -308,7 +308,7 @@ CREATE TABLE IF NOT EXISTS `object_relationship` (
   KEY `num` (`num`),
   KEY `till` (`till`),
   KEY `weight` (`weight`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='人员关系' AUTO_INCREMENT=112179 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='人员关系' AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `object_status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS `object_status` (
   KEY `uid` (`uid`),
   KEY `time` (`time`),
   KEY `team` (`group`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3070 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `object_tag` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -345,7 +345,7 @@ CREATE TABLE IF NOT EXISTS `object_tag` (
   KEY `uid` (`uid`),
   KEY `time` (`time`),
   KEY `tag_name` (`tag_name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=33326 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `people` (
   `id` int(11) NOT NULL,
@@ -443,7 +443,7 @@ CREATE TABLE IF NOT EXISTS `school_view_score` (
   KEY `exam` (`exam`),
   KEY `time` (`time`),
   KEY `extra_course` (`extra_course`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='分数汇总' AUTO_INCREMENT=13231 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='分数汇总' AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `score` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -461,7 +461,7 @@ CREATE TABLE IF NOT EXISTS `score` (
   KEY `time` (`time`),
   KEY `indicator` (`indicator`),
   KEY `project` (`project`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='阅卷分数' AUTO_INCREMENT=95017 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='阅卷分数' AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `sessions` (
   `session_id` varchar(40) NOT NULL DEFAULT '0',
@@ -494,7 +494,7 @@ CREATE TABLE IF NOT EXISTS `tag` (
   UNIQUE KEY `name` (`name`),
   KEY `order` (`order`),
   KEY `type` (`type`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=423 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `tag_relationship` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -505,7 +505,7 @@ CREATE TABLE IF NOT EXISTS `tag_relationship` (
   KEY `label` (`label`),
   KEY `relative` (`relative`),
   KEY `relation` (`relation`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int(11) NOT NULL,
@@ -529,7 +529,7 @@ CREATE TABLE IF NOT EXISTS `user_config` (
   `value` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user-name` (`user`,`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2087 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
 ALTER TABLE `account`
