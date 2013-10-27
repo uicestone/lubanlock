@@ -1248,7 +1248,60 @@ class CI_DB_active_record extends CI_DB_driver {
 		$this->_reset_write();
 		return $this->query($sql);
 	}
+	
+	// --------------------------------------------------------------------
 
+	/**
+	 * On Duplicate Key Update
+	 *
+	 * Compiles an on duplicate key update string and runs the query
+	 * uicestone 2013/10/27
+	 * 
+	 * @author    Chris Miller <chrismill03@hotmail.com>
+	 * @since     1.6.2
+	 * @access    public
+	 * @param     string    the table to retrieve the results from
+	 * @param     array     an associative array of update value
+	 * @return    object
+	 */
+
+	function duplicate_insert($table = '', $set = NULL )
+	{
+		if ( ! is_null($set))
+		{
+			$this->set($set);
+		}
+
+		if (count($this->ar_set) == 0)
+		{
+				if ($this->db_debug)
+			{
+					return $this->display_error('db_must_use_set');
+			}
+				return FALSE;
+		}
+
+		if ($table == '')
+		{
+			if ( ! isset($this->ar_from[0]))
+			{
+				if ($this->db_debug)
+				{
+					return $this->display_error('db_must_set_table');
+				}
+				return FALSE;
+			}
+
+			$table = $this->ar_from[0];
+		}
+
+
+		$sql = $this->_duplicate_insert($this->_protect_identifiers($this->dbprefix.$table), $this->ar_set );
+
+		$this->_reset_write();
+		return $this->query($sql);
+	}
+	
 	// --------------------------------------------------------------------
 
 	/**

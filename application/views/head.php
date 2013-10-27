@@ -13,7 +13,7 @@
     <script type="text/javascript" src="/js/lib/angular-ui-modal.js"></script>
     <script type="text/javascript" src="/js/lib/angular-ui-router.js"></script>
 
-    <title><?=$this->output->title.' '.$this->company->sysname?></title>
+    <title><?=$this->company->sysname?></title>
     <style>
             #global-search{
                 margin:8px 48px;

@@ -8,6 +8,7 @@ class Object extends SS_Controller{
 	}
 	
 	function single($id=NULL){
+		
 		switch ($this->input->method) {
 			case 'GET':
 				$this->fetch($id);
@@ -21,156 +22,179 @@ class Object extends SS_Controller{
 			case 'POST':
 				$this->update($id);
 				break;
-			
-			case 'DELETE':
-				break;
-			
-			default:
-				show_error('input method error: '.$this->input->method);
 		}
 	}
 	
 	function fetch($id){
-		$args=$this->input->get();
 		
-		if($args===false){
-			$args=array();
-		}
+		$args=$this->input->get();
 		
 		$this->output->set_output(json_encode($this->object->fetch($id,$args)));
 	}
 	
 	function update($id){
+		
 		$this->object->id=$id;
-		$this->object->update($this->input->post());
+		
+		$this->object->update($this->input->data());
+		
+		$this->fetch($this->object->id);
 	}
 	
 	function add(){
-		$insert_id = $this->object->add($this->input->put());
-		$this->output->set_output($insert_id);
+		
+		$data = $this->input->data();
+		
+		$this->object->id = $this->object->add($data);
+		
+		$this->fetch($this->object->id);
 	}
 	
 	function getList(){
+		
 		$args=$this->input->get();
 
-		if($args===false){
-			$args=array();
-		}
-		
 		$this->output->set_output(json_encode($this->object->getList($args)));
 	}
 	
 	function meta($object_id){
+		
+		$this->object->id=$object_id;
+		
 		switch ($this->input->method) {
 			case 'GET':
-				break;
-			
-			case 'POST':
+				$this->output->set_output(json_encode($this->object->getMeta()));
 				break;
 			
 			case 'PUT':
+			case 'POST' && $this->input->data('id') === false:
+				$meta_id=$this->object->addMeta($this->input->data());
+				$this->output->set_output(json_encode($this->object->getMeta($meta_id)));
+				break;
+			
+			case 'POST':
+				$this->object->updateMeta($this->input->data());
+				$this->output->set_output(json_encode($this->object->getMeta($this->input->data('id'))));
 				break;
 			
 			case 'DELETE':
+				$this->object->removeMeta($this->input->get());
 				break;
-			
-			default:
-				show_error('input method error: '.$this->input->method);
 		}
 	}
 	
 	function mod($object_id){
+		
+		$this->object->id=$object_id;
+		
 		switch ($this->input->method) {
 			case 'GET':
-				break;
-			
-			case 'POST':
+				$this->output->set_output(json_encode($this->object->getMod()));
 				break;
 			
 			case 'PUT':
+			case 'POST' && $this->input->data('id') === false:
+				$mod_id=$this->object->addMod($this->input->data('mod'),$this->input->data('user'));
+				$this->output->set_output(json_encode($this->object->getMod($mod_id)));
 				break;
 			
 			case 'DELETE':
+				$this->object->removeMod($this->input->data('mod'),$this->input->data('user'));
 				break;
-			
-			default:
-				show_error('input method error: '.$this->input->method);
 		}
 	}
 	
 	function relative($object_id){
+		
+		$this->object->id=$object_id;
+		
 		switch ($this->input->method) {
 			case 'GET':
-				break;
-			
-			case 'POST':
+				$this->output->set_output(json_encode($this->object->getRelative()));
 				break;
 			
 			case 'PUT':
+			case 'POST' && $this->input->data('id') === false:
+				$relative_id=$this->object->addRelative($this->input->data());
+				$this->output->set_output(json_encode($this->object->getRelative($relative_id)));
+				break;
+			
+			case 'POST':
+				$this->object->updateRelative($this->input->data());
+				$this->output->set_output(json_encode($this->object->getRelative(NULL,array(), $this->input->data('id'))));
 				break;
 			
 			case 'DELETE':
+				$this->object->removeRelative($this->input->get());
 				break;
-			
-			default:
-				show_error('input method error: '.$this->input->method);
 		}
 	}
 	
 	function relativeMod($object_id, $relative_id){
+		
+		$this->object->id=$object_id;
+		
 		switch ($this->input->method) {
 			case 'GET':
-				break;
-			
-			case 'POST':
+				$this->output->set_output(json_encode($this->object->getRelativeMod()));
 				break;
 			
 			case 'PUT':
+			case 'POST' && $this->input->data('id') === false:
+				$mod_id=$this->object->addRelativeMod($this->input->data());
+				$this->output->set_output(json_encode($this->object->getRelativeMod($mod_id)));
 				break;
 			
 			case 'DELETE':
+				$this->object->removeRelativeMod($this->input->get());
 				break;
-			
-			default:
-				show_error('input method error: '.$this->input->method);
 		}
 	}
 	
 	function status($object_id){
+		
+		$this->object->id=$object_id;
+		
 		switch ($this->input->method) {
 			case 'GET':
-				break;
-			
-			case 'POST':
+				$this->output->set_output(json_encode($this->object->getStatus()));
 				break;
 			
 			case 'PUT':
+			case 'POST' && $this->input->data('id') === false:
+				$status_id=$this->object->addStatus($this->input->data());
+				$this->output->set_output(json_encode($this->object->getStatus($status_id)));
+				break;
+			
+			case 'POST':
+				$this->object->updateStatus($this->input->data());
+				$this->output->set_output(json_encode($this->object->getStatus($this->input->data('id'))));
 				break;
 			
 			case 'DELETE':
+				$this->object->removeStatus($this->input->get());
 				break;
-			
-			default:
-				show_error('input method error: '.$this->input->method);
 		}
 	}
 	
 	function tag($object_id){
+		
+		$this->object->id=$object_id;
+		
 		switch ($this->input->method) {
 			case 'GET':
-				break;
-			
-			case 'POST':
+				$this->output->set_output(json_encode($this->object->getTag()));
 				break;
 			
 			case 'PUT':
+			case 'POST' && $this->input->data('id') === false:
+				$tag_id=$this->object->addTag($this->input->data());
+				$this->output->set_output(json_encode($this->object->getTag(NULL, $tag_id)));
 				break;
 			
 			case 'DELETE':
+				$this->object->removeTag($this->input->get());
 				break;
-			
-			default:
-				show_error('input method error: '.$this->input->method);
 		}
 	}
 	

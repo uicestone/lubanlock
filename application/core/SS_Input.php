@@ -9,91 +9,54 @@ class SS_input extends CI_Input{
 	}
 	
 	/**
-	* @access	public
-	* @param	string
-	* @param	bool
-	* @return	string
-	*/
-	function get($index = NULL, $xss_clean = FALSE){
-		
-		$get = parent::get($index, $xss_clean);
-		
-		if($get === FALSE && isset($_GET['query'])){
-			$get_temp = $_GET;
-			$_GET = json_decode($_GET['query'],JSON_OBJECT_AS_ARRAY);
-			$get = parent::get($index, $xss_clean);
-			$_GET = $get_temp;
-		}
-		
-		return $get;
-	}
-	
-	/**
-	 * 继承post方法，处理post数组
-	 * 现可如下访问：
-	 * $this->input->post('submit/newcase')
+	 * return the parsed request body, or a key value of it
 	 */
-	function post($index = NULL, $xss_clean = FALSE){
-
-		if(is_null($index)){
-			return parent::post($index, $xss_clean);
-		
-		}else{
-			
-			if(parent::post($index, $xss_clean)!==false){
-				return parent::post($index, $xss_clean);
-			}
-			
-			$index_array=explode('/',$index);
-			
-			$post=parent::post($index_array[0], $xss_clean);
-			
-			for($i=1;$i<count($index_array);$i++){
-				if(isset($post[$index_array[$i]])){
-					$post=$post[$index_array[$i]];
-				}else{
-					return false;
-				}
-				
-			}
-			
-			return $post;
-		}
-	}
-	
-	function put(){
-		
-		if($this->server('REQUEST_METHOD')!=='PUT'){
-			return false;
-		}
-		
+	function data($index = NULL){
 		$data=file_get_contents('php://input');
 		
 		$headers=$this->request_headers();
 
-		if(array_key_exists('Content-type', $headers)){
-			if(
-				strpos($headers['Content-type'],'application/x-www-form-urlencoded')===0
-				|| strpos($headers['Content-type'],'multipart/form-data')===0){
-				parse_str($data,$data);
-			}
+		//parse as form data
+		if(array_key_exists('Content-type', $headers) && (
+			strpos($headers['Content-type'],'application/x-www-form-urlencoded')===0
+			|| strpos($headers['Content-type'],'multipart/form-data')===0)
+		){
+			parse_str($data,$data);
+		}
+		
+		//parse as json
+		if($headers['Content-type']==='application/json' || json_decode($data)){
+			$data=json_decode($data,JSON_OBJECT_AS_ARRAY);
+		}
 
-			if($headers['Content-type']==='application/json'){
-				$data=json_decode($data,JSON_OBJECT_AS_ARRAY);
-			}
+		if(!is_null($index) && array_key_exists($index, $data)){
+			return $data[$index];
 		}
 
 		return $data;
-
 	}
 	
-	function delete(){
+	/**
+	 * parse query string and json in query string
+	 */
+	function get($index = NULL, $xss_clean = FALSE){
 		
-		if($this->server('REQUEST_METHOD')==='DELETE'){
-			return true;
+		$get_temp = $_GET;
+		unset($_GET['query']);
+		$get = parent::get($index, $xss_clean);
+		
+		if($get === FALSE && isset($get_temp['query'])){
+			$_GET = json_decode($get_temp['query'],JSON_OBJECT_AS_ARRAY);
+			$get = parent::get($index, $xss_clean);
 		}
 		
-		return false;
+		$_GET = $get_temp;
+		
+		if(is_null($index) && $get===false){
+			$get=array();
+		}
+		
+		return $get;
 	}
 	
 	function _clean_input_keys($str){   

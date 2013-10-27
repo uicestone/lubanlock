@@ -73,13 +73,13 @@
             <ul class="nav ace-nav pull-right">
 
             <?if($this->user->isLogged()){?>
-                <li class="green">
+                <li>
                     <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                         <i class="icon-envelope"></i>
                         <span class="badge badge-success"><?=$this->message->getNewMessages()?></span>
                     </a>
                 </li>
-                <li class="green">
+                <li>
                     <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                             
                         <a href="#profile"><?=$this->user->name?></a>

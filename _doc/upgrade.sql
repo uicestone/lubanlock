@@ -422,3 +422,10 @@ ADD FOREIGN KEY (  `id` ) REFERENCES  `sys`.`object` (
 ) ON DELETE NO ACTION ON UPDATE CASCADE ;
 
 drop table people;
+
+`object_relationship` DROP `till`;
+
+`object_relationship` DROP `accepted`;
+
+`object_relationship` DROP `is_on`;
+
