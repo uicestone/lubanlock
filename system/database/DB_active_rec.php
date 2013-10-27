@@ -30,6 +30,7 @@ class CI_DB_active_record extends CI_DB_driver {
 
 	var $ar_select				= array();
 	var $ar_distinct			= FALSE;
+	var $ar_found_rows			= FALSE;//uicestone 2013/10/27
 	var $ar_from				= array();
 	var $ar_join				= array();
 	var $ar_where				= array();
@@ -240,6 +241,23 @@ class CI_DB_active_record extends CI_DB_driver {
 	public function distinct($val = TRUE)
 	{
 		$this->ar_distinct = (is_bool($val)) ? $val : TRUE;
+		return $this;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * FOUND_ROWS
+	 *
+	 * Sets a flag which tells the query string compiler to add SQL_CALC_FOUND_ROWS
+	 * uicestone 2013/10/27
+	 * 
+	 * @param	bool
+	 * @return	object
+	 */
+	public function found_rows($val = TRUE)
+	{
+		$this->ar_found_rows = (is_bool($val)) ? $val : TRUE;
 		return $this;
 	}
 
@@ -1744,7 +1762,17 @@ class CI_DB_active_record extends CI_DB_driver {
 		}
 		else
 		{
-			$sql = ( ! $this->ar_distinct) ? 'SELECT ' : 'SELECT DISTINCT ';
+			//$sql = ( ! $this->ar_distinct) ? 'SELECT ' : 'SELECT DISTINCT ';
+			//uicestone 2013/10/27 添加FOUND_ROWS支持
+			$sql = 'SELECT ';
+			
+			if($this->ar_distinct){
+				$sql.='DISTINCT ';
+			}
+			
+			if($this->ar_found_rows){
+				$sql.='SQL_CALC_FOUND_ROWS ';
+			}
 
 			if (count($this->ar_select) == 0)
 			{

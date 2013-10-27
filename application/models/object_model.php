@@ -328,6 +328,8 @@ class Object_model extends CI_Model{
 	 */
 	function getList(array $args=array()){
 
+		$this->db->found_rows();
+		
 		if(!$this->db->ar_select){
 			$this->db->select('object.*');
 		}
@@ -561,7 +563,7 @@ class Object_model extends CI_Model{
 		else{
 			call_user_func(array($this->db,'limit'), $args['limit']);
 		}
-
+		
 		$result_array=$this->db->get()->result_array();
 		
 		foreach(array('meta','mod','relative','status','tag') as $field){
@@ -572,18 +574,19 @@ class Object_model extends CI_Model{
 			}
 		}
 
-		$result = Array();
-		$result["total"] = 1234;
-		$result["data"] = $result_array;
+		$result = array();
+		$result['total'] = $this->db->query('SELECT FOUND_ROWS() rows')->row()->rows;
+		$result['data'] = $result_array;
+		
 		return $result;
 	}
 	
 	
-	function getArray($args=array(),$keyname='name',$keyname_forkey='id'){
+	function getArray(array $args=array(),$keyname='name',$keyname_forkey='id'){
 		return array_column($this->getList($args),$keyname,$keyname_forkey);
 	}
 	
-	function getRow($args=array()){
+	function getRow(array $args=array()){
 		!array_key_exists('limit',$args) && $args['limit']=1;
 		$result=$this->getList($args);
 		if(isset($result[0])){
@@ -597,14 +600,14 @@ class Object_model extends CI_Model{
 	 * 返回一个对象的资料项列表
 	 * @return array
 	 */
-	function getMeta($id=NULL){
+	function getMeta(array $args = array()){
 		
 		$this->db->select('object_meta.*')
 			->from('object_meta')
 			->where("object_meta.object",$this->id);
 		
-		if(!is_null($id)){
-			$this->db->where('id',$id);
+		if(array_key_exists('id', $args)){
+			$this->db->where('object_meta.id',$args['id']);
 			return $this->db->get()->row_array();
 		}
 		
@@ -647,12 +650,12 @@ class Object_model extends CI_Model{
 	 * @param array $data
 	 * @return Object_model
 	 */
-	function updateMeta($data){
+	function updateMeta($data, array $args = array()){
 		
 		$this->db->update('object_meta',array_merge(
 			array('uid'=>$this->user->id,'time'=>time()),
 			array_intersect_key($data, self::$fields_meta)
-		),array('id'=>$data['id']));
+		),$args?$args:array('id'=>$data['id']));
 		
 		return $this;
 	}
@@ -676,8 +679,8 @@ class Object_model extends CI_Model{
 	 * @param int $meta_id
 	 * @return Object_model
 	 */
-	function removeMeta($meta){
-		$this->db->delete('object_meta',array('id'=>$meta['id']));
+	function removeMeta(array $args = array()){
+		$this->db->delete('object_meta',array('id'=>$args['id']));
 		return $this;
 	}
 	
@@ -687,13 +690,14 @@ class Object_model extends CI_Model{
 	function getRelatedMetaNames(){
 	}
 	
-	function getMod($id=NULL){
+	function getMod(array $args = array()){
+		
 		$this->db->select('user,mod')
 			->from('object_mod')
 			->where('object',$this->id);
 		
-		if(!is_null($id)){
-			$this->db->where('object_mod.id',$id);
+		if(array_key_exists('id', $args)){
+			$this->db->where('object_mod.id',$args['id']);
 		}
 		
 		$mods = $this->db->get()->result_array();
@@ -709,7 +713,7 @@ class Object_model extends CI_Model{
 			unset($mod['mod']);
 		}
 		
-		if(!is_null($id)){
+		if(array_key_exists('id', $args)){
 			return array_pop($mods);
 		}
 		
@@ -781,20 +785,20 @@ class Object_model extends CI_Model{
 		return $this;
 	}
 	
-	function getRelative($relation=NULL,array $mod_set=array(), $id=NULL){
+	function getRelative(array $args = array()){
 		
 		$this->db->select('object.*, object_relationship.*')
 			->from('object_relationship')
 			->join('object','object.id = object_relationship.relative','inner')
 			->where('object_relationship.object',$this->id);
 		
-		if(isset($relation)){
-			$this->db->where('object_relationship.relation',$relation);
+		if(array_key_exists('relation', $args)){
+			$this->db->where('object_relationship.relation',$args['relation']);
 		}
 		
-		if($mod_set){
+		if(array_key_exists('mod_set', $args)){
 			$positive=$negative=0;
-			foreach($mod_set as $relative_type => $mods){
+			foreach($args['mod_set'] as $relative_type => $mods){
 				
 				if(!array_key_exists($relative_type, $this->relative_mod_list)){
 					log_message('error','relation type not found: '.$relative_type);
@@ -818,8 +822,8 @@ class Object_model extends CI_Model{
 			
 		}
 		
-		if(!is_null($id)){
-			$this->db->where('object_relationship.id',$id);
+		if(array_key_exists('id', $args)){
+			$this->db->where('object_relationship.id',$args['id']);
 			return $this->db->get()->row_array();
 		}
 		
@@ -848,15 +852,12 @@ class Object_model extends CI_Model{
 		return $this;
 	}
 	
-	function updateRelative(array $data){
+	function updateRelative(array $data, array $args=array()){
 		
-		$this->db->where('object',$this->id)
-			->where('id',$data['id'])
-			->set(array_merge(
+		$this->db->update('object_relationship',array_merge(
 				array('uid'=>$this->user->id,'time'=>time()),
 				array_intersect_key($data, self::$fields_relationship)
-			))
-			->update('object_relationship');
+			),$args?$args:array('id'=>$data['id']));
 		
 		return $this;
 	}
@@ -870,17 +871,40 @@ class Object_model extends CI_Model{
 		return $this;
 	}
 	
-	function removeRelative($relative){
+	function removeRelative(array $args = array()){
 		
-		$this->db->where('id',$relative['id'])->delete('object_relationship');
+		$this->db->where('id',$args['id'])->delete('object_relationship');
 		return $this;
 	}
 	
-	/**
-	 * @todo
-	 */
-	function getRelativeMod(){
+	function getRelativeMod(array $args = array()){
 		
+		$this->db
+			->from('object_relationship')
+			->where('object',$this->id);
+		
+		if(array_key_exists('id', $args)){
+			$this->db->where('object_relationship.id',$args['id']);
+		}
+		
+		$mods = $this->db->get()->result_array();
+		
+		foreach($mods as &$mod){
+			foreach($this->relative_mod_list as $mod_name => $mod_value){
+				if(($mod['mod'] & $mod_value) === $mod_value){
+					$mod[$mod_name]=true;
+				}else{
+					$mod[$mod_name]=false;
+				}
+			}
+			unset($mod['mod']);
+		}
+		
+		if(array_key_exists('id', $args)){
+			return array_pop($mods);
+		}
+		
+		return $mods;
 	}
 	
 	/**
@@ -964,14 +988,15 @@ class Object_model extends CI_Model{
 	/**
 	 * 获得对象的当前状态或者状态列表
 	 */
-	function getStatus($id=NULL){
+	function getStatus(array $args = array()){
+		
 		$this->db->select('object_status.*')
 			->select('UNIX_TIMESTAMP(datetime) timestamp')
 			->select('DATE(datetime) date')
 			->from('object_status')
 			->where('object',$this->id);
 		
-		if(!is_null($id)){
+		if(array_key_exists('id', $args)){
 			$this->db->where('object_status.id',$id);
 			return $this->db->get()->row_array();
 		}
@@ -1013,19 +1038,19 @@ class Object_model extends CI_Model{
 		return $this;
 	}
 	
-	function updateStatus(array $data){
+	function updateStatus(array $data, array $args = array()){
 		
 		$this->db->update('object_meta',array_merge(
 			array('uid'=>$this->user->id,'time'=>time()),
 			array_intersect_key($data, self::$fields_status)
-		),array('id'=>$data['id']));
+		),$args?$args:array('id'=>$data['id']));
 		
 		return $this;
 	}
 	
-	function removeStatus($status){
+	function removeStatus(array $args = array()){
 		
-		$this->db->delete('object_status',array('id'=>$status['id']));
+		$this->db->delete('object_status',array('id'=>$args['id']));
 		
 		return $this;
 	}
@@ -1035,7 +1060,7 @@ class Object_model extends CI_Model{
 	 * @param string $type
 	 * @return array([type=>]name,...)
 	 */
-	function getTag($type=NULL, $id=NULL){
+	function getTag(array $args = array()){
 		
 		$this->db
 			->select('tag.name,object_tag.type')
@@ -1044,18 +1069,18 @@ class Object_model extends CI_Model{
 		
 		$this->db->where('object_tag.object', $this->id);
 		
-		if(!is_null($id)){
-			$this->db->where('object_tag.id',$id);
+		if(array_key_exists('id', $args)){
+			$this->db->where('object_tag.id', $args['id']);
 		}
 		
-		if($type===true){
+		if(array_key_exists('type', $args) && $args['type'] === true){
 			$this->db->where('object_tag.type IS NOT NULL');
 		}
-		elseif(isset($type)){
-			$this->db->where('object_tag.type',$type);
+		elseif(array_key_exists('type', $args)){
+			$this->db->where('object_tag.type',$args['type']);
 		}
 		
-		if(!is_null($id)){
+		if(array_key_exists('id', $args)){
 			return $this->db->get()->row_array();
 		}
 		
@@ -1099,24 +1124,18 @@ class Object_model extends CI_Model{
 	/**
 	 * 为一个对象添加一组标签
 	 * @param array $tags
-	 *	array(
-	 *		[type=>]name,
-	 *		...
-	 *	)
 	 */
 	function addTags(array $tags){
-		foreach($tags as $type => $name){
-			if(is_integer($type)){
-				$this->addTag($name);
-			}else{
-				$this->addTag($name, $type);
-			}
+		foreach($tags as $tag){
+			$this->addTag($tag);
 		}
 		
 		return $this;
 	}
 	
 	/**
+	 * @deprecated
+	 * 
 	 * 为一个对象更新一组带类型的标签
 	 * 不存在的标签将被添加
 	 * @param array $tags
@@ -1154,19 +1173,19 @@ class Object_model extends CI_Model{
 		
 	}
 	
-	function removeTag($data){
+	function removeTag(array $args = array()){
 		
-		$data['object']=$this->id;
+		$args['object']=$this->id;
 		
-		if(array_key_exists('id', $data)){
-			$data['tag']=$data['id'];
+		if(array_key_exists('id', $args)){
+			$args['tag']=$args['id'];
 		}
 		
-		if(array_key_exists('name', $data)){
-			$data['tag_name']=$data['name'];
+		if(array_key_exists('name', $args)){
+			$args['tag_name']=$args['name'];
 		}
 		
-		$this->db->delete('object_tag',array_intersect_key($data, self::$fields_tag));
+		$this->db->delete('object_tag',array_intersect_key($args, self::$fields_tag));
 		
 		return $this;
 	}

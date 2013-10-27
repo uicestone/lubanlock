@@ -6,10 +6,7 @@ class Test extends SS_Controller{
 	}
 	
 	function index(){
-		$this->output->enable_profiler(TRUE);
-		$this->load->model('object_model','object');
-		$this->object->id=1;
-		$this->object->addTag(array('name'=>'新标签'));
+		$row=$this->db->query("SELECT FOUND_ROWS() rows")->row();
 	}
 	
 	function object(){
@@ -84,9 +81,9 @@ class Test extends SS_Controller{
 		$this->unit->run(array_column($object->getMeta(),'content','comment'),array('单位电话'=>'51096488-128','单位地址'=>'上海市常德路1211号1204-1207','家庭地址'=>'韶山路348弄'),'资料项增删');
 		
 		$object->id=$project;
-		$object->addTag('房产','领域');
-		$object->addTags(array('初成案','阶段'=>'一审'));
-		$object->updateTags(array('阶段'=>'二审'));
+		$object->addTag(array('name'=>'房产','type'=>'领域'));
+		$object->addTags(array(array('tag_name'=>'初成案'),array('type'=>'阶段','name'=>'一审')));
+		$object->updateTags(array('type'=>'阶段','name'=>'二审'));
 		$this->unit->run($object->getTag(),array('领域'=>'房产','初成案','阶段'=>'二审'),'标签增删');
 
 		$relationship_client=$object->addRelative(array('relative'=>$client,'relation'=>'咨询人'));
