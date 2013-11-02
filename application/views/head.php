@@ -86,7 +86,9 @@
 
             }
             
-
+            .table{
+                table-layout: fixed;
+            }
             .table tr{
                -moz-user-select: none;
                -khtml-user-select: none;

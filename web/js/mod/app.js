@@ -8,7 +8,7 @@ app.config(['$stateProvider', function ($stateProvider) {
     }).state("list",{
       templateUrl:"listView.html",
       controller:"List",
-      url:"/list?name&type&tag&related&status&info&limit"
+      url:"/list?search&name&type&tag&related&status&info&limit"
     }).state("detail",{
       templateUrl:"detailView.html",
       controller:"Detail",
@@ -37,18 +37,22 @@ app.directive('sysGrid',function($timeout,$resource){
     },
     replace:false,
     link: function(scope, elem, attrs){
-      var parent_data = scope.$parent.data;
-      var mode = scope.$parent.mode;
-      var attr_name = attrs.gridAttr;
-      var data = parent_data[attr_name];
+      
       var render = scope.render;
 
+      var attr_name,Info;
 
       scope.title = attrs.gridTitle;
       scope.fields = attrs.gridFields.split(",");
-      scope.tdwidth = (100/(scope.fields.length-1)) + "%";
+      scope.titles = attrs.gridTitles.split(",");
 
-      var Info = $resource("/object/" + parent_data.id + "/" + attr_name);
+      var updateScopeValues = function(){
+        scope.data = scope.$parent.data[attr_name];
+        attr_name = attrs.gridAttr;
+        Info = $resource("/object/" + scope.$parent.data.id + "/" + attr_name);
+      }
+
+      updateScopeValues();
 
       var makeEmptyRow = function(){
         var obj = {};
@@ -61,8 +65,8 @@ app.directive('sysGrid',function($timeout,$resource){
       if(attrs.editable !== undefined){
         scope.editcell = function(e){
           var elem = angular.element(e.srcElement);
-          var scope = elem.scope();
-          scope.editing = true;
+          var elem_scope = elem.scope();
+          elem_scope.editing = true;
           $timeout(function(){
             var input = elem.parent().find('input')[0];
             input && input.focus();
@@ -72,37 +76,46 @@ app.directive('sysGrid',function($timeout,$resource){
         scope.editcell = function(){}
       }
 
-      scope.exitEdit = function(e,row){
+      scope.exitEdit = function(e,row,index){
+        updateScopeValues();
         var elem = angular.element(e.srcElement);
-        var scope = elem.scope();
-        scope.editing = false;
-        if(mode == "edit"){
-          Info.save({id:row.id},row);
+        var elem_scope = elem.scope();
+        var params = {};
+
+        elem_scope.editing = false;
+        if(scope.$parent.mode == "edit"){
+          if(scope.data[index].id){
+            params={id:scope.data[index].id};
+          }
+          scope.data[index] = Info.save(params,row,function(resource){
+            console.log(scope.data[index],resource);
+          });
         }
-        scope.onFinishEdit({name:attr_name,value:row,grid:data});
+        scope.onFinishEdit({name:attr_name,value:row,grid:scope.data});
       }
 
       scope.removerow = function(row){
-        if(mode == "edit"){
+        updateScopeValues();
+        if(scope.$parent.mode == "edit"){
           Info.remove({id:row.id},function(){
-            data.splice(data.indexOf(row),1);
+            scope.data.splice(scope.data.indexOf(row),1);
           });
         }else{
-          data.splice(data.indexOf(row),1);
+          scope.data.splice(scope.data.indexOf(row),1);
         }
       }
 
       scope.addrow = function(){
+        updateScopeValues();
         var newrow;
-        if(mode == "edit"){
-          newrow = Info.save(function(){
-            data.push(newrow);
-          });
-        }else{
-          data.push(makeEmptyRow());
-        }
+        // if(scope.$parent.mode == "edit"){
+        //   newrow = Info.save(function(){
+        //     data.push(newrow);
+        //   });
+        // }else{
+        scope.data.push(makeEmptyRow());
+        // }
       }
-      scope.data = data;
     },
     controller: function($scope, $element, $attrs, $transclude, Obj) {
       // $scope.data = Obj.get
@@ -302,7 +315,7 @@ app.controller('Search',function($scope,$state,SearchService){
     SearchService.currentTemplate = "default";
     var args = {};
     Object.keys($state.params).forEach(function(name){args[name] = ""});
-    args.name = $scope.key;
+    args.search = $scope.key;
     $state.go("list",args);
   }
 
@@ -469,13 +482,21 @@ app.controller('Detail',function($scope,$state,$stateParams,Obj){
   }
 
   $scope.editDone = function(name,value,grid){
+    var data = $scope.data;
+
+    if($scope.mode === "edit"){return;}
     if(typeof value == "string"){
-      $scope.data[name] = value;
+      data[name] = value;
     }else{
-      $scope.data[name] = grid;
+      data[name] = grid;
     }
-    Obj.save($scope.data);
-    console.log("done",$scope.data);
+
+    if($scope.fetching){return;}
+    $scope.fetching = true;
+    $scope.data = Obj.save(data,function(){
+      $scope.fetching = false;
+      $scope.mode = "edit";
+    });
   }
 
   $scope.template = ["template/detailView",$stateParams.tpl||"default","html"].join(".");

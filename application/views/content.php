@@ -43,14 +43,14 @@
                 <h3>名字：<span sys-editable field-name="name" on-finish-edit="editDone(name,value)"></span></h3>
                 <h3>类型：<span sys-editable field-name="type" on-finish-edit="editDone(name,value)"></span></h3>
                 
-                <div sys-grid editable grid-attr="meta"  grid-title="关联数据" grid-fields="name,content" 
+                <div sys-grid editable grid-attr="meta"  grid-title="关联数据" grid-fields="name,content" grid-titles="名称,内容"
                     on-finish-edit="editDone(name,value,grid)"></div>
 
-                <div sys-grid editable grid-attr="status" grid-title="状态" grid-fields="name,type,datetime,content,comment" 
+                <div sys-grid editable grid-attr="status" grid-title="状态" grid-fields="name,type,datetime,content,comment" grid-titles="名称,类型,日期,内容,备注"
                     on-finish-edit="editDone(name,value,grid)"
                     ng-controller="StatusCtrl"></div>
 
-                <div sys-grid editable grid-attr="relative" grid-title="关系" grid-fields="name,num,relatrion,relative,till,type"
+                <div sys-grid editable grid-attr="relative" grid-title="关系" grid-fields="name,num,relation,type" grid-titles="名称,编号,关系,类型"
                     on-finish-edit="editDone(name,value,grid)"></div>
         </script>
         <!-- Detail -->

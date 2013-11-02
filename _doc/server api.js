@@ -95,6 +95,65 @@ var api = [
 			"query":meta//with "id" or some attributes for resource locating
 		}
 	},
+	{
+		"name":"推荐的meta.name",
+		"request":{
+			"method":"GET",
+			"path":"meta/name",
+			"query":{
+				"object":0,
+				"type":""
+			}
+		},
+		"response":[
+			"电话","地址","邮件"
+		]
+	},
+	
+	/*
+	 * status
+	 */
+	{
+		"name":"为一个对象添加一个状态",
+		"request":{
+			"method":"PUT/POST",
+			"path":"/object/{id}/status",
+			"body":status//without "id" attribute
+		},
+		"response":{
+			"body":status
+		}
+	},
+	{
+		"name":"更新对象的一个状态",
+		"request":{
+			"method":"POST",
+			"path":"/object/{id}/status",
+			"body":status
+		}
+	},
+	{
+		"name":"删除一个对象的一个状态",
+		"request":{
+			"method":" DELETE",
+			"path":"/object/{id}/status",
+			"query":status//with "id" or some attributes for resource locating
+		}
+	},
+	{
+		"name":"推荐的status.name",
+		"request":{
+			"method":"GET",
+			"path":"status/name",
+			"query":{
+				"object":0,
+				"type":""
+			}
+		},
+		"response":[
+			"立案","签约","一审开庭"
+		]
+	},
 	
 	/*
 	 * relative
@@ -124,6 +183,22 @@ var api = [
 			"path":"/object/{id}/relative",
 			"query":relative//with "id" or some attributes for resource locating
 		}
+	},
+	{
+		"name":"推荐的relative.relation",
+		"request":{
+			"method":"GET",
+			"path":"relative/relation",
+			"query":{
+				"object":0,
+				"type":"",
+				"relative":0,
+				"relative_type":""
+			}
+		},
+		"response":[
+			"主办律师","协办律师","案源人"
+		]
 	},
 	
 	/*
@@ -181,6 +256,21 @@ var api = [
 			"query":tag//with "id" or some attributes for resource locating
 		}
 	},
+	{
+		"name":"推荐的tag.name",
+		"request":{
+			"method":"GET",
+			"path":"tag/name",
+			"query":{
+				"object":0,
+				"type":"",
+			}
+		},
+		"response":[
+			"潜在客户","成交客户"
+		]
+	},
+	
 	
 	/*
 	 * 其他api
@@ -337,6 +427,7 @@ var tag={
  * 对象列表搜索参数
  */
 var listArgs={
+	"search":"",
 	"id_in":[],
 	"id_less_than":0,
 	"id_greater_than":0,
