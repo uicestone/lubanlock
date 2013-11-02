@@ -305,12 +305,7 @@
 	// Mark a start point so we can benchmark the controller
 	$BM->mark('controller_execution_time_( '.$class.' / '.$method.' )_start');
 
-	//uicestone 2013/7/25 在整个控制器外加一层异常捕获
-	try{
-		$CI = new $class();
-	}catch(Exception $exception){
-		show_error($exception->getMessage());
-	}
+	$CI = new $class();
 
 /*
  * ------------------------------------------------------
@@ -365,7 +360,10 @@
 		try{
 			call_user_func_array(array(&$CI, $method), array_slice($URI->rsegments, 2));
 		}catch(Exception $exception){
-			show_error($exception->getMessage());
+			$OUT->set_status_header($exception->getCode(), lang($exception->getMessage()));
+			if(!$IN->is_ajax_request()){
+				show_error(lang($exception->getMessage()), NULL);
+			}
 		}
 	}
 

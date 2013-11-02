@@ -6,7 +6,7 @@ class Test extends SS_Controller{
 	}
 	
 	function index(){
-		$row=$this->db->query("SELECT FOUND_ROWS() rows")->row();
+		
 	}
 	
 	function object(){
