@@ -48,9 +48,6 @@ $route['signup']='user/signup';
 $route['browser']='index/browser';
 $route['reception']='index/reception';
 
-$route['object']='object/getlist';
-$route['object/(:num)']='object/fetch/$1';
-
 $route['object/(:num)/meta']='object/meta/$1';
 $route['object/(:num)/mod']='object/mod/$1';
 $route['object/(:num)/relative']='object/relative/$1';

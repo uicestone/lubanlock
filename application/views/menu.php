@@ -1,7 +1,7 @@
-<div class="navbar">
+<div class="navbar" ng-controller="RootCtrl">
     <div class="navbar-inner">
         <div class="container-fluid">
-            <a href="#" class="brand">
+            <a href="#" class="brand" ng-click="resetTemplate()">
                 <small>
                     <i class="icon-leaf"></i>
                     Ace Admin
@@ -10,13 +10,13 @@
             
             <div class="form-search input-append" id="global-search" ng-controller="Search">
                 <input type="text" class="span5 search-query" ng-enter="simpleSearch()" ng-model="key">
-                <div class="icon-angle-down bigger-110" ng-hide="advantage_search_open" ng-click="toggleAdvantageSearch()"></div>
+                <div class="icon-angle-down bigger-110" ng-hide="advanced_search_open" ng-click="toggleAdvancedSearch()"></div>
                 <button class="btn btn-purple btn-small" ng-click="simpleSearch()">
                     搜索
                     <i class="icon-search icon-on-right bigger-110" ></i>
                 </button>
     
-                <div id="advantage-search" ng-show="advantage_search_open" ng-cloak>
+                <div id="advanced-search" ng-show="advanced_search_open" ng-cloak>
 
                     <div class="row-fluid">
                         <label for="form-field-type">类型</label>
@@ -61,10 +61,10 @@
                     </div>
     
                     <div class="row-fluid btn-container">
-                        <button class="btn btn-info btn-small" ng-click="advantageSearch()">搜索<i class="icon-search icon-on-right bigger-110"></i></button>
+                        <button class="btn btn-info btn-small" ng-click="advancedSearch()">搜索<i class="icon-search icon-on-right bigger-110"></i></button>
                     </div>
 
-                    <i class="icon-remove" ng-click="toggleAdvantageSearch()"></i>
+                    <i class="icon-remove" ng-click="toggleAdvancedSearch()"></i>
 
                 </div>
             </div>

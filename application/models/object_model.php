@@ -44,7 +44,7 @@ class Object_model extends CI_Model{
 			'name'=>NULL,
 			'type'=>'',
 			'num'=>NULL,
-			'display'=>false,
+			'display'=>true,
 			'company'=>isset($CI->company)?$CI->company->id:NULL,
 			'uid'=>isset($CI->user)?$CI->user->id:NULL,
 			'time_insert'=>time(),
@@ -560,6 +560,10 @@ class Object_model extends CI_Model{
 			//sql limit方式
 			call_user_func_array(array($this->db,'limit'), $args['limit']);
 		}
+		elseif(count(preg_split('/,\s*/',$args['limit'])) === 2){
+			$args['limit'] = preg_split('/,\s*/',$args['limit']);
+			call_user_func_array(array($this->db,'limit'), $args['limit']);
+		}
 		else{
 			call_user_func(array($this->db,'limit'), $args['limit']);
 		}
@@ -1012,6 +1016,10 @@ class Object_model extends CI_Model{
 			if(array_key_exists($datetime_field, $data)){
 				$data['datetime']=$data[$datetime_field];
 			}
+		}
+		
+		if(array_key_exists('datetime',$data) && !$data['datetime']){
+			unset($data['datetime']);
 		}
 		
 		if(array_key_exists('datetime',$data) && is_integer($data['datetime'])){

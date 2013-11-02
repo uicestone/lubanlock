@@ -96,28 +96,6 @@ var api = [
 		}
 	},
 	
-//	/*
-//	 * mod
-//	 */
-//	{
-//		"name":"为一个对象(针对一个用户)添加一个权限/状态(设为肯定)",
-//		"request":{
-//			"method":"PUT/POST",
-//			"path":"/object/{id}/mod",
-//			"contentType":"application/json",
-//			"body":mod
-//		}
-//	},
-//	{
-//		"name":"删除一个对象(针对一个用户)的一个权限/状态(设为否定)",
-//		"request":{
-//			"method":" DELETE",
-//			"path":"/object/{id}/mod",
-//			"contentType":"application/json",
-//			"query":mod
-//		}
-//	},
-	
 	/*
 	 * relative
 	 */
@@ -148,31 +126,29 @@ var api = [
 		}
 	},
 	
-//	/*
-//	 * mod of relative
-//	 */
-//	{
-//		"name":"为一个对象和另一个对象的关系添加一个状态(设为肯定)",
-//		"request":{
-//			"method":"PUT",
-//			"path":"/object/{id}/relative/{relative.id}/mod",
-//			"body":{
-//				name:"",//开关量的名称
-//				uid:0//optional
-//			}
-//		}
-//	},
-//	{
-//		"name":"删除一个对象和另一个对象的关系的状态(设为否定)",
-//		"request":{
-//			"method":" DELETE",
-//			"path":"/object/{id}/relative/{relative.id}/mod",
-//			"query":{
-//				name:"",//开关量的名称
-//				uid:0//optional
-//			}
-//		}
-//	},
+	/*
+	 * mod of relative
+	 */
+	{
+		"name":"为一个对象和另一个对象的关系添加一个状态(设为肯定)",
+		"request":{
+			"method":"PUT/POST",
+			"path":"/object/{id}/relative/{relative.id}/mod",
+			"body":{
+				name:"",//开关量的名称
+			}
+		}
+	},
+	{
+		"name":"删除一个对象和另一个对象的关系的状态(设为否定)",
+		"request":{
+			"method":" DELETE",
+			"path":"/object/{id}/relative/{relative.id}/mod",
+			"query":{
+				name:"",//开关量的名称
+			}
+		}
+	},
 	
 	/*
 	 * tag
@@ -317,13 +293,7 @@ var meta={
  * 对象有开关量，对象与对象的关联也有开关量
  * 如一个对象的读, 写权限, 又如一个日程对于某用户的“删除”状态
  */
-var mod={
-	"id":0,
-	"user":0,//不为null的时候表示此(组)开关量针对于此用户
-	"username":"",
-	"read":true,//一组可变权限/状态名，可以逐个添加，但抓取时是按用户分组合并的
-	"write":true
-};
+var mod=["read","write"];
 
 /**
  * 关连对象
@@ -333,7 +303,7 @@ var relative={
 	"id":0,//关系id
 	"num":"",//关系编号，比如一个学生在一个班级中的学号
 	"relation":"",
-	"mod":[mod/*without "user" and "username" attribute*/],//一组可变权限/状态名
+	"mod":mod,//一组可变权限/状态名
 	"weight":0.00,//比重，同relation的比重之和不应超过1
 	"relative":0,//关联对象id
 	"type":"",//关连对象类型

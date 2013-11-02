@@ -40,12 +40,18 @@
             <div ng-include="template"></div>
         </script>
         <script type="text/ng-template" id="template/detailView.default.html">
-                <button class="btn btn-primary save-object" ng-show="mode=='add'">保存</button>
-                <h3>名字：{{data.name}}</h3>
-                <h3>类型：{{data.type}}</h3>
-                <div sys-grid editable grid-attr="meta"  grid-title="关联数据" grid-fields="name,content"></div>
-                <div sys-grid editable grid-attr="status" grid-title="状态" grid-fields="name,type,color" ng-controller="StatusCtrl"></div>
-                <div sys-grid editable grid-attr="relative" grid-title="关系" grid-fields="name,num,relatrion,relative,till,type"></div>
+                <h3>名字：<span sys-editable field-name="name" on-finish-edit="editDone(name,value)"></span></h3>
+                <h3>类型：<span sys-editable field-name="type" on-finish-edit="editDone(name,value)"></span></h3>
+                
+                <div sys-grid editable grid-attr="meta"  grid-title="关联数据" grid-fields="name,content" 
+                    on-finish-edit="editDone(name,value,grid)"></div>
+
+                <div sys-grid editable grid-attr="status" grid-title="状态" grid-fields="name,type,datetime,content,comment" 
+                    on-finish-edit="editDone(name,value,grid)"
+                    ng-controller="StatusCtrl"></div>
+
+                <div sys-grid editable grid-attr="relative" grid-title="关系" grid-fields="name,num,relatrion,relative,till,type"
+                    on-finish-edit="editDone(name,value,grid)"></div>
         </script>
         <!-- Detail -->
     </div><!--/.page-content-->

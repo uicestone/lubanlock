@@ -32,31 +32,34 @@ app.directive('sysGrid',function($timeout,$resource){
   return {
     templateUrl: 'template/sysGrid/table.html',
     restrict: 'A',
-    scope:true,
+    scope:{
+      onFinishEdit:"&"
+    },
     replace:false,
-    link: function($scope, $elem, $attrs){
-      var parent_data = $scope.$parent.data;
-      var mode = $scope.$parent.mode;
-      var data = parent_data[$attrs.gridAttr];
-      var render = $scope.render;
+    link: function(scope, elem, attrs){
+      var parent_data = scope.$parent.data;
+      var mode = scope.$parent.mode;
+      var attr_name = attrs.gridAttr;
+      var data = parent_data[attr_name];
+      var render = scope.render;
 
 
-      $scope.title = $attrs.gridTitle;
-      $scope.fields = $attrs.gridFields.split(",");
-      $scope.tdwidth = (100/($scope.fields.length-1)) + "%";
+      scope.title = attrs.gridTitle;
+      scope.fields = attrs.gridFields.split(",");
+      scope.tdwidth = (100/(scope.fields.length-1)) + "%";
 
-      var Info = $resource("/object/" + parent_data.id + "/" + $attrs.gridAttr);
+      var Info = $resource("/object/" + parent_data.id + "/" + attr_name);
 
       var makeEmptyRow = function(){
         var obj = {};
-        $scope.fields.forEach(function(key){
+        scope.fields.forEach(function(key){
           obj[key] = "";
         });
         return obj;
       };
 
-      if($attrs.editable !== undefined){
-        $scope.editcell = function(e){
+      if(attrs.editable !== undefined){
+        scope.editcell = function(e){
           var elem = angular.element(e.srcElement);
           var scope = elem.scope();
           scope.editing = true;
@@ -66,19 +69,20 @@ app.directive('sysGrid',function($timeout,$resource){
           },100);
         }
       }else{
-        $scope.editcell = function(){}
+        scope.editcell = function(){}
       }
 
-      $scope.exitedit = function(e,row){
+      scope.exitEdit = function(e,row){
         var elem = angular.element(e.srcElement);
         var scope = elem.scope();
         scope.editing = false;
         if(mode == "edit"){
           Info.save({id:row.id},row);
         }
+        scope.onFinishEdit({name:attr_name,value:row,grid:data});
       }
 
-      $scope.removerow = function(row){
+      scope.removerow = function(row){
         if(mode == "edit"){
           Info.remove({id:row.id},function(){
             data.splice(data.indexOf(row),1);
@@ -88,7 +92,7 @@ app.directive('sysGrid',function($timeout,$resource){
         }
       }
 
-      $scope.addrow = function(){
+      scope.addrow = function(){
         var newrow;
         if(mode == "edit"){
           newrow = Info.save(function(){
@@ -98,7 +102,7 @@ app.directive('sysGrid',function($timeout,$resource){
           data.push(makeEmptyRow());
         }
       }
-      $scope.data = data;
+      scope.data = data;
     },
     controller: function($scope, $element, $attrs, $transclude, Obj) {
       // $scope.data = Obj.get
@@ -106,6 +110,38 @@ app.directive('sysGrid',function($timeout,$resource){
   }
 });
 
+
+app.directive('sysEditable',function($timeout){
+  return {
+    templateUrl: 'template/sysEditable/field.html',
+    restrict: 'A',
+    replace:false,
+    scope:{
+      fieldName:"@",
+      onFinishEdit:"&"
+    },
+    link: function(scope, elem, attrs){
+      var input = elem.parent().find("input");
+      var viewRootScope = scope.$parent.$parent;
+      scope.fieldValue = viewRootScope.data[scope.fieldName];
+      scope.editing = !scope.fieldValue;
+
+      scope.edit = function(){
+        scope.editing = true;
+        $timeout(function(){
+          input[0].focus();
+        },0);
+      };
+
+      scope.exitEdit = function(){
+        if(scope.fieldValue){
+          scope.editing = false;
+          scope.onFinishEdit({name:scope.fieldName,value:scope.fieldValue});
+        }
+      };
+    }
+  }
+});
 
 /**
  * 支持键盘触发
@@ -226,6 +262,12 @@ app.factory("SearchService",["Obj","$rootScope","$state","$location","$statePara
   };
 }]);
 
+app.controller('RootCtrl',function($scope,SearchService){
+  $scope.resetTemplate = function(){
+    SearchService.currentTemplate = "default";
+  }
+});
+
 /**
  * 侧边栏
  * @param  {[type]} $scope        [description]
@@ -247,11 +289,11 @@ app.controller('Sidebar',function($scope,$state,NavData,SearchService){
 
 app.controller('Search',function($scope,$state,SearchService){
   $scope.searchService = SearchService;
-  $scope.advantage_search_open = false;
+  $scope.advanced_search_open = false;
   $scope.key = "";
 
-  $scope.toggleAdvantageSearch = function(){
-    $scope.advantage_search_open = !$scope.advantage_search_open;
+  $scope.toggleAdvancedSearch = function(){
+    $scope.advanced_search_open = !$scope.advanced_search_open;
     // $scope.$apply();
   };
 
@@ -264,10 +306,10 @@ app.controller('Search',function($scope,$state,SearchService){
     $state.go("list",args);
   }
 
-  $scope.advantageSearch = function(){
+  $scope.advancedSearch = function(){
     SearchService.from_side_bar = false;
-    $scope.advantage_search_open = false;
-    $state.go("list");
+    $scope.advanced_search_open = false;
+    $state.go("list",SearchService.search_param);
   };
 
 });
@@ -374,15 +416,7 @@ app.controller('List', function($scope,$state,$modal,$log,$location,$stateParams
 });
 
 app.controller('Detail',function($scope,$state,$stateParams,Obj){
-  // $scope.data = Obj.get({
-  //   id:$stateParams.id
-  // });
 
-  // ["meta","tag","relative"].forEach(function(key){
-  //   if(!$scope.data[key]){
-  //     $scope.data[key] = [];
-  //   }
-  // });
   var mode = $state.current.name;
   $scope.mode = mode == "add" ? "add" : "edit";
 
@@ -432,6 +466,16 @@ app.controller('Detail',function($scope,$state,$stateParams,Obj){
         "type":""//关连对象类型
       }]
     }
+  }
+
+  $scope.editDone = function(name,value,grid){
+    if(typeof value == "string"){
+      $scope.data[name] = value;
+    }else{
+      $scope.data[name] = grid;
+    }
+    Obj.save($scope.data);
+    console.log("done",$scope.data);
   }
 
   $scope.template = ["template/detailView",$stateParams.tpl||"default","html"].join(".");

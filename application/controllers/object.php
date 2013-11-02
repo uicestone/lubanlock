@@ -7,11 +7,16 @@ class Object extends SS_Controller{
 		$this->output->set_content_type('application/json');
 	}
 	
-	function single($id=NULL){
+	function index($id=NULL){
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->fetch($id);
+				if(is_null($id)){
+					$this->getList();
+				}
+				else{
+					$this->fetch($id);
+				}
 				break;
 			
 			case 'POST' && is_null($id):
@@ -42,7 +47,6 @@ class Object extends SS_Controller{
 	}
 	
 	function add(){
-		
 		$data = $this->input->data();
 		
 		$this->object->id = $this->object->add($data);

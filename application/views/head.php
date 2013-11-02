@@ -37,7 +37,7 @@
                 width: 469px;
             }
 
-            #advantage-search{
+            #advanced-search{
                 background-color: #fff;
                 padding: 17px;
                 position: absolute;
@@ -48,11 +48,11 @@
                 top: 29px;
                 box-shadow:0 2px 3px #ccc;
             }
-            #advantage-search .input-xlarge{
+            #advanced-search .input-xlarge{
                 width:435px;
                 margin-bottom:10px;
             }
-            #advantage-search .icon-remove{
+            #advanced-search .icon-remove{
                 cursor: pointer;
                 font-size: 14px;
                 color: #999;
@@ -60,10 +60,10 @@
                 top: 8px;
                 right: 8px;
             }
-            #advantage-search .btn-container{
+            #advanced-search .btn-container{
                 text-align: right;
             }
-            #advantage-search .btn-info{
+            #advanced-search .btn-info{
                 border-radius: 0;
             }
         
@@ -128,6 +128,11 @@
                 margin:0;
                 border:0;
                 padding:0;
+            }
+
+            .save-object{
+                position: absolute;
+                right:20px;
             }
     </style>
 </head>
