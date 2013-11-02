@@ -29,8 +29,13 @@ class SS_input extends CI_Input{
 			$data=json_decode($data,JSON_OBJECT_AS_ARRAY);
 		}
 
-		if(!is_null($index) && array_key_exists($index, $data)){
-			return $data[$index];
+		if(!is_null($index)){
+			
+			if(array_key_exists($index, $data)){
+				return $data[$index];
+			}
+			
+			return false;
 		}
 
 		return $data;
