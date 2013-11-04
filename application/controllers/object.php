@@ -87,27 +87,6 @@ class Object extends SS_Controller{
 		}
 	}
 	
-	function mod($object_id){
-		
-		$this->object->id=$object_id;
-		
-		switch ($this->input->method) {
-			case 'GET':
-				$this->output->set_output(json_encode($this->object->getMod()));
-				break;
-			
-			case 'PUT':
-			case 'POST' && $this->input->data('id') === false:
-				$mod_id=$this->object->addMod($this->input->data('mod'),$this->input->data('user'));
-				$this->output->set_output(json_encode($this->object->getMod(array('id'=>$mod_id))));
-				break;
-			
-			case 'DELETE':
-				$this->object->removeMod($this->input->data('mod'),$this->input->data('user'));
-				break;
-		}
-	}
-	
 	function relative($object_id){
 		
 		$this->object->id=$object_id;
@@ -134,18 +113,18 @@ class Object extends SS_Controller{
 		}
 	}
 	
-	function relativeMod($object_id, $relative_id){
+	function relativeMod($object_id){
 		
 		$this->object->id=$object_id;
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output(json_encode($this->object->getRelativeMod()));
+				$this->output->set_output(json_encode($this->object->getRelativeMod($this->input->get())));
 				break;
 			
 			case 'PUT':
-			case 'POST' && $this->input->data('id') === false:
-				$mod_id=$this->object->addRelativeMod($this->input->data());
+			case 'POST':
+				$mod_id=$this->object->addRelativeMod($this->input->data('name'), $this->input->get());
 				$this->output->set_output(json_encode($this->object->getRelativeMod(array('id'=>$mod_id))));
 				break;
 			
@@ -191,7 +170,7 @@ class Object extends SS_Controller{
 				break;
 			
 			case 'PUT':
-			case 'POST' && $this->input->data('id') === false:
+			case 'POST':
 				$tag_id=$this->object->addTag($this->input->data());
 				$this->output->set_output(json_encode($this->object->getTag(array('id'=>$tag_id))));
 				break;

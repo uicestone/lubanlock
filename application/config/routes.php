@@ -49,9 +49,8 @@ $route['browser']='index/browser';
 $route['reception']='index/reception';
 
 $route['object/(:num)/meta']='object/meta/$1';
-$route['object/(:num)/mod']='object/mod/$1';
 $route['object/(:num)/relative']='object/relative/$1';
-$route['object/(:num)/relative/(:num)/mod']='object/relative/mod/$1/$2';
+$route['object/(:num)/relativemod']='object/relativemod/$1';
 $route['object/(:num)/status']='object/status/$1';
 $route['object/(:num)/tag']='object/tag/$1';
 

@@ -13,14 +13,11 @@ class Object_model extends CI_Model{
 	var $data;//具体对象数据
 	var $meta;//具体对象的元数据
 	var $mod=false;
-	var $mod_list=array(//开关参数意义
-		'read'=>1,
-		'write'=>2,
-		'distribute'=>4
-	);
 	var $relative;
 	var $relative_mod_list=array(//相关对象开关参数意义
-		'active'=>1
+		1=>'read',
+		2=>'write',
+		4=>'distribute'
 	);
 	var $status;
 	var $tags;//具体对象的标签
@@ -29,7 +26,6 @@ class Object_model extends CI_Model{
 	
 	static $fields;//存放对象的表结构
 	static $fields_meta;
-	static $fields_mod;
 	static $fields_relationship;
 	static $fields_status;
 	static $fields_tag;
@@ -56,14 +52,6 @@ class Object_model extends CI_Model{
 			'name'=>'',
 			'content'=>NULL,
 			'comment'=>NULL,
-			'uid'=>isset($CI->user)?$CI->user->id:NULL,
-			'time'=>time()
-		);
-		
-		self::$fields_mod=array(
-			'object'=>NULL,
-			'user'=>NULL,
-			'mod'=>0,
 			'uid'=>isset($CI->user)?$CI->user->id:NULL,
 			'time'=>time()
 		);
@@ -128,22 +116,16 @@ class Object_model extends CI_Model{
 
 		//验证读权限
 		if($this->mod && !$this->user->isLogged($this->table.'admin')){
-			$this->db->where("object.id IN (
-				SELECT object FROM object_mod
-				WHERE 
-					( object_mod.people IS NULL OR object_mod.people{$this->db->escape_int_array($this->user->groups)} )
-					AND ( (object_mod.mod & 1) = 1 )
-				)
-			");
+			//TODO
 		}
 
 		$object=$this->db->get()->row_array();
 		
 		if(!$object){
-			throw new Exception(lang($this->table).' '.$this->id.' '.lang('not_found'));
+			throw new Exception(lang($this->table).' '.$this->id.' '.lang('not_found'), 404);
 		}
 		
-		foreach(array('meta','mod','relative','status','tag') as $field){
+		foreach(array('meta','relative','status','tag') as $field){
 			if(!array_key_exists('get_'.$field,$args) || $args['get_'.$field]){
 				$object[$field]=call_user_func(array($this,'get'.$field));
 			}
@@ -163,14 +145,15 @@ class Object_model extends CI_Model{
 		);
 		
 		$this->db->insert('object',array_merge(self::$fields,array_intersect_key($data,self::$fields)));
-		$insert_id=$this->db->insert_id();
 		
-		if($this->mod){
-			$this->addMod(7, $this->user->id, $insert_id);
-		}
+		$this->id=$this->db->insert_id();
 		
-		$this->id=$insert_id;
-		
+		$this->addRelative(array(
+			'relative'=>$this->user->id,
+			'relation'=>lang('author'),
+			'mod'=>7
+		));
+
 		if(isset($data['meta'])){
 			$this->addMetas($data['meta']);
 		}
@@ -535,6 +518,10 @@ class Object_model extends CI_Model{
 			}
 		}
 		
+		if(!array_key_exists('order_by', $args)){
+			$args['order_by'] = 'object.id desc';
+		}
+		
 		if(array_key_exists('order_by',$args) && $args['order_by']){
 			if(is_array($args['order_by'])){
 				foreach($args['order_by'] as $orderby){
@@ -689,87 +676,6 @@ class Object_model extends CI_Model{
 	}
 	
 	/**
-	 * @todo 返回当前对象同type，同标签对象的meta name
-	 */
-	function getRelatedMetaNames(){
-	}
-	
-	function getMod(array $args = array()){
-		
-		$this->db->select('user,mod')
-			->from('object_mod')
-			->where('object',$this->id);
-		
-		if(array_key_exists('id', $args)){
-			$this->db->where('object_mod.id',$args['id']);
-		}
-		
-		$mods = $this->db->get()->result_array();
-		
-		foreach($mods as &$mod){
-			foreach($this->mod_list as $mod_name => $mod_value){
-				if(($mod['mod'] & $mod_value) === $mod_value){
-					$mod[$mod_name]=true;
-				}else{
-					$mod[$mod_name]=false;
-				}
-			}
-			unset($mod['mod']);
-		}
-		
-		if(array_key_exists('id', $args)){
-			return array_pop($mods);
-		}
-		
-		return $mods;
-	}
-	
-	/**
-	 * 给当前对象增加一个权限(开关参数)
-	 * @param string $mod
-	 * @param int $user
-	 * @return Object_model
-	 */
-	function addMod($mod,$user){
-		
-		$mod=$this->mod_list[$mod];
-		
-		$query=$this->db->insert_string('object_mod',array(
-			'object'=>$this->id,
-			'user'=>$user,
-			'mod'=>$mod,
-			'uid'=>$this->user->id,
-			'time'=>time()
-		));
-		
-		$query.=' ON DUPLICATE KEY UPDATE `mod` = (`mod` | '.intval($mod).')';
-		
-		$this->db->query($query);
-		
-		return $this->db->insert_id();
-		
-	}
-	
-	/**
-	 * 给当前对象取消一个权限(开关参数)
-	 * @param string $mod
-	 * @param int $user
-	 * @return \Object_model
-	 */
-	function removeMod($mod,$user){
-		
-		$mod=$this->mod_list[$mod];
-		
-		$this->db
-			->where('object',$this->id)
-			->where('user',$user)
-			->set('mod','`mod` & ~'.intval($mod),false)
-			->update('object_mod');
-		
-		return $this;
-	}
-	
-	/**
 	 * add a group of mods to an object
 	 * @param type $mods_array
 	 */
@@ -800,7 +706,7 @@ class Object_model extends CI_Model{
 			$this->db->where('object_relationship.relation',$args['relation']);
 		}
 		
-		if(array_key_exists('mod_set', $args)){
+		if(array_key_exists('mods', $args)){
 			$positive=$negative=0;
 			foreach($args['mod_set'] as $relative_type => $mods){
 				
@@ -883,7 +789,7 @@ class Object_model extends CI_Model{
 	
 	function getRelativeMod(array $args = array()){
 		
-		$this->db
+		$this->db->select_sum('mod')
 			->from('object_relationship')
 			->where('object',$this->id);
 		
@@ -891,24 +797,21 @@ class Object_model extends CI_Model{
 			$this->db->where('object_relationship.id',$args['id']);
 		}
 		
-		$mods = $this->db->get()->result_array();
+		if(array_key_exists('relative', $args)){
+			$this->db->where('object_relationship.id',$args['relative']);
+		}
 		
-		foreach($mods as &$mod){
-			foreach($this->relative_mod_list as $mod_name => $mod_value){
-				if(($mod['mod'] & $mod_value) === $mod_value){
-					$mod[$mod_name]=true;
-				}else{
-					$mod[$mod_name]=false;
-				}
+		$mod = $this->db->get()->row()->mod;
+		
+		$mod_names = array();
+		
+		foreach($this->relative_mod_list as $mod_value => $mod_name){
+			if($mod & $mod_value === $mod_value){
+				$mod_names[]=$mod_name;
 			}
-			unset($mod['mod']);
 		}
 		
-		if(array_key_exists('id', $args)){
-			return array_pop($mods);
-		}
-		
-		return $mods;
+		return $mod_names;
 	}
 	
 	/**
@@ -918,18 +821,38 @@ class Object_model extends CI_Model{
 	 * @param string $relative_type
 	 * @return boolean | Object_model
 	 */
-	function addRelativeMod($relationship_id, $mod_name, $relative_type='_self'){
+	function addRelativeMod($name, array $args){
 		
-		if(!array_key_exists($relative_type, $this->relative_mod_list) || !array_key_exists($mod_name, $this->relative_mod_list[$relative_type])){
-			log_message('error','relation type/mod name not found: '.$relative_type.' '.$mod_name);
-			return false;
+		foreach($this->relative_mod_list as $mod_value => $mod_name){
+			if($name === $mod_name){
+				$mod = $mod_value;
+				break;
+			}
 		}
 		
-		$this->db->where('id',$relationship_id)
-			->set('mod',"`mod` | {$this->relative_mod_list[$relative_type][$mod_name]}",false)
-			->update('object_relationship');
+		if(empty($mod)){
+			throw new Exception('mod_name_not_found', 404);
+		}
 		
-		return $this;
+		//已知关系id，那么更新之
+		if(array_key_exists('id', $args)){
+			$this->db->where('id',$args['id'])
+				->set('mod',"`mod` | $mod",false)
+				->update('object_relationship');
+			
+			return;
+		}
+		
+		//已知关联对象id，新增一条新关系
+		if(array_key_exists('relative', $args)){
+			$this->db->insert('object_relationship',array_merge(
+				self::$fields_relationship,
+				array('object'=>$this->id, 'relative'=>$args['relative'], 'mod'=>$mod)
+			));
+
+			return $this->db->insert_id();
+		}
+		
 	}
 	
 	/**

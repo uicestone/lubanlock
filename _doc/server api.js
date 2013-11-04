@@ -11,7 +11,6 @@ var api = [
 			/*query指url中的query string，也可以用?query={json}来传递*/
 			"query":{
 				"get_meta":true,
-				"get_mod":true,
 				"get_relative":true,
 				"get_status":true,
 				"get_tag":true
@@ -200,15 +199,15 @@ var api = [
 			"主办律师","协办律师","案源人"
 		]
 	},
-	
-	/*
-	 * mod of relative
-	 */
 	{
 		"name":"为一个对象和另一个对象的关系添加一个状态(设为肯定)",
 		"request":{
 			"method":"PUT/POST",
-			"path":"/object/{id}/relative/{relative.id}/mod",
+			"path":"/object/{id}/relativemod",
+			"query":{
+				"id":0,//关系的id
+				"relative":0//关联对象的id
+			},
 			"body":{
 				name:"",//开关量的名称
 			}
@@ -218,8 +217,10 @@ var api = [
 		"name":"删除一个对象和另一个对象的关系的状态(设为否定)",
 		"request":{
 			"method":" DELETE",
-			"path":"/object/{id}/relative/{relative.id}/mod",
+			"path":"/object/{id}/relativemod",
 			"query":{
+				"id":0,//关系的id
+				"relative":0,//关联对象的id
 				name:"",//开关量的名称
 			}
 		}
@@ -350,9 +351,6 @@ var objectData={
 	"{additional_fields}":"",//非必有，根据不同type的对象，可能有些额外的根字段（考虑一律去处这些字段）
 	"meta":[//非必有，获得对象时get_meta参数决定
 		meta
-	],
-	"mod":[
-		mod//非必有，获得对象时get_mod参数决定
 	],
 	"relative":[//非必有，获得对象时get_relative参数决定
 		relative

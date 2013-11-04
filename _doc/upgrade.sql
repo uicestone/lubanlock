@@ -417,15 +417,14 @@ ALTER TABLE `company`
   DROP `ucenter`;
 
 ALTER TABLE  `user` DROP FOREIGN KEY  `user_ibfk_1` ,
-ADD FOREIGN KEY (  `id` ) REFERENCES  `sys`.`object` (
+ADD FOREIGN KEY (  `id` ) REFERENCES  `object` (
 `id`
 ) ON DELETE NO ACTION ON UPDATE CASCADE ;
 
-drop table people;
+ALTER TABLE `object_relationship` DROP `till`;
 
-`object_relationship` DROP `till`;
+ALTER TABLE `object_relationship` DROP `accepted`;
 
-`object_relationship` DROP `accepted`;
+ALTER TABLE `object_relationship` DROP `is_on`;
 
-`object_relationship` DROP `is_on`;
-
+DROP TABLE object_mod;
