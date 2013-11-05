@@ -411,8 +411,6 @@ SELECT team,'教室',name,capacity FROM `school_room` WHERE 1;
 
 DROP TABLE school_room;
 
--- structure exported
-
 ALTER TABLE `company`
   DROP `ucenter`;
 
@@ -428,3 +426,28 @@ ALTER TABLE `object_relationship` DROP `accepted`;
 ALTER TABLE `object_relationship` DROP `is_on`;
 
 DROP TABLE object_mod;
+
+ALTER TABLE `nav` DROP `add_href`;
+
+ALTER TABLE  `nav` DROP FOREIGN KEY  `nav_ibfk_4` ;
+
+ALTER TABLE  `nav` DROP FOREIGN KEY  `nav_ibfk_2` ;
+
+ALTER TABLE `nav`
+  DROP `company`,
+  DROP `company_type`;
+
+ALTER TABLE  `nav` CHANGE  `team`  `user` INT( 11 ) NOT NULL COMMENT  'name相同的条目，逐级覆盖';
+ALTER TABLE  `nav` CHANGE  `name`  `name` VARCHAR( 16 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;
+
+ALTER TABLE `nav` MODIFY `user` INT( 11 ) AFTER `id`;
+
+ALTER TABLE  `lubanlock`.`nav` DROP INDEX  `team` ,
+ADD INDEX  `user` (  `user` ) COMMENT  '';
+ALTER TABLE  `nav` ADD INDEX (  `name` ) ;
+
+ALTER TABLE  `nav` ADD UNIQUE (
+`user` ,
+`name`
+);
+-- structure exported
