@@ -54,6 +54,7 @@
 * @property Express_model $express
 * @property Group_model $group
 * @property Instrument_model $instrument
+* @property Nav_model $nav
 * @property Tag_model $tag
 * @property Message_model $message
 * @property Minify $minify
