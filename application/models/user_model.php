@@ -22,7 +22,7 @@ class User_model extends People_model{
 	function initialize($id=NULL){
 		isset($id) && $this->id=$id;
 		
-		if(is_null($this->id)){
+		if(is_null($this->id) && $this->session->userdata('user_id')){
 			$this->id=$this->session->userdata('user_id');
 		}
 		
