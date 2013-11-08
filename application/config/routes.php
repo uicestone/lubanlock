@@ -48,6 +48,7 @@ $route['signup']='user/signup';
 $route['browser']='index/browser';
 $route['reception']='index/reception';
 
+$route['object/(:num)']='object/index/$1';
 $route['object/(:num)/meta']='object/meta/$1';
 $route['object/(:num)/relative']='object/relative/$1';
 $route['object/(:num)/relativemod']='object/relativemod/$1';
