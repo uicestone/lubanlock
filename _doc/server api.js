@@ -312,16 +312,14 @@ var api = [
 			},
 			"body":[
 				{
-					"id":"1",
-					"name":"客户",
-					"href":'/object?query=%7Btype:%22%E5%AE%A2%E6%88%B7%22%7D',
-					"sub":[
-						{
-							"id":"2",
-							"name":"潜在客户",
-							"href":"/object?query=%7Btype:%22%E5%AE%A2%E6%88%B7%22,tag:%5B%22%E6%BD%9C%E5%9C%A8%E5%AE%A2%E6%88%B7%22%5D%7D",
-						}
-					]
+					"id":1,
+					"name":"潜在客户",//菜单的显示名称
+					"params":{//由前端自行决定，json存数据库
+						"controller":"List",
+						"type":"客户",
+						"tag":["潜在客户"]
+					},
+					"parent":0
 				}
 			]
 		}
@@ -329,12 +327,49 @@ var api = [
 	{
 		"name":"菜单存储",
 		"request":{
-			"method":"PUT",
+			"method":"PUT/POST",
+			"path":"/nav",
+			"body":[
+				{
+					"name":"潜在客户",//菜单的显示名称
+					"params":{//由前端自行决定，json存数据库
+						"controller":"List",
+						"type":"客户",
+						"tag":["潜在客户"]
+					},
+					"parent":0
+				}
+			]
+		}
+	},
+	{
+		"name":"菜单更新",
+		"request":{
+			"method":"POST",
 			"path":"/nav",
 			"query":{
-				"name":"潜在客户",//菜单的显示名称
-				"path":"/object?query=%7Btype:%22%E5%AE%A2%E6%88%B7%22,tag:%5B%22%E6%BD%9C%E5%9C%A8%E5%AE%A2%E6%88%B7%22%5D%7D",
-				"parent":"1"
+				"id":1
+			},
+			"body":[
+				{
+					"name":"潜在客户",//菜单的显示名称
+					"params":{//由前端自行决定，json存数据库
+						"controller":"List",
+						"type":"客户",
+						"tag":["潜在客户"]
+					},
+					"parent":0
+				}
+			]
+		}
+	},
+	{
+		"name":"菜单删除",
+		"request":{
+			"method":"DELETE",
+			"path":"/nav",
+			"query":{
+				"id":1
 			}
 		}
 	}

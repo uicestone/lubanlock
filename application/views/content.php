@@ -44,7 +44,7 @@
                 <h3>类型：<span sys-editable field-name="type" on-finish-edit="editDone(name,value)"></span></h3>
                 
                 <div sys-grid editable grid-attr="meta"  grid-title="关联数据" grid-fields="name,content" grid-titles="名称,内容"
-                    on-finish-edit="editDone(name,value,grid)"></div>
+                    on-finish-edit="editDone(name,value,grid)" grid-widget='select2,text'></div>
 
                 <div sys-grid editable grid-attr="status" grid-title="状态" grid-fields="name,type,datetime,content,comment" grid-titles="名称,类型,日期,内容,备注"
                     on-finish-edit="editDone(name,value,grid)"

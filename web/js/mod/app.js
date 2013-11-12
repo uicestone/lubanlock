@@ -1,4 +1,4 @@
-var app = angular.module('sys', ['ngResource','ui.bootstrap.modal','ui.router']);
+var app = angular.module('sys', ['ngResource','ui.bootstrap.modal','ui.router','ui.select2']);
 
 app.config(['$stateProvider', function ($stateProvider) {
     $stateProvider.state("home",{
@@ -29,6 +29,21 @@ app.config(['$stateProvider', function ($stateProvider) {
  */
 app.directive('sysGrid',function($timeout,$resource){
 
+  var Widgets = {
+    "text":angular.noop,
+    "select2":function(scope){
+      // 这里的scope其实是整个表格的scope，不是某个单元格的scope
+      // 所以供选数据并没有区分，目前这是ok的
+      // 如果需要做区分，就需要在select2.html，对数据进行关联，再在相应的controller中予以实现
+      scope.selections = [];
+      var Names = $resource("/meta/name");
+
+      Names.query(function(resources){
+        scope.selections = resources.map(function(res){return res[0]});
+      });
+    }
+  }
+
   return {
     templateUrl: 'template/sysGrid/table.html',
     restrict: 'A',
@@ -37,15 +52,33 @@ app.directive('sysGrid',function($timeout,$resource){
     },
     replace:false,
     link: function(scope, elem, attrs){
-      
+
+      var parent_data = scope.$parent.data;
+      var mode = scope.$parent.mode;
+      var attr_name = attrs.gridAttr;
+      var data = parent_data[attr_name];
+
       var render = scope.render;
 
-      var attr_name,Info;
+      var Info;
 
+      /* 从attr设置初始值（将来考虑在单个属性上写json） */
       scope.title = attrs.gridTitle;
       scope.fields = attrs.gridFields.split(",");
       scope.titles = attrs.gridTitles.split(",");
+      scope.widgets = [];
+      var widgetsAttrList = (attrs.gridWidget||"").split(",");
+      
+      /* 用于在模板中将某一列设置成对应的widget */
+      for(var i=0; i < scope.fields.length; i++ ){
+        scope.widgets[i] = widgetsAttrList[i] || "text";
+        /* 执行相应的初始化方法 */
+        Widgets[scope.widgets[i]](scope);
+      }
 
+
+
+      /* 更新scope值 */
       var updateScopeValues = function(){
         scope.data = scope.$parent.data[attr_name];
         attr_name = attrs.gridAttr;
@@ -54,6 +87,7 @@ app.directive('sysGrid',function($timeout,$resource){
 
       updateScopeValues();
 
+      /* 数据真正进入后端之前，前端模板需要有空行 */
       var makeEmptyRow = function(){
         var obj = {};
         scope.fields.forEach(function(key){
@@ -62,9 +96,10 @@ app.directive('sysGrid',function($timeout,$resource){
         return obj;
       };
 
+      /* 表格可设为不能编辑（考虑某列不允许编辑的情况） */
       if(attrs.editable !== undefined){
         scope.editcell = function(e){
-          var elem = angular.element(e.srcElement);
+          var elem = angular.element(e.target);
           var elem_scope = elem.scope();
           elem_scope.editing = true;
           $timeout(function(){
@@ -76,9 +111,10 @@ app.directive('sysGrid',function($timeout,$resource){
         scope.editcell = function(){}
       }
 
+      /* 单元格完成编辑 */
       scope.exitEdit = function(e,row,index){
         updateScopeValues();
-        var elem = angular.element(e.srcElement);
+        var elem = angular.element(e.target);
         var elem_scope = elem.scope();
         var params = {};
 
@@ -94,6 +130,7 @@ app.directive('sysGrid',function($timeout,$resource){
         scope.onFinishEdit({name:attr_name,value:row,grid:scope.data});
       }
 
+      /* 删除行 */
       scope.removerow = function(row){
         updateScopeValues();
         if(scope.$parent.mode == "edit"){
@@ -105,16 +142,11 @@ app.directive('sysGrid',function($timeout,$resource){
         }
       }
 
+      /* 新增行 */
       scope.addrow = function(){
         updateScopeValues();
         var newrow;
-        // if(scope.$parent.mode == "edit"){
-        //   newrow = Info.save(function(){
-        //     data.push(newrow);
-        //   });
-        // }else{
         scope.data.push(makeEmptyRow());
-        // }
       }
     },
     controller: function($scope, $element, $attrs, $transclude, Obj) {
@@ -124,7 +156,7 @@ app.directive('sysGrid',function($timeout,$resource){
 });
 
 
-app.directive('sysEditable',function($timeout){
+app.directive('sysEditable',function($timeout,Obj){
   return {
     templateUrl: 'template/sysEditable/field.html',
     restrict: 'A',
@@ -138,7 +170,6 @@ app.directive('sysEditable',function($timeout){
       var viewRootScope = scope.$parent.$parent;
       scope.fieldValue = viewRootScope.data[scope.fieldName];
       scope.editing = !scope.fieldValue;
-
       scope.edit = function(){
         scope.editing = true;
         $timeout(function(){
@@ -147,8 +178,15 @@ app.directive('sysEditable',function($timeout){
       };
 
       scope.exitEdit = function(){
+        var data = {};
         if(scope.fieldValue){
           scope.editing = false;
+          if(scope.$parent.mode == "edit"){
+            data[scope.fieldName] = scope.fieldValue;
+            Obj.save({
+              id:viewRootScope.data.id
+            },data);
+          }
           scope.onFinishEdit({name:scope.fieldName,value:scope.fieldValue});
         }
       };
@@ -177,11 +215,28 @@ app.directive('ngEnter', function() {
 app.directive('ngBlur', ['$parse', function($parse) {
   return function( scope, elem, attrs ) {
     var fn = $parse(attrs.ngBlur);
-    elem.bind('blur', function(event) {
-      scope.$apply(function() {
-        fn(scope, {$event:event});
+    if(elem.is("input,text")){
+      elem.bind('blur', function(event) {
+        scope.$apply(function() {
+          fn(scope, {$event:event});
+        });
+      }); 
+    }else{
+      // let the div has the ability to blur
+      var focused = false;
+      elem.on("click",function(e){
+        e.stopPropagation();
+        focused = true;
       });
-    });
+      $("body").click(function(e) {
+        if(!$.contains(elem,e.target) && focused){
+          focused = false;
+          scope.$apply(function() {
+            fn(scope, {$event:event});
+          });
+        }
+      });
+    }
   };
 }]);
 
@@ -430,11 +485,11 @@ app.controller('List', function($scope,$state,$modal,$log,$location,$stateParams
 
 app.controller('Detail',function($scope,$state,$stateParams,Obj){
 
-  var mode = $state.current.name;
-  $scope.mode = mode == "add" ? "add" : "edit";
+  var current_state_name = $state.current.name;
+  $scope.mode = current_state_name = current_state_name == "add" ? "add" : "edit";
 
 
-  if(mode == "add"){
+  if(current_state_name == "add"){
     $scope.data = {
       name:"",
       type:"",
@@ -443,48 +498,19 @@ app.controller('Detail',function($scope,$state,$stateParams,Obj){
       relative:[]
     }
   }else{
-    $scope.data = {
-      name:"沈苹",
-      type:"客户",
-      id:$stateParams.id,
-      meta:[{
-        id:1,
-        name:"a",
-        content:"b"
-      },{
-        id:2,
-        name:"b",
-        content:"c"
-      }],
-
-      status:[{
-        "id":0,
-        "name":"czxc",
-        "type":"we",//标签类型，分类的分类，如“阶段”，“领域”,
-        "color":"#390"
-      },{
-        "id":1,
-        "name":"qwe",
-        "type":"qwe",//标签类型，分类的分类，如“阶段”，“领域”,
-        "color":"#990"
-      }],
-
-      relative:[{
-        "id":0,//关系id
-        "name":"学号",//关连对象显示名称
-        "num":"123",//关系编号，比如一个学生在一个班级中的学号
-        "relation":"",
-        "till":"1970-01-01",//关系结束时间
-        "relative":0,//关联对象id
-        "type":""//关连对象类型
-      }]
-    }
+    $scope.data = Obj.get({
+      id:$stateParams.id
+    });
   }
 
   $scope.editDone = function(name,value,grid){
     var data = $scope.data;
 
-    if($scope.mode === "edit"){return;}
+    if($scope.mode === "edit"){
+      return;
+    }
+
+    // $scope.mode == "add"
     if(typeof value == "string"){
       data[name] = value;
     }else{

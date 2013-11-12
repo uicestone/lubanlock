@@ -5,13 +5,19 @@
     <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
     <!--[if lt IE 9]><?=$this->javascript('html5')?><![endif]-->
     <?=$this->stylesheet('css/combined')?>
+    <link rel="stylesheet" href="/css/select2.css">
     <!-- <link rel="stylesheet" href="http://cdn.staticfile.org/ng-grid/2.0.7/ng-grid.css"> -->
     <!-- <link rel="stylesheet" href="http://cdn.staticfile.org/select2/3.4.1/select2.css"> -->
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+        
 
+    
+    <script type="text/javascript" src="/js/lib/jquery.js"></script>
+    <script type="text/javascript" src="/js/lib/select2.js"></script>
     <script type="text/javascript" src="/js/lib/angular.js"></script>
     <script type="text/javascript" src="/js/lib/angular-ui-modal.js"></script>
     <script type="text/javascript" src="/js/lib/angular-ui-router.js"></script>
+    <script type="text/javascript" src="/components/angular-ui-select2/src/select2.js"></script>
 
     <title><?=$this->company->sysname?></title>
     <style>
@@ -115,10 +121,14 @@
                 color:#666;
             }
 
-            .table .icon-plus{
+            .table-title .icon-plus,.table .icon-plus{
                 color:#629b58;
+                font-size:16px;
+                cursor: pointer;
             }
-
+            .table-title .icon-plus{
+                margin-left: 15px;
+            }
             .table .grid-content{
                 min-height:20px;
                 line-height:20px;
@@ -131,7 +141,9 @@
                 border:0;
                 padding:0;
             }
-
+            .table .select2-container{
+                width:100%;
+            }
             .save-object{
                 position: absolute;
                 right:20px;

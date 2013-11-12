@@ -8531,7 +8531,7 @@ th.fc-widget-header {
 .select2-search input {
   background: #fff none;
 }
-.select2-search:after {
+/*.select2-search:after {
   font-family: FontAwesome;
   font-size: 14px;
   display: inline;
@@ -8541,7 +8541,7 @@ th.fc-widget-header {
   top: 2px;
   left: -20px;
   z-index: 0;
-}
+}*/
 .select2-container-active .select2-choice,
 .select2-container-active .select2-choices,
 .select2-container-multi.select2-container-active .select2-choices,
