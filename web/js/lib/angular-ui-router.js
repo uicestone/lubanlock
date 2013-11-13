@@ -597,7 +597,7 @@ UrlMatcher.prototype.format = function (values) {
   for (/**/; i<nTotal; i++) {
     value = values[params[i]];
     if (value != null) {
-      result += (search ? '&' : '?') + params[i] + '=' + encodeURIComponent(value);
+      result += (search ? '&' : '?') + (value ? (params[i] + '=' + encodeURIComponent(value)) :"");
       search = true;
     }
   }
