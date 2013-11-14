@@ -11,16 +11,20 @@ class user extends SS_controller{
 	
 	function login(){
 		
-		$user=$this->user->verify($this->input->get_post('username'), $this->input->get_post('password'));
+		if($this->input->post()){
+			$user=$this->user->verify($this->input->get_post('username'), $this->input->get_post('password'));
 
-		if($user){
-			$this->session->set_userdata('user_id', intval($user['id']));
-			$this->user->updateLoginTime();
-			$this->output->set_output(json_encode($user));
+			if($user){
+				$this->session->set_userdata('user_id', intval($user['id']));
+				$this->user->updateLoginTime();
+				$this->output->set_output(json_encode($user));
+			}
+			else{
+				$this->output->set_status_header(403, lang('login_info_error'));
+			}
 		}
-		else{
-			$this->output->set_status_header(403, lang('login_info_error'));
-		}
+		
+		$this->load->view('login');
 		
 	}
 	

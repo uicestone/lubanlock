@@ -53,11 +53,11 @@ class SS_Controller extends CI_Controller{
 		/*
 		 * 页面权限判断
 		 */
+/*
 		if(isset($this->permission[METHOD])){
 			$this->permission=$this->permission[METHOD];
 		}
 		
-/*
 		 if($this->permission===array() && !$this->user->isLogged()){
 			if($this->output->as_ajax){
 				$this->output->set_header('Location: /login');
