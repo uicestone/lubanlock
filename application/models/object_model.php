@@ -493,27 +493,24 @@ class Object_model extends CI_Model{
 			
 			$args['status']=array_merge($args['status'], array_prefix($args['status'], '.*?', true));
 			
-			foreach($args['status'] as $status){
+			foreach($args['status'] as $status_name => $status){
 				
-				if(isset($status['from']) && $status['from']){
-					if(isset($status['format']) && $status['format']!=='timestamp'){
+				if(array_key_exists('from', $status)){
+					
+					if(strtotime($status['from'])){
 						$status['from']=strtotime($status['from']);
 					}
-					$this->db->where('UNIX_TIMESTAMP(schedule.start) >=',$status['from']);
+					
+					$this->db->join("object_status `{$status_name}_from`","`{$status_name}_from`.object = object.id AND `{$status_name}_from`.name = '$status_name' AND UNIX_TIMESTAMP(`{$status_name}_from`.datetime) >= {$status['from']}",'inner',false);
 				}
-
-				if(isset($status['to']) && $status['to']){
-
-					if(isset($status['format']) && $status['format']!=='timestamp'){
+				
+				if(array_key_exists('to', $status)){
+					
+					if(strtotime($status['to'])){
 						$status['to']=strtotime($status['to']);
 					}
-
-					if(isset($status['format']) && $status['format']==='date'){
-						$status['to']=strtotime(date('Y-m-d 00:00:00',$status['to']));
-					}
-
-					$this->db->where('schedule.end <',$status['to']);
-
+					
+					$this->db->join("object_status `{$status_name}_to`","`{$status_name}_to`.object = object.id AND `{$status_name}_to`.name = '$status_name' AND UNIX_TIMESTAMP(`{$status_name}_to`.datetime) < {$status['to']}",'inner',false);
 				}
 			}
 		}
