@@ -149,7 +149,7 @@ class Object extends SS_Controller{
 			case 'PUT':
 			case 'POST' && $this->input->data('id') === false:
 				$status_id=$this->object->addStatus($this->input->data());
-				$this->output->set_output(json_encode($this->object->getStatus($status_id)));
+				$this->output->set_output(json_encode($this->object->getStatus(array('id'=>$status_id))));
 				break;
 			
 			case 'POST':

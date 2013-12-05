@@ -922,7 +922,7 @@ class Object_model extends CI_Model{
 			->where('object',$this->id);
 		
 		if(array_key_exists('id', $args)){
-			$this->db->where('object_status.id',$id);
+			$this->db->where('object_status.id',$args['id']);
 			return $this->db->get()->row_array();
 		}
 		
