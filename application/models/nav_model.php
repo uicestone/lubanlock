@@ -9,7 +9,7 @@ class Nav_model extends CI_Model{
 		self::$fields=array(
 			'user' => $this->user->id,
 			'name' => '',
-			'href' => '',
+			'params' => '',
 			'parent' => NULL,
 			'order' => 0
 		);
@@ -18,6 +18,10 @@ class Nav_model extends CI_Model{
 	
 	
 	function add(array $data){
+		
+		if(array_key_exists('param', $data)){
+			$data['param'] = json_encode($data['param']);
+		}
 		
 		$this->db->upsert('nav',
 			array_merge(
@@ -31,6 +35,10 @@ class Nav_model extends CI_Model{
 	
 	function update(array $data, $id){
 	
+		if(array_key_exists('params', $data)){
+			$data['params'] = json_encode($data['params']);
+		}
+		
 		return $this->db->update('nav', array_intersect_key($data, self::$fields), array('id'=>$id));
 	}
 	
@@ -43,6 +51,7 @@ class Nav_model extends CI_Model{
 		$nav_items=array();
 		
 		foreach($result as $nav_item){
+			$nav_item['params'] = json_decode($nav_item['params']);
 			$nav_items[$nav_item['id']] = $nav_item;
 		}
 		
