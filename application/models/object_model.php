@@ -969,7 +969,7 @@ class Object_model extends CI_Model{
 	
 	function updateStatus(array $data, array $args = array()){
 		
-		$this->db->update('object_meta',array_merge(
+		$this->db->update('object_status',array_merge(
 			array('uid'=>$this->user->id,'time'=>time()),
 			array_intersect_key($data, self::$fields_status)
 		),$args?$args:array('id'=>$data['id']));
