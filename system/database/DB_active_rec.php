@@ -1283,7 +1283,7 @@ class CI_DB_active_record extends CI_DB_driver {
 	 * @return    object
 	 */
 
-	function duplicate_insert($table = '', $set = NULL )
+	function upsert($table = '', $set = NULL )
 	{
 		if ( ! is_null($set))
 		{
@@ -1314,7 +1314,7 @@ class CI_DB_active_record extends CI_DB_driver {
 		}
 
 
-		$sql = $this->_duplicate_insert($this->_protect_identifiers($this->dbprefix.$table), $this->ar_set );
+		$sql = $this->_upsert($this->_protect_identifiers($this->dbprefix.$table), $this->ar_set );
 
 		$this->_reset_write();
 		return $this->query($sql);

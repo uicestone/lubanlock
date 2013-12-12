@@ -19,7 +19,7 @@ class Nav_model extends CI_Model{
 	
 	function add(array $data){
 		
-		$this->db->duplicate_insert('nav',
+		$this->db->upsert('nav',
 			array_merge(
 				self::$fields,
 				array_intersect_key($data, self::$fields)
