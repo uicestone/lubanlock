@@ -58,8 +58,10 @@ ALTER TABLE  `object_relationship` CHANGE  `people`  `object` INT( 11 ) NOT NULL
 ALTER TABLE  `object_meta` CHANGE  `people`  `object` INT( 11 ) NOT NULL;
 ALTER TABLE  `object_label` CHANGE  `people`  `object` INT( 11 ) NOT NULL;
 
+update account set account = id where account is null;
+
 insert into object (id,type,team,name,display,company,uid,time_insert,time)
-select id,'account',team,name,display,company,uid,time_insert,time from account;
+select id,'account',team,name,display,company,uid,time_insert,time from account where id = account;
 
 insert into object (id,type,name,display,company,uid,time_insert,time)
 select id,'document',name,display,company,uid,time_insert,time from document;
@@ -110,7 +112,14 @@ ALTER TABLE  `project` CHANGE  `id`  `id` INT( 11 ) NOT NULL;
 ALTER TABLE  `people` CHANGE  `id`  `id` INT( 11 ) NOT NULL;
 ALTER TABLE  `schedule` CHANGE  `id`  `id` INT( 11 ) NOT NULL;
 
-ALTER TABLE  `account` ADD FOREIGN KEY (  `id` ) REFERENCES  `object` (
+update account set account = 16574 where account = 16736;
+
+ALTER TABLE  `object_status` CHANGE  `uid`  `uid` INT( 11 ) NULL ;
+
+insert into object_status (object, name, date, comment)
+select account, IF(received = 1, '到账', '签约'), date, concat(if(label_name is null,'',label_name), if(comment is null,'',comment)) from account left join account_label using (account) group by account;
+
+ALTER TABLE  `account` ADD FOREIGN KEY (  `account` ) REFERENCES  `object` (
 `id`
 ) ON DELETE NO ACTION ON UPDATE CASCADE ;
 ALTER TABLE  `document` ADD FOREIGN KEY (  `id` ) REFERENCES  `object` (
@@ -128,8 +137,7 @@ ALTER TABLE  `schedule` ADD FOREIGN KEY (  `id` ) REFERENCES  `object` (
 
 ALTER TABLE  `object_label` CHANGE  `type`  `type` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL;
 update object_label set type = null where type = '';
-insert into object_label (object, label, label_name,type)
-select account,label,label_name,type from account_label;
+
 insert into object_label (object, label, label_name,type)
 select document,label,label_name,type from document_label;
 insert into object_label (object, label, label_name,type)
@@ -192,12 +200,15 @@ select id,'首次接洽',first_contact
 from project where first_contact is not null and first_contact != '';
 
 insert into object_status (object,name,date)
-select id,'立案日期',time_contract
+select id,'立案',time_contract
 from project where time_contract is not null and time_contract != '';
 
 insert into object_status (object,name,date)
-select id,'结案日期',end
-from project where end is not null and end != '';
+select id,'结案',end
+from project where end is not null and end != '' and active = 1;
+
+insert into object_meta (object,name,content)
+select id,'预估结案日期',end from project where end is not null and end != '';
 
 ALTER TABLE  `object_meta` DROP INDEX  `people-name` ,
 ADD INDEX  `object-name` (  `object` );
@@ -423,8 +434,6 @@ ALTER TABLE `object_relationship` DROP `till`;
 
 ALTER TABLE `object_relationship` DROP `accepted`;
 
-ALTER TABLE `object_relationship` DROP `is_on`;
-
 DROP TABLE object_mod;
 
 ALTER TABLE `nav` DROP `add_href`;
@@ -442,12 +451,181 @@ ALTER TABLE  `nav` CHANGE  `name`  `name` VARCHAR( 16 ) CHARACTER SET utf8 COLLA
 
 ALTER TABLE `nav` MODIFY `user` INT( 11 ) AFTER `id`;
 
-ALTER TABLE  `lubanlock`.`nav` DROP INDEX  `team` ,
+ALTER TABLE `nav` DROP INDEX  `team` ,
 ADD INDEX  `user` (  `user` ) COMMENT  '';
 ALTER TABLE  `nav` ADD INDEX (  `name` ) ;
 
-ALTER TABLE  `nav` ADD UNIQUE (
-`user` ,
-`name`
-);
+update nav set user = null where user = 0;
 -- structure exported
+
+ALTER TABLE  `nav` ADD  `params` TEXT NULL AFTER  `name` ;
+
+ALTER TABLE  `group` DROP FOREIGN KEY  `group_ibfk_4` ;
+
+ALTER TABLE  `group` ADD CONSTRAINT  `group_ibfk_4` FOREIGN KEY (  `id` ) REFERENCES  `object` (
+`id`
+) ON DELETE NO ACTION ON UPDATE CASCADE ;
+
+ALTER TABLE  `group` DROP FOREIGN KEY  `group_ibfk_1` ;
+
+ALTER TABLE  `group` ADD FOREIGN KEY (  `leader` ) REFERENCES  `user` (
+`id`
+) ON DELETE NO ACTION ON UPDATE CASCADE ;
+
+ALTER TABLE  `object` DROP FOREIGN KEY  `object_ibfk_4` ;
+
+ALTER TABLE `object` DROP `group`;
+
+CREATE TABLE IF NOT EXISTS `tag_taxonomy` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tag` int(11) NOT NULL,
+  `taxonomy` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tag` (`tag`),
+  KEY `taxonomy` (`taxonomy`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+ALTER TABLE `tag_taxonomy`
+  ADD CONSTRAINT `tag_taxonomy_ibfk_1` FOREIGN KEY (`tag`) REFERENCES `tag` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+ALTER TABLE  `object_status` DROP FOREIGN KEY  `object_status_ibfk_4` ;
+
+ALTER TABLE `object_status` DROP `group`;
+
+ALTER TABLE  `object_status` CHANGE  `datetime`  `date` DATETIME NOT NULL ;
+
+ALTER TABLE `object_tag`
+  DROP `tag_name`;
+
+insert into object_meta (object, name, content)
+select account, '数额', sum(amount) from account group by account;
+
+insert into object_meta (object, name, content)
+select account, '计入创收', `count` from account group by account;
+
+insert into object_relationship (object, relative, relation)
+select account, project, '所属项目' from account group by account;
+
+insert into object_relationship (object, relative, relation)
+select account, people, '付款人' from account group by account;
+
+insert into object_meta (object,name,content)
+select id, '文件名',filename from document;
+insert into object_meta (object,name,content)
+select id, '扩展名',extname from document;
+insert into object_meta (object,name,content)
+select id, '大小',size from document;
+insert into object_meta (object,name,content)
+select id, '备注',comment from document;
+
+ALTER TABLE  `object` ADD  `comment` TEXT NULL ;
+
+insert into object (type, name, display, company, uid, time, time_insert, comment)
+select 'message',LEFT(content,255),1,user.company,uid,time,time,message.id from message inner join user on message.uid = user.id;
+
+insert into object_meta (object,name,content)
+select object.id, '内容',message.content from object inner join message on object.comment = message.id;
+
+insert into object (type, display, company, uid, time, time_insert, comment)
+select 'dialog',1,user.company,uid,time,time,dialog.id from dialog inner join user on dialog.uid = user.id;
+
+insert into object_relationship (object, relative, `mod`)
+select object.id, dialog_user.user, (`read`*1 | hidden*2) from dialog_user inner join object on object.comment = dialog_user.dialog and object.type = 'dialog';
+
+insert into object_relationship (object, relative)
+select dialog_object.id, message_object.id
+from dialog_message 
+inner join object dialog_object on dialog_object.comment = dialog_message.dialog and dialog_object.type = 'dialog' 
+inner join object message_object on message_object.comment = dialog_message.message and message_object.type = 'message';
+
+insert into object_relationship (object, relative,`mod`)
+select message_object.id, message_user.user, (`read`*1 | deleted*2)
+from message_user 
+inner join object message_object on message_object.comment = message_user.message and message_object.type = 'message';
+
+update object_relationship 
+inner join object message_object on message_object.id = object_relationship.relative
+inner join object dialog_object on dialog_object.id = object_relationship.object
+inner join dialog on dialog.id = dialog_object.comment and dialog.last_message = message_object.comment
+set object_relationship.mod = 1;
+
+insert into object_relationship (object, relative)
+select message_object.id, message_document.document
+from message_document inner join object message_object on message_object.comment = message_document.message and message_object.type = 'message';
+
+insert into tag (name) values ('个人');
+
+insert into object_tag (object, tag)
+select people.id, tag.id
+from people inner join tag on people.character = tag.name;
+
+insert into object_meta (object,name,content)
+select id, '英文名', name_en from people where name_en != '' and name_en is not null;
+
+insert into object_meta (object,name,content)
+select id, '拼音', name_pinyin from people where name_pinyin != '' and name_pinyin is not null;
+
+insert into object_meta (object,name,content)
+select id, '简称', abbreviation from people where abbreviation != '' and abbreviation is not null;
+
+insert into object_meta (object,name,content)
+select id, '性别', gender from people where gender !='' and gender is not null;
+
+insert into object_meta (object,name,content)
+select id, '电话', phone from people where phone !='' and phone is not null;
+
+insert into object_meta (object,name,content)
+select id, '电子邮件', email from people where email !='' and email is not null;
+
+insert into object_meta (object,name,content)
+select id, '身份证', id_card from people where id_card !='' and id_card is not null;
+
+insert into object_meta (object,name,content)
+select id, '工作单位', work_for from people where work_for !='' and work_for is not null;
+
+insert into object_meta (object,name,content)
+select id, '职位', position from people where position !='' and position is not null;
+
+insert into object_meta (object,name,content)
+select id, '生日', birthday from people where birthday !='' and birthday is not null;
+
+insert into object_relationship (object,relative,relation)
+select id, staff, '来源律师' from people;
+
+insert into object_meta (object,name,content)
+select id, '民族', race from people where race !='' and race is not null;
+
+insert into object_meta (object,name,content)
+select id,'备注',comment from project where comment is not null and comment != '';
+
+insert into object_meta (object,name,content)
+select id,'内容',content from schedule;
+
+insert into object_status (object,name,date)
+select id, '开始',from_unixtime(start) from schedule where start != 0 and start is not null;
+
+insert into object_status (object,name,date)
+select id, '结束', from_unixtime(end) from schedule where end !=0 and end is not null;
+
+insert into object_status (object,name,date)
+select id, '截止', from_unixtime(deadline) from schedule where deadline !=0 and deadline is not null;
+
+insert into object_meta (object,name,content)
+select id,'自报小时',hours_own from schedule;
+
+insert into object_meta (object,name,content)
+select id,'审核小时',hours_checked from schedule where hours_checked != hours_own;
+
+insert into object_meta (object,name,content)
+select id,'全天',1 from schedule where all_day = 1;
+
+insert into object_meta (object,name,content)
+select id,'已完成',1 from schedule where completed = 1;
+
+insert into object_relationship (object,relative)
+select id,project from schedule;
+
+insert into object_meta (object,name,content)
+select id,'职称',title from staff where title is not null;
+
+drop table account, dialog_message, dialog_user, message_user, dialog, message_document, message, evaluation_indicator, evaluation_model_indicator, evaluation_model, school_view_score, score, document, `holidays`, `idcard_region`, indicator,schedule,project,staff,people;
