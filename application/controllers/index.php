@@ -12,11 +12,7 @@ class Index extends SS_Controller{
 	}
 	
 	function index(){
-		$this->load->view('head');
-		$this->load->view('menu');
-		$this->load->view('nav');
-		$this->load->view('content');
-		$this->load->view('foot');
+		$this->load->view('index');
 	}
 	
 	/**

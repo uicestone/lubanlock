@@ -57,8 +57,11 @@ class Object extends SS_Controller{
 	function getList(){
 		
 		$args=$this->input->get();
+		
+		$result=$this->object->getList($args);
 
-		$this->output->set_output(json_encode($this->object->getList($args)));
+		$this->output->set_output(json_encode($result['data']));
+		$this->output->set_status_header(200, 'OK, '.$result['total'].' Objects in Total');
 	}
 	
 	function meta($object_id){

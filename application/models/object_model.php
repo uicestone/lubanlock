@@ -557,16 +557,17 @@ class Object_model extends CI_Model{
 		
 		$result_array=$this->db->get()->result_array();
 		
+		$result = array();
+		$result['total'] = $this->db->query('SELECT FOUND_ROWS() rows')->row()->rows;
+		
 		foreach(array('meta','mod','relative','status','tag') as $field){
 			if(array_key_exists('get_'.$field,$args) && $args['get_'.$field]){
-				array_walk($result_array,function(&$row){
+				array_walk($result_array,function(&$row, $index, $field){
 					$row[$field]=call_user_func(array($this,'get'.$field));
-				});
+				},$field);
 			}
 		}
 
-		$result = array();
-		$result['total'] = $this->db->query('SELECT FOUND_ROWS() rows')->row()->rows;
 		$result['data'] = $result_array;
 		
 		return $result;
@@ -1044,7 +1045,7 @@ class Object_model extends CI_Model{
 			$data['tag_name']=$data['name'];
 		}
 		
-		$this->db->duplicate_insert('object_tag',array_merge(
+		$this->db->upsert('object_tag',array_merge(
 			self::$fields_tag,
 			array_intersect_key($data, self::$fields_tag)
 		));

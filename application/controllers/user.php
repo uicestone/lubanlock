@@ -17,14 +17,14 @@ class user extends SS_controller{
 			if($user){
 				$this->session->set_userdata('user_id', intval($user['id']));
 				$this->user->updateLoginTime();
-				$this->output->set_output(json_encode($user));
+				redirect();
 			}
 			else{
-				$this->output->set_status_header(403, lang('login_info_error'));
+				$alert[]=array('type'=>'warning','message'=>lang('Wrong username or password.'));
 			}
 		}
 		
-		$this->load->view('login');
+		$this->load->view('login', compact('alert'));
 		
 	}
 	
