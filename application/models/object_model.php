@@ -71,7 +71,7 @@ class Object_model extends CI_Model{
 			'object'=>NULL,
 			'name'=>'',
 			'type'=>NULL,
-			'datetime'=>date('Y-m-d H:i:s',time()),
+			'date'=>date('Y-m-d H:i:s',time()),
 			'content'=>NULL,
 			'comment'=>NULL,
 			'group'=>NULL,
@@ -919,8 +919,8 @@ class Object_model extends CI_Model{
 	function getStatus(array $args = array()){
 		
 		$this->db->select('object_status.*')
-			->select('UNIX_TIMESTAMP(datetime) timestamp')
-			->select('DATE(datetime) date')
+			->select('UNIX_TIMESTAMP(date) timestamp')
+			->select('DATE(date) date')
 			->from('object_status')
 			->where('object',$this->id);
 		
@@ -936,21 +936,21 @@ class Object_model extends CI_Model{
 		
 		$data['object']=$this->id;
 		
-		foreach(array('timestamp','time','datetime','date') as $datetime_field){
-			if(array_key_exists($datetime_field, $data)){
-				$data['datetime']=$data[$datetime_field];
+		foreach(array('timestamp','time','datetime','date') as $date_field){
+			if(array_key_exists($date_field, $data)){
+				$data['date']=$data[$date_field];
 			}
 		}
 		
-		if(array_key_exists('datetime',$data) && !$data['datetime']){
-			unset($data['datetime']);
+		if(array_key_exists('date',$data) && !$data['date']){
+			unset($data['date']);
 		}
 		
-		if(array_key_exists('datetime',$data) && is_integer($data['datetime'])){
-			if($data['datetime'] >= 1E12){
-				$data['datetime'] = $data['datetime']/1000;
+		if(array_key_exists('date',$data) && is_integer($data['date'])){
+			if($data['date'] >= 1E12){
+				$data['date'] = $data['date']/1000;
 			}
-			$data['datetime'] = date('Y-m-d H:i:s',$data['datetime']);
+			$data['date'] = date('Y-m-d H:i:s',$data['date']);
 		}
 		
 		$this->db->insert('object_status',array_merge(
@@ -994,32 +994,16 @@ class Object_model extends CI_Model{
 	 */
 	function getTag(array $args = array()){
 		
-		$this->db
-			->select('tag.name,object_tag.type')
-			->from('tag')
-			->join('object_tag', 'tag.id = object_tag.tag', 'inner');
+		$this->db->from('object_tag')
+			->join('tag_taxonomy','tag_taxonomy.id = object_tag.tag_taxonomy')
+			->join('tag','tag.id = tag_taxonomy.tag')
+			->where('object_tag.object', $this->id)
+			->select('tag.name, tag_taxonomy.taxonomy');
 		
-		$this->db->where('object_tag.object', $this->id);
+		$result = $this->db->get()->result_array();
 		
-		if(array_key_exists('id', $args)){
-			$this->db->where('object_tag.id', $args['id']);
-		}
+		$tags = array_column($result, 'name', 'taxonomy');
 		
-		if(array_key_exists('type', $args) && $args['type'] === true){
-			$this->db->where('object_tag.type IS NOT NULL');
-		}
-		elseif(array_key_exists('type', $args)){
-			$this->db->where('object_tag.type',$args['type']);
-		}
-		
-		if(array_key_exists('id', $args)){
-			return $this->db->get()->row_array();
-		}
-		
-		$result=$this->db->get()->result_array();
-		
-		$tags=array_column($result,'name','type');
-
 		return $tags;
 	}
 	
