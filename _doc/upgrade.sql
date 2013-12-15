@@ -629,3 +629,15 @@ insert into object_meta (object,name,content)
 select id,'职称',title from staff where title is not null;
 
 drop table account, dialog_message, dialog_user, message_user, dialog, message_document, message, evaluation_indicator, evaluation_model_indicator, evaluation_model, school_view_score, score, document, `holidays`, `idcard_region`, indicator,schedule,project,staff,people;
+
+ALTER TABLE `object_meta` CHANGE `name` `key` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+ALTER TABLE `object_meta` CHANGE `content` `value` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+ALTER TABLE object_meta DROP INDEX name;
+
+ALTER TABLE object_meta DROP INDEX content;
+
+ALTER TABLE `object_meta` ADD INDEX(`key`);
+
+ALTER TABLE `object_meta` ADD INDEX(`value`(20));

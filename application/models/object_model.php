@@ -49,8 +49,8 @@ class Object_model extends CI_Model{
 		
 		self::$fields_meta=array(
 			'object'=>NULL,
-			'name'=>'',
-			'content'=>NULL,
+			'key'=>'',
+			'value'=>NULL,
 			'comment'=>NULL,
 			'uid'=>isset($CI->user)?$CI->user->id:NULL,
 			'time'=>time()
@@ -410,15 +410,15 @@ class Object_model extends CI_Model{
 		}
 		
 		if(array_key_exists('meta',$args) && is_array($args['meta'])){
-			foreach($args['meta'] as $name => $content){
-				$name=$this->db->escape($name);
-				$content=$this->db->escape($content);
+			foreach($args['meta'] as $key => $value){
+				$key=$this->db->escape($key);
+				$value=$this->db->escape($value);
 
-				if(is_integer($name)){
-					$this->db->where("object.id IN (SELECT object FROM object_meta WHERE name = $content)");
+				if(is_integer($key)){
+					$this->db->where("object.id IN (SELECT object FROM object_meta WHERE `key` = $value)");
 				}
 				else{
-					$this->db->where("object.id IN (SELECT object FROM object_meta WHERE name = $name AND content = $content)");
+					$this->db->where("object.id IN (SELECT object FROM object_meta WHERE `key` = $key AND `value` = $value)");
 				}
 			}
 		}
@@ -607,9 +607,6 @@ class Object_model extends CI_Model{
 	
 	/**
 	 * 给当前对象添加一个资料项
-	 * @param string $name
-	 * @param string $content
-	 * @param string $comment default: NULL
 	 * @return Object_model
 	 */
 	function addMeta(array $data){

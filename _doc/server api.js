@@ -404,8 +404,8 @@ var objectData={
  */
 var meta={
 	"id":0,
-	"name":"",
-	"content":"",
+	"key":"",
+	"value":"",
 	"comment":""
 };
 
