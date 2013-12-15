@@ -641,3 +641,12 @@ ALTER TABLE object_meta DROP INDEX content;
 ALTER TABLE `object_meta` ADD INDEX(`key`);
 
 ALTER TABLE `object_meta` ADD INDEX(`value`(20));
+
+ALTER TABLE `user_config` CHANGE `name` `key` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `user_config` DROP INDEX `user-name`, ADD UNIQUE `user-key`(`user`, `key`);
+ALTER TABLE `user_config` CHANGE `value` `value` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+ALTER TABLE `company_config` CHANGE `name` `key` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `company_config` CHANGE `value` `value` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `company_config` DROP INDEX `company`, ADD UNIQUE `company-key`(`company`, `key`);
+

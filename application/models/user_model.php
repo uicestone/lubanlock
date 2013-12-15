@@ -51,7 +51,7 @@ class User_model extends People_model{
 		$this->db->from('user_config')
 			->where('user',$this->id);
 		
-		$config=array_column($this->db->get()->result_array(),'value','name');
+		$config=array_column($this->db->get()->result_array(),'value','key');
 		
 		array_walk($config, function(&$value){
 			$decoded=json_decode($value);

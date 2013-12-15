@@ -15,7 +15,7 @@ class Company_model extends Object_model{
 		$this->db->from('company_config')
 			->where('company',$this->id);
 		
-		$config=array_column($this->db->get()->result_array(),'value','name');
+		$config=array_column($this->db->get()->result_array(),'value','key');
 		
 		array_walk($config, function(&$value){
 			$decoded=json_decode($value,true);
@@ -45,15 +45,15 @@ class Company_model extends Object_model{
 	/**
 	 * set or get a  company config value
 	 * json_decode/encode automatically
-	 * @param string $name
+	 * @param string $key
 	 * @param mixed $value
 	 * @return
 	 *	get: the config value, false if not found
 	 *	set: the insert or update query
 	 */
-	function config($name,$value=NULL){
+	function config($key,$value=NULL){
 		
-		$row=$this->db->select('id,value')->from('company_config')->where('company',$this->id)->where('name',$name)
+		$row=$this->db->select('id,value')->from('company_config')->where('company',$this->id)->where('key',$key)
 			->get()->row();
 		
 		if(is_null($value)){
@@ -74,11 +74,7 @@ class Company_model extends Object_model{
 				$value=json_encode($value);
 			}
 			
-			if($row){
-				return $this->db->update('company_config',array('value'=>$value),array('id'=>$row->id));
-			}else{
-				return $this->db->insert('company_config',array('company'=>$this->id,'name'=>$name,'value'=>$value));
-			}
+			return $this->db->upsert('company_config', array('value'=>$value, 'id'=>$row->id));
 		}
 	}
 }
