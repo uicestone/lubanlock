@@ -22,7 +22,7 @@ class Nav extends SS_Controller{
 	}
 	
 	function get(){
-		$this->output->set_output(json_encode($this->nav->get()));
+		$this->output->set_output($this->nav->get());
 	}
 	
 	function add(){

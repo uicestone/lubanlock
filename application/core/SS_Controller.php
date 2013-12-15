@@ -80,5 +80,14 @@ class SS_Controller extends CI_Controller{
 		
 	}
 	
+	function _output($output){
+		if($this->input->is_ajax_request()){
+			echo json_encode($output);
+		}
+		else{
+			echo $output;
+		}
+	}
+	
 }
 ?>

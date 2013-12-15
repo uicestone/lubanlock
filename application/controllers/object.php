@@ -4,7 +4,6 @@ class Object extends SS_Controller{
 	function __construct() {
 		parent::__construct();
 		$this->load->model('object_model','object');
-		$this->output->set_content_type('application/json');
 	}
 	
 	function index($id=NULL){
@@ -34,7 +33,7 @@ class Object extends SS_Controller{
 		
 		$args=$this->input->get();
 		
-		$this->output->set_output(json_encode($this->object->fetch($id,$args)));
+		$this->output->set_output($this->object->fetch($id,$args));
 	}
 	
 	function update($id){
@@ -60,7 +59,7 @@ class Object extends SS_Controller{
 		
 		$result=$this->object->getList($args);
 
-		$this->output->set_output(json_encode($result['data']));
+		$this->output->set_output($result['data']);
 		$this->output->set_status_header(200, 'OK, '.$result['total'].' Objects in Total');
 	}
 	
@@ -70,18 +69,18 @@ class Object extends SS_Controller{
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output(json_encode($this->object->getMeta()));
+				$this->output->set_output($this->object->getMeta());
 				break;
 			
 			case 'PUT':
 			case 'POST' && $this->input->data('id') === false:
 				$meta_id=$this->object->addMeta($this->input->data());
-				$this->output->set_output(json_encode($this->object->getMeta(array('id'=>$meta_id))));
+				$this->output->set_output($this->object->getMeta(array('id'=>$meta_id)));
 				break;
 			
 			case 'POST':
 				$this->object->updateMeta($this->input->data());
-				$this->output->set_output(json_encode($this->object->getMeta(array('id'=>$this->input->data('id')))));
+				$this->output->set_output($this->object->getMeta(array('id'=>$this->input->data('id'))));
 				break;
 			
 			case 'DELETE':
@@ -96,18 +95,18 @@ class Object extends SS_Controller{
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output(json_encode($this->object->getRelative()));
+				$this->output->set_output($this->object->getRelative());
 				break;
 			
 			case 'PUT':
 			case 'POST' && $this->input->data('id') === false:
 				$relative_id=$this->object->addRelative($this->input->data());
-				$this->output->set_output(json_encode($this->object->getRelative(array('id'=>$relative_id))));
+				$this->output->set_output($this->object->getRelative(array('id'=>$relative_id)));
 				break;
 			
 			case 'POST':
 				$this->object->updateRelative($this->input->data());
-				$this->output->set_output(json_encode($this->object->getRelative(array('id'=>$this->input->data('id')))));
+				$this->output->set_output($this->object->getRelative(array('id'=>$this->input->data('id'))));
 				break;
 			
 			case 'DELETE':
@@ -122,13 +121,13 @@ class Object extends SS_Controller{
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output(json_encode($this->object->getRelativeMod($this->input->get())));
+				$this->output->set_output($this->object->getRelativeMod($this->input->get()));
 				break;
 			
 			case 'PUT':
 			case 'POST':
 				$mod_id=$this->object->addRelativeMod($this->input->data('name'), $this->input->get());
-				$this->output->set_output(json_encode($this->object->getRelativeMod(array('id'=>$mod_id))));
+				$this->output->set_output($this->object->getRelativeMod(array('id'=>$mod_id)));
 				break;
 			
 			case 'DELETE':
@@ -143,18 +142,18 @@ class Object extends SS_Controller{
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output(json_encode($this->object->getStatus()));
+				$this->output->set_output($this->object->getStatus());
 				break;
 			
 			case 'PUT':
 			case 'POST' && $this->input->data('id') === false:
 				$status_id=$this->object->addStatus($this->input->data());
-				$this->output->set_output(json_encode($this->object->getStatus(array('id'=>$status_id))));
+				$this->output->set_output($this->object->getStatus(array('id'=>$status_id)));
 				break;
 			
 			case 'POST':
 				$this->object->updateStatus($this->input->data());
-				$this->output->set_output(json_encode($this->object->getStatus(array('id'=>$this->input->data('id')))));
+				$this->output->set_output($this->object->getStatus(array('id'=>$this->input->data('id'))));
 				break;
 			
 			case 'DELETE':
@@ -169,13 +168,13 @@ class Object extends SS_Controller{
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output(json_encode($this->object->getTag()));
+				$this->output->set_output($this->object->getTag());
 				break;
 			
 			case 'PUT':
 			case 'POST':
 				$tag_id=$this->object->addTag($this->input->data());
-				$this->output->set_output(json_encode($this->object->getTag(array('id'=>$tag_id))));
+				$this->output->set_output($this->object->getTag(array('id'=>$tag_id)));
 				break;
 			
 			case 'DELETE':
