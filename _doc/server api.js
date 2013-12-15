@@ -10,10 +10,10 @@ var api = [
 			"path":"/object/{id}",
 			/*query指url中的query string，也可以用?query={json}来传递*/
 			"query":{
-				"get_meta":true,
-				"get_relative":true,
-				"get_status":true,
-				"get_tag":true
+				"with_meta":true,
+				"with_relative":true,
+				"with_status":true,
+				"with_tag":true
 			}
 		},
 		"response":{
@@ -384,16 +384,16 @@ var objectData={
 	"num":"",//对象的编号，字符串
 	"name":"",//对象的显示名称
 	"{additional_fields}":"",//非必有，根据不同type的对象，可能有些额外的根字段（考虑一律去处这些字段）
-	"meta":[//非必有，获得对象时get_meta参数决定
+	"meta":[//非必有，获得对象时with_meta参数决定
 		meta
 	],
-	"relative":[//非必有，获得对象时get_relative参数决定
+	"relative":[//非必有，获得对象时with_relative参数决定
 		relative
 	],
-	"status":[//非必有，获得对象时get_status参数决定
+	"status":[//非必有，获得对象时with_status参数决定
 		status
 	],
-	"tag":[//非必有，获得对象时get_tag参数决定
+	"tag":[//非必有，获得对象时with_tag参数决定
 		tag
 	]
 };
@@ -473,10 +473,10 @@ var listArgs={
 
 	"tags":{"tagType":tagName,"0":tagName},//包含一组标签
 	"without_tags":{"tagType":tagName,"0":tagName},//不包含一组标签
-	"get_tags":false,
+	"with_tags":false,
 
-	"has_meta":{"metaName":metaContent,"0":metaName},//包含一组资料项，一组资料项为某值
-	"get_meta":false,
+	"meta":{"metaName":metaContent,"0":metaName},//包含一组资料项，一组资料项为某值
+	"with_meta":false,
 
 	"is_relative_of":0,//根据本对象获得相关对象
 		"is_relative_of__relation":"",//只查找具有某关系的相关人
@@ -490,7 +490,7 @@ var listArgs={
 		"has_common_relative_with__media":"",
 	"has_secondary_relative_like":0,//左侧相关对象的左侧相关对象，“上司的上司”
 		"has_secondary_relative_like__media":"",
-	"get_relative":false,
+	"with_relative":false,
 
 	"status":{
 		"name":[//存在两种判断方式
@@ -502,7 +502,7 @@ var listArgs={
 		"立案":{"from":"2013-01-01","to":"2013-06-30"},
 		"结案":true
 	},
-	"get_status":false,
+	"with_status":false,
 
 	"orderby":[//支持2种数据格式
 		"id desc, name asc",

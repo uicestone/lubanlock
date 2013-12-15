@@ -126,7 +126,7 @@ class Object_model extends CI_Model{
 		}
 		
 		foreach(array('meta','relative','status','tag') as $field){
-			if(!array_key_exists('get_'.$field,$args) || $args['get_'.$field]){
+			if(!array_key_exists('with_'.$field,$args) || $args['with_'.$field]){
 				$object[$field]=call_user_func(array($this,'get'.$field));
 			}
 		}
@@ -277,12 +277,12 @@ class Object_model extends CI_Model{
 	 * 
 	 *	tags array
 	 *	without_tags array
-	 *	get_tags
+	 *	with_tags
 	 * 
-	 *	has_meta
+	 *	meta
 	 *		array('电话','来源'=>'网站')
 	 *		以上例子将搜素'来源'为'网站'并且有'电话'的对象
-	 *	get_meta array
+	 *	with_meta array
 	 * 
 	 *	is_relative_of =>user_id object_relationship  根据本对象获得相关对象
 	 *		is_relative_of__role
@@ -409,8 +409,8 @@ class Object_model extends CI_Model{
 				->where("object_mod.mod & $positive = $positive AND object_mod.mod & $negative = 0",NULL,false);
 		}
 		
-		if(array_key_exists('has_meta',$args) && is_array($args['has_meta'])){
-			foreach($args['has_meta'] as $name => $content){
+		if(array_key_exists('meta',$args) && is_array($args['meta'])){
+			foreach($args['meta'] as $name => $content){
 				$name=$this->db->escape($name);
 				$content=$this->db->escape($content);
 
@@ -501,7 +501,7 @@ class Object_model extends CI_Model{
 						$status['from']=strtotime($status['from']);
 					}
 					
-					$this->db->join("object_status `{$status_name}_from`","`{$status_name}_from`.object = object.id AND `{$status_name}_from`.name = '$status_name' AND UNIX_TIMESTAMP(`{$status_name}_from`.datetime) >= {$status['from']}",'inner',false);
+					$this->db->join("object_status `{$status_name}_from`","`{$status_name}_from`.object = object.id AND `{$status_name}_from`.name = '$status_name' AND UNIX_TIMESTAMP(`{$status_name}_from`.date) >= {$status['from']}",'inner',false);
 				}
 				
 				if(array_key_exists('to', $status)){
@@ -510,7 +510,7 @@ class Object_model extends CI_Model{
 						$status['to']=strtotime($status['to']);
 					}
 					
-					$this->db->join("object_status `{$status_name}_to`","`{$status_name}_to`.object = object.id AND `{$status_name}_to`.name = '$status_name' AND UNIX_TIMESTAMP(`{$status_name}_to`.datetime) < {$status['to']}",'inner',false);
+					$this->db->join("object_status `{$status_name}_to`","`{$status_name}_to`.object = object.id AND `{$status_name}_to`.name = '$status_name' AND UNIX_TIMESTAMP(`{$status_name}_to`.date) < {$status['to']}",'inner',false);
 				}
 			}
 		}
@@ -558,8 +558,9 @@ class Object_model extends CI_Model{
 		$result['total'] = $this->db->query('SELECT FOUND_ROWS() rows')->row()->rows;
 		
 		foreach(array('meta','mod','relative','status','tag') as $field){
-			if(array_key_exists('get_'.$field,$args) && $args['get_'.$field]){
+			if(array_key_exists('with_'.$field,$args) && $args['with_'.$field]){
 				array_walk($result_array,function(&$row, $index, $field){
+					$this->id = $row['id'];
 					$row[$field]=call_user_func(array($this,'get'.$field));
 				},$field);
 			}
