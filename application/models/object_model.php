@@ -262,258 +262,140 @@ class Object_model extends CI_Model{
 		}
 	}
 	
+	function _parse_criteria($args, $field='`object`.`id`', $logical_operator = 'AND'){
+
+		if(empty($args)){
+			return 'TRUE';
+		}
+		
+		if(!is_array($args)){
+			return $field.' = '.$this->db->escape($args);
+		}
+		
+		//如果参数数组全是数字键，则作in处理
+		if(array_reduce(array_keys($args), function($result, $item){
+			return $result && is_integer($item);
+		}, true)){
+			$args = array('in'=>$args);
+		}
+		
+		$where = array();
+		
+		foreach($args as $arg_name => $arg_value){
+			
+			if($arg_name === 'or'){
+				return $this->_parse_criteria($arg_value, $field, 'OR');
+			}
+			
+			if($arg_name === 'gt'){
+				$where[] = $field.' > '.$this->db->escape($arg_value);
+			}
+			elseif($arg_name === 'gte'){
+				$where[] = $field.' >= '.$this->db->escape($arg_value);
+			}
+			elseif($arg_name === 'ne'){
+				$where[] = $field.' != '.$this->db->escape($arg_value);
+			}
+			elseif($arg_name === 'lt'){
+				$where[] = $field.' < '.$this->db->escape($arg_value);
+			}
+			elseif($arg_name === 'lte'){
+				$where[] = $field.' <= '.$this->db->escape($arg_value);
+			}
+			elseif($arg_name === 'in'){
+				$where[] = $field." IN ( \n".implode(', ', array_map(array($this->db, 'escape'), $arg_value)).' )';
+			}
+			elseif($arg_name === 'nin'){
+				$where[] = $field." NOT IN ( \n".implode(', ', array_map(array($this->db, 'escape'), $arg_value)).' )';
+			}
+			
+			elseif($arg_name === 'meta'){
+				foreach($arg_value as $key => $value){
+					$where[] = "$field IN ( \nSELECT `object` FROM `object_meta` WHERE `key` = {$this->db->escape($key)} AND {$this->_parse_criteria($value, '`value`')} )";
+				}
+			}
+			elseif($arg_name === 'status'){
+				foreach($arg_value as $name => $date){
+					$where[] = "$field IN ( \nSELECT `object` FROM `object_status` WHERE `name` = {$this->db->escape($name)} AND {$this->_parse_criteria($date, '`value`')} )";
+				}
+			}
+			elseif($arg_name === 'tag'){
+				foreach($arg_value as $taxonomy => $tag){
+					$taxonomy_criteria = is_integer($taxonomy) ? ' ' : " AND `taxonomy` = {$this->db->escape($taxonomy)}";
+					$where[] = "$field IN ( \nSELECT `object` FROM `object_tag` WHERE `tag_taxonomy` IN ( \nSELECT `id` FROM `tag_taxonomy` WHERE `tag` = ( \nSELECT `id` FROM `tag` WHERE  {$this->_parse_criteria($tag, '`name`')} \n)$taxonomy_criteria\n) \n)";
+				}
+			}
+			
+			elseif($arg_name === 'is_relative_of'){
+				foreach($arg_value as $relation => $relative_args){
+					$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation);
+					$where[] = "$field IN ( \nSELECT `relative` FROM `object_relationship` WHERE $relation_criteria AND ".$this->_parse_criteria($relative_args, '`object_relationship`.`object`')." )";
+				}
+			}
+			elseif($arg_name === 'has_relative_like'){
+				foreach($arg_value as $relation => $relative_args){
+					$where[] = "$field IN ( \nSELECT `object` FROM `object_relationship` WHERE ".$this->_parse_criteria($relative_args, '`object.relationship`.`relative`')." )";
+				}
+			}
+			
+			elseif(in_array($arg_name,array('name','type'))){
+				$where[] = $this->_parse_criteria($arg_value, '`object`.'.$arg_name);
+			}
+			
+		}
+
+		return "( \n".implode("\n$logical_operator\n", $where)." \n)";
+
+	}
+	
 	/**
 	 * 
 	 * @param array $args
-	 *	id_in
-	 *	id_less_than
-	 *	id_greater_than
-	 *	name
-	 *	type
-	 *	num
-	 *	display
-	 *	company
-	 *	uid
+	 *	recursive args
+	 *		name
+	 *			recursive args
+	 *		type
+	 *			recursive args
+	 *		meta
+	 *			[key => ]value
+	 *				recursive args
+	 *		status
+	 *			name
+	 *			name => date
+	 *				recursive args
+	 *		tag
+	 *			[taxonomy => ]tag
+	 *				recursive args
 	 * 
-	 *	tags array
-	 *	without_tags array
-	 *	with_tags
+	 *		is_relative_of
+	 *			[role => ]recursive args
+	 *		has_relative_like
+	 *			[role => ]recursive args
 	 * 
-	 *	meta
-	 *		array('电话','来源'=>'网站')
-	 *		以上例子将搜素'来源'为'网站'并且有'电话'的对象
-	 *	with_meta array
+	 *		and, or
+	 *			recursive args
 	 * 
-	 *	is_relative_of =>user_id object_relationship  根据本对象获得相关对象
-	 *		is_relative_of__role
-	 *	has_relative_like => user_id object_relationship  根据相关对象获得本对象
-	 *		has_relative_like__role
-	 *	is_secondary_relative_of 右侧相关对象的右侧相关对象，“下属的下属”
-	 *		is_secondary_relative_of__media
-	 *	is_both_relative_with 右侧相关对象的左侧相关对象，“具有共同上司的同事”
-	 *		is_both_relative_with__media
-	 *	has_common_relative_with 左侧相关对象的右侧相关对象，“具有共同下属的上司”
-	 *		has_common_relative_with__media
-	 *	has_secondary_relative_like 左侧相关对象的左侧相关对象，“上司的上司”
-	 *		has_secondary_relative_like__media
+	 *		gt, gte, lt, lte, ne
+	 *			value
+	 *		in, nin
+	 *			array of value
 	 * 
-	 *	status
-	 *		array(
-	 *			'status_name'=>array('from'=>'from_syntax','to'=>'to_syntax','format'=>'timestamp/date/datetime')/bool
-	 *			'首次接洽'=>array('from'=>1300000000,'to'=>1300100000,'format'=>'timestamp'),
-	 *			'立案'=>array('from'=>'2013-01-01','to'=>'2013-06-30'),
-	 *			'结案'=>true
-	 *		)
-	 * 
-	 *	orderby string or array
-	 *	limit string, array
+	 *	static args
+	 *		orderby string or array
+	 *		limit string, array
+	 *		page int
+	 *		perpage int
 	 * @return array
 	 */
 	function getList(array $args=array()){
 
 		$this->db->found_rows();
 		
-		if(!$this->db->ar_select){
-			$this->db->select('object.*');
-		}
-		
 		$this->db->from('object');
 		
-		if($this->table!=='object'){
-			$this->db->select("{$this->table}.*")->join($this->table,"object.id = {$this->table}.id",'inner');
-		}
+		$this->db->where('object.company', $this->company->id);
 		
-		//对具体object表的join需要放在其他join前面
-		if($this->db->ar_join){
-			array_unshift($this->db->ar_join,array_pop($this->db->ar_join));
-		}
-		
-		if(array_key_exists('name',$args)){
-			$this->db->like('object.name',$args['name']);
-		}
-		
-		if(array_key_exists('id_in',$args)){
-			if(!$args['id_in']){
-				$this->db->where('FALSE',NULL,false);
-			}else{
-				$this->db->where_in('object.id',$args['id_in']);
-			}
-		}
-		
-		if(array_key_exists('id_less_than',$args)){
-			$this->db->where('object.id <',$args['id_less_than']);
-		}
-		
-		if(array_key_exists('id_greater_than',$args)){
-			$this->db->where('object.id >',$args['id_greater_than']);
-		}
-		
-		if(array_key_exists('type',$args) && $args['type']){
-			$this->db->where('object.type',$args['type']);
-		}
-		
-		if(array_key_exists('num',$args)){
-			$this->db->like('object.num',$args['num']);
-		}
-		
-		if(!array_key_exists('display',$args) || $args['display']===true){
-			$this->db->where('object.display',true);
-		}
-
-		if(!array_key_exists('company',$args) || $args['company']===true){
-			$this->db->where('object.company',$this->company->id);
-		}
-		
-		if(array_key_exists('uid',$args) && $args['uid']){
-			$this->db->where('object.uid',$args['uid']);
-		}
-		
-		//使用INNER JOIN的方式来筛选标签，聪明又机灵。//TODO 总觉得哪里不对- -||
-		if(array_key_exists('tags',$args) && is_array($args['tags'])){
-			foreach($args['tags'] as $id => $tag_name){
-				//每次连接object_tag表需要定一个唯一的名字
-				$on="object.id = `t_$id`.object AND `t_$id`.tag_name = {$this->db->escape($tag_name)}";
-				if(!is_integer($id)){
-					$on.=" AND `t_$id`.type = {$this->db->escape($id)}";
-				}
-				$this->db->join("object_tag `t_$id`",$on,'inner',false);
-			}
-		}
-		
-		if(array_key_exists('without_tags',$args)){
-			foreach($args['without_tags'] as $id => $tag_name){
-				$query_with="SELECT object FROM object_tag WHERE tag_name = {$this->db->escape($tag_name)}";
-				if(!is_integer($id)){
-					$query_with.=" AND type = {$this->db->escape($id)}";
-				}
-				$where="object.id NOT IN ($query_with)";
-				$this->db->where($where, NULL, false);
-			}
-		}
-		
-		if(array_key_exists('mod', $args)){
-			$positive=$negative=0;
-			foreach($args['mod'] as $mod_name => $status){
-					
-				if(!array_key_exists($mod_name, $this->mod_list)){
-					log_message('error','mod name not found: '.$mod_name);
-					continue;
-				}
-
-				$mod=$this->mod_list[$mod_name];
-				$status?($positive|=$mod):($negative|=$mod);
-			}
-			
-			$this->db
-				->join('object_mod',"object_mod.object = object.id AND object_mod.user = {$this->user->id}",'inner')
-				->where("object_mod.mod & $positive = $positive AND object_mod.mod & $negative = 0",NULL,false);
-		}
-		
-		if(array_key_exists('meta',$args) && is_array($args['meta'])){
-			foreach($args['meta'] as $key => $value){
-				$key=$this->db->escape($key);
-				$value=$this->db->escape($value);
-
-				if(is_integer($key)){
-					$this->db->where("object.id IN (SELECT object FROM object_meta WHERE `key` = $value)");
-				}
-				else{
-					$this->db->where("object.id IN (SELECT object FROM object_meta WHERE `key` = $key AND `value` = $value)");
-				}
-			}
-		}
-		
-		if(array_key_exists('is_relative_of',$args)){
-			
-			$on="object.id = object_relationship__is_relative_of.relative AND object_relationship__is_relative_of.object{$this->db->escape_int_array($args['is_relative_of'])}";
-			
-			if(array_key_exists('is_relative_of__role',$args)){
-				$on.=" object_relationship__is_relative_of.role = {$this->db->escape($args['is_relative_of__role'])}";
-			}
-			
-			$this->db->join('object_relationship object_relationship__is_relative_of',$on,'inner',false)
-				->select('object_relationship__is_relative_of.id relationship_id, object_relationship__is_relative_of.relation, object_relationship__is_relative_of.time relationship_time');
-			
-		}
-
-		if(array_key_exists('has_relative_like',$args)){
-			
-			$on="object.id = object_relationship__has_relative_like.object AND object_relationship__has_relative_like.relative{$this->db->escape_int_array($args['has_relative_like'])}";
-			
-			if(array_key_exists('has_relative_like__role',$args)){
-				$on.=" object_relationship__has_relative_like.role = {$this->db->escape($args['has_relative_like__role'])}";
-			}
-			
-			$this->db->join('object_relationship object_relationship__has_relative_like',$on,'inner',false)
-				->select('object_relationship__has_relative_like.id relationship_id, object_relationship__has_relative_like.relation, object_relationship__has_relative_like.time relationship_time');
-		}
-		
-		if(array_key_exists('is_secondary_relative_of',$args)){
-			$this->db->where("object.id IN (
-				SELECT relative FROM object_relative WHERE object IN (
-					SELECT relative FROM object_relative
-					".(empty($args['is_secondary_relative_of__media'])?'':" INNER JOIN `{$args['is_secondary_relative_of__media']}` ON `{$args['is_secondary_relative_of__media']}`.id = object_relationship.relative")."
-					WHERE object{$this->db->escape_int_array($args['is_secondary_relative_of'])}
-				)
-			)");
-		}
-
-		if(array_key_exists('is_both_relative_with',$args)){
-			$this->db->where("object.id IN (
-				SELECT relative FROM object_relative WHERE object IN (
-					SELECT object FROM object_relative
-					".(empty($args['is_both_relative_with__media'])?'':" INNER JOIN `{$args['is_both_relative_with__media']}` ON `{$args['is_both_relative_with__media']}`.id = object_relationship.object")."
-					WHERE relative{$this->db->escape_int_array($args['is_both_relative_with'])}
-				)
-			)");
-		}
-
-		if(array_key_exists('has_common_relative_with',$args)){
-			$this->db->where("object.id IN (
-				SELECT object FROM object_relative WHERE relative IN (
-					SELECT relative FROM object_relative
-					".(empty($args['has_common_relative_with__media'])?'':" INNER JOIN `{$args['has_common_relative_with__media']}` ON `{$args['has_common_relative_with__media']}`.id = object_relationship.relative")."
-					WHERE object{$this->db->escape_int_array($args['has_common_relative_with'])}
-				)
-			)");
-		}
-
-		if(array_key_exists('has_secondary_relative_like',$args)){
-			$this->db->where("object.id IN (
-				SELECT object FROM object_relative WHERE relative IN (
-					SELECT object FROM object_relative
-					".(empty($args['has_secondary_relative_like__media'])?'':" INNER JOIN `{$args['has_secondary_relative_like__media']}` ON `{$args['has_secondary_relative_like__media']}`.id = object_relationship.object")."
-					WHERE relative{$this->db->escape_int_array($args['has_secondary_relative_like'])}
-				)
-			)");
-		}
-		
-		$args['status']=array_prefix($args,'status');
-		if($args['status']){
-			
-			$args['status']=array_merge($args['status'], array_prefix($args['status'], '.*?', true));
-			
-			foreach($args['status'] as $status_name => $status){
-				
-				if(array_key_exists('from', $status)){
-					
-					if(strtotime($status['from'])){
-						$status['from']=strtotime($status['from']);
-					}
-					
-					$this->db->join("object_status `{$status_name}_from`","`{$status_name}_from`.object = object.id AND `{$status_name}_from`.name = '$status_name' AND UNIX_TIMESTAMP(`{$status_name}_from`.date) >= {$status['from']}",'inner',false);
-				}
-				
-				if(array_key_exists('to', $status)){
-					
-					if(strtotime($status['to'])){
-						$status['to']=strtotime($status['to']);
-					}
-					
-					$this->db->join("object_status `{$status_name}_to`","`{$status_name}_to`.object = object.id AND `{$status_name}_to`.name = '$status_name' AND UNIX_TIMESTAMP(`{$status_name}_to`.date) < {$status['to']}",'inner',false);
-				}
-			}
-		}
+		$this->db->where($this->_parse_criteria($args), null, false);
 		
 		if(!array_key_exists('order_by', $args)){
 			$args['order_by'] = 'object.id desc';
