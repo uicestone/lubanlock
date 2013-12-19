@@ -81,12 +81,16 @@ class SS_Controller extends CI_Controller{
 	}
 	
 	function _output($output){
-		if($this->input->is_ajax_request()){
+		
+		$accepts = explode(',', $this->input->get_request_header('Accept'));
+		
+		if(in_array('application/json', $accepts)){
 			echo json_encode($output);
 		}
 		else{
 			echo $output;
 		}
+		
 	}
 	
 }
