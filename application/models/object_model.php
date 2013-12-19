@@ -263,10 +263,6 @@ class Object_model extends CI_Model{
 	}
 	
 	function _parse_criteria($args, $field='`object`.`id`', $logical_operator = 'AND'){
-
-		if(empty($args)){
-			return 'TRUE';
-		}
 		
 		if(!is_array($args)){
 			return $field.' = '.$this->db->escape($args);
@@ -311,12 +307,14 @@ class Object_model extends CI_Model{
 			
 			elseif($arg_name === 'meta'){
 				foreach($arg_value as $key => $value){
-					$where[] = "$field IN ( \nSELECT `object` FROM `object_meta` WHERE `key` = {$this->db->escape($key)} AND {$this->_parse_criteria($value, '`value`')} )";
+					$meta_criteria = is_integer($key) ? " {$this->_parse_criteria($value, '`key`')} " : " `key` = {$this->db->escape($key)} AND {$this->_parse_criteria($value, '`value`')} " ;
+					$where[] = "$field IN ( \nSELECT `object` FROM `object_meta` WHERE$meta_criteria)";
 				}
 			}
 			elseif($arg_name === 'status'){
 				foreach($arg_value as $name => $date){
-					$where[] = "$field IN ( \nSELECT `object` FROM `object_status` WHERE `name` = {$this->db->escape($name)} AND {$this->_parse_criteria($date, '`value`')} )";
+					$status_criteria = is_integer($name) ? " {$this->_parse_criteria($date, '`name`')} " : " `name` = {$this->db->escape($name)} AND {$this->_parse_criteria($date, '`date`')} ";
+					$where[] = "$field IN ( \nSELECT `object` FROM `object_status` WHERE$status_criteria)";
 				}
 			}
 			elseif($arg_name === 'tag'){
@@ -344,7 +342,7 @@ class Object_model extends CI_Model{
 			
 		}
 
-		return "( \n".implode("\n$logical_operator\n", $where)." \n)";
+		return empty($where) ? '1 = 1' : ("( \n".implode("\n$logical_operator\n", $where)." \n)");
 
 	}
 	

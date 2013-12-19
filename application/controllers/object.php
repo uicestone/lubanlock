@@ -18,14 +18,14 @@ class Object extends SS_Controller{
 				}
 				break;
 			
-			case 'POST' && is_null($id):
-			case 'PUT':
+			case 'POST':
 				$this->add();
 				break;
 			
-			case 'POST':
+			case 'PUT':
 				$this->update($id);
 				break;
+			
 		}
 	}
 	
