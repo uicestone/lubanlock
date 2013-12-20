@@ -456,7 +456,6 @@ ADD INDEX  `user` (  `user` ) COMMENT  '';
 ALTER TABLE  `nav` ADD INDEX (  `name` ) ;
 
 update nav set user = null where user = 0;
--- structure exported
 
 ALTER TABLE  `nav` ADD  `params` TEXT NULL AFTER  `name` ;
 
@@ -650,3 +649,8 @@ ALTER TABLE `company_config` CHANGE `name` `key` VARCHAR(255) CHARACTER SET utf8
 ALTER TABLE `company_config` CHANGE `value` `value` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
 ALTER TABLE `company_config` DROP INDEX `company`, ADD UNIQUE `company-key`(`company`, `key`);
 
+ALTER TABLE `tag_taxonomy` CHANGE `taxonomy` `taxonomy` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+ALTER TABLE  `tag_taxonomy` DROP INDEX  `tag` ,
+ADD UNIQUE  `tag_taxonomy` (  `tag` ,  `taxonomy` );
+-- structure exported
