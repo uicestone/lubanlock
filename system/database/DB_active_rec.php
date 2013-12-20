@@ -325,8 +325,7 @@ class CI_DB_active_record extends CI_DB_driver {
 	 * @param	string	the type of join
 	 * @return	object
 	 */
-	//public function join($table, $cond, $type = '')	//uicestone enable subquery in (join)
-	public function join($table, $cond, $type = '', $escape_cond = TRUE)
+	public function join($table, $cond, $type = '')
 	{
 		if ($type != '')
 		{
