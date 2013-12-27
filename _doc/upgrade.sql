@@ -653,4 +653,70 @@ ALTER TABLE `tag_taxonomy` CHANGE `taxonomy` `taxonomy` VARCHAR(255) CHARACTER S
 
 ALTER TABLE  `tag_taxonomy` DROP INDEX  `tag` ,
 ADD UNIQUE  `tag_taxonomy` (  `tag` ,  `taxonomy` );
+
+ALTER TABLE `company` COMMENT = '';
+ALTER TABLE `group` COMMENT = '';
+ALTER TABLE `log` COMMENT = '';
+ALTER TABLE `object_meta` COMMENT = '';
+ALTER TABLE `object_relationship` COMMENT = '';
+ALTER TABLE `user` COMMENT = '';
+ALTER TABLE `log` COMMENT = '';
+ALTER TABLE `log` COMMENT = '';
+
+ALTER TABLE `object`
+  DROP `display`,
+  DROP `time_insert`,
+  DROP `comment`;
+
+ALTER TABLE `lubanlock`.`object_meta` DROP INDEX `value`, ADD INDEX `value` (`value`(255))COMMENT '';
+
+ALTER TABLE `lubanlock`.`object_meta` DROP INDEX `key`, ADD INDEX `key-value` (`key`, `value`(255))COMMENT '';
+
+ALTER TABLE `object_meta` ADD `flag` INT NOT NULL ;
+
+create temporary table t
+select id from `object_meta` group by object, `key`, value;
+
+update object_meta inner join t using (id) set object_meta.flag = 1;
+
+delete from object_meta where flag != 1;
+
+ALTER TABLE `object_meta` DROP `flag`;
+
+ALTER TABLE `lubanlock`.`object_meta` ADD UNIQUE `object-key-value` (`object`, `key`, `value`(255))COMMENT '';
+
+ALTER TABLE `object_relationship` DROP `comment`;
+
+CREATE TABLE IF NOT EXISTS `object_relationship_meta` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `relationship` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` longtext NOT NULL,
+  `uid` int(11) NOT NULL,
+  `time` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `relationship` (`relationship`,`key`),
+  KEY `uid` (`uid`),
+  KEY `time` (`time`),
+  KEY `key-value` (`key`,`value`(255)),
+  KEY `value` (`value`(255))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `object_relationship_meta`
+  ADD CONSTRAINT `object_relationship_meta_ibfk_1` FOREIGN KEY (`relationship`) REFERENCES `object_relationship` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `object_relationship_meta_ibfk_2` FOREIGN KEY (`uid`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+INSERT into  `object_relationship_meta` (relationship,`key`,`value`,uid,time)
+select id,'weight',weight,6343,unix_timestamp()
+from object_relationship where weight is not null;
+
+ALTER TABLE `user` ADD `email` VARCHAR(255) NULL DEFAULT NULL AFTER `name`;
+ALTER TABLE `user` ADD UNIQUE(`email`);
+
+ALTER TABLE `object_meta` DROP FOREIGN KEY `object_meta_ibfk_5`;
+ALTER TABLE `object_meta` DROP FOREIGN KEY `object_meta_ibfk_4`; ALTER TABLE `object_meta` ADD CONSTRAINT `object_meta_ibfk_4` FOREIGN KEY (`object`) REFERENCES `lubanlock`.`object`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `object_relationship` DROP FOREIGN KEY `object_relationship_ibfk_5`; ALTER TABLE `object_relationship` ADD CONSTRAINT `object_relationship_ibfk_5` FOREIGN KEY (`object`) REFERENCES `lubanlock`.`object`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `object_status` ADD FOREIGN KEY (`object`) REFERENCES `lubanlock`.`object`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `object_tag` DROP FOREIGN KEY `object_tag_ibfk_3`; ALTER TABLE `object_tag` ADD CONSTRAINT `object_tag_ibfk_3` FOREIGN KEY (`object`) REFERENCES `lubanlock`.`object`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 -- structure exported
+

@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `company` (
   `syscode` varchar(255) NOT NULL,
   `sysname` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='公司列表（系统表）' AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `company_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `company_config` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `company-key` (`company`,`key`),
   KEY `name` (`key`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=25 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `group` (
   `id` int(11) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `group` (
   PRIMARY KEY (`id`),
   KEY `leader` (`leader`),
   KEY `company` (`company`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='团队（主表）';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `username` varchar(255) DEFAULT NULL,
   `time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='系统请求日志（记录表）' AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `nav` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -64,28 +64,24 @@ CREATE TABLE IF NOT EXISTS `nav` (
   KEY `order` (`order`),
   KEY `user` (`user`),
   KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=76 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` varchar(255) NOT NULL,
   `num` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
-  `display` tinyint(1) NOT NULL,
   `company` int(11) NOT NULL,
   `uid` int(11) DEFAULT NULL,
-  `time_insert` int(11) NOT NULL,
   `time` int(11) NOT NULL,
-  `comment` text,
   PRIMARY KEY (`id`),
   KEY `company` (`company`),
   KEY `uid` (`uid`),
-  KEY `time_insert` (`time_insert`),
   KEY `time` (`time`),
   KEY `name` (`name`),
   KEY `type` (`type`),
   KEY `num` (`num`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=67873 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_meta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -96,34 +92,46 @@ CREATE TABLE IF NOT EXISTS `object_meta` (
   `uid` int(11) DEFAULT NULL,
   `time` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `object-key-value` (`object`,`key`,`value`(255)),
   KEY `uid` (`uid`),
   KEY `time` (`time`),
-  KEY `object` (`object`),
-  KEY `key` (`key`),
-  KEY `value` (`value`(20))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='客户联系方式' AUTO_INCREMENT=219395 ;
+  KEY `value` (`value`(255)),
+  KEY `key-value` (`key`,`value`(255))
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_relationship` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object` int(11) NOT NULL,
-  `relative` int(11) DEFAULT NULL,
-  `relation` varchar(255) DEFAULT NULL,
+  `relative` int(11) NOT NULL,
+  `relation` varchar(255) NOT NULL,
   `mod` int(11) NOT NULL DEFAULT '0',
-  `weight` double DEFAULT NULL,
   `is_on` tinyint(1) DEFAULT '1',
   `num` int(11) DEFAULT NULL,
   `uid` int(11) DEFAULT NULL,
   `time` int(11) NOT NULL,
-  `comment` text,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `people-relative-relation-is_on` (`object`,`relative`,`relation`,`is_on`),
+  UNIQUE KEY `people-relative-relation-is_on` (`object`,`relative`,`relation`),
   KEY `uid` (`uid`),
   KEY `time` (`time`),
   KEY `relative` (`relative`),
   KEY `relation` (`relation`),
-  KEY `num` (`num`),
-  KEY `weight` (`weight`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='人员关系' AUTO_INCREMENT=208210 ;
+  KEY `num` (`num`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `object_relationship_meta` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `relationship` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` longtext NOT NULL,
+  `uid` int(11) NOT NULL,
+  `time` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `relationship` (`relationship`,`key`),
+  KEY `uid` (`uid`),
+  KEY `time` (`time`),
+  KEY `key-value` (`key`,`value`(255)),
+  KEY `value` (`value`(255))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -140,7 +148,7 @@ CREATE TABLE IF NOT EXISTS `object_status` (
   KEY `date` (`date`),
   KEY `uid` (`uid`),
   KEY `time` (`time`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=70772 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_tag` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -153,7 +161,7 @@ CREATE TABLE IF NOT EXISTS `object_tag` (
   KEY `uid` (`uid`),
   KEY `time` (`time`),
   KEY `tag_taxonomy` (`tag_taxonomy`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=41833 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sessions` (
   `session_id` varchar(40) NOT NULL DEFAULT '0',
@@ -175,7 +183,7 @@ CREATE TABLE IF NOT EXISTS `tag` (
   UNIQUE KEY `name` (`name`),
   KEY `order` (`order`),
   KEY `type` (`type`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=458 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `tag_taxonomy` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -187,11 +195,12 @@ CREATE TABLE IF NOT EXISTS `tag_taxonomy` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `tag` (`tag`,`taxonomy`),
   KEY `taxonomy` (`taxonomy`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=328 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int(11) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
   `alias` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `group` varchar(255) NOT NULL DEFAULT '',
@@ -201,8 +210,9 @@ CREATE TABLE IF NOT EXISTS `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`,`company`),
   KEY `company` (`company`),
-  KEY `password` (`password`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户';
+  KEY `password` (`password`),
+  KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `user_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -211,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `user_config` (
   `value` longtext NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user-key` (`user`,`key`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1200 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 
 ALTER TABLE `company_config`
@@ -236,14 +246,19 @@ ALTER TABLE `object_meta`
 
 ALTER TABLE `object_relationship`
   ADD CONSTRAINT `object_relationship_ibfk_3` FOREIGN KEY (`uid`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  ADD CONSTRAINT `object_relationship_ibfk_5` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `object_relationship_ibfk_5` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `object_relationship_ibfk_6` FOREIGN KEY (`relative`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
+ALTER TABLE `object_relationship_meta`
+  ADD CONSTRAINT `object_relationship_meta_ibfk_1` FOREIGN KEY (`relationship`) REFERENCES `object_relationship` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `object_relationship_meta_ibfk_2` FOREIGN KEY (`uid`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+
 ALTER TABLE `object_status`
+  ADD CONSTRAINT `object_status_ibfk_4` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `object_status_ibfk_3` FOREIGN KEY (`uid`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 ALTER TABLE `object_tag`
-  ADD CONSTRAINT `object_tag_ibfk_3` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `object_tag_ibfk_3` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `object_tag_ibfk_5` FOREIGN KEY (`uid`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 ALTER TABLE `tag_taxonomy`
