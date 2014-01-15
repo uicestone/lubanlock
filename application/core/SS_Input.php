@@ -64,6 +64,16 @@ class SS_input extends CI_Input{
 		return $get;
 	}
 	
+	function accept($content_type){
+		$accepts = explode(',', $this->get_request_header('Accept'));
+		
+		if($accepts && in_array($content_type, $accepts)){
+			return true;
+		}
+		
+		return false;
+	}
+	
 	function _clean_input_keys($str){   
 		$config = &get_config('config');   
 		if( ! preg_match("/^[".$config['permitted_uri_chars']."]+$/i", rawurlencode($str))){   

@@ -42,7 +42,7 @@ class SS_Controller extends CI_Controller{
 		
 		$this->user->initialize();
 		
-		if($this->input->is_ajax_request()){
+		if($this->input->accept('application/json')){
 			$this->output->set_content_type('application/json');
 		}
 		
@@ -50,41 +50,11 @@ class SS_Controller extends CI_Controller{
 			$this->load->language($this->company->syscode);
 		}
 		
-		/*
-		 * 页面权限判断
-		 */
-/*
-		if(isset($this->permission[METHOD])){
-			$this->permission=$this->permission[METHOD];
-		}
-		
-		 if($this->permission===array() && !$this->user->isLogged()){
-			if($this->output->as_ajax){
-				$this->output->set_header('Location: /login');
-				$this->output->set_status_header(301, lang('Login Required'));
-				return;
-			}else{
-				redirect('login');
-			}
-		}
-		
-		if(is_array($this->permission) && $this->permission && (!$this->user->groups || !array_intersect(array_keys($this->user->groups),$this->permission))){
-			if($this->output->as_ajax){
-				$this->output->set_status_header(401, lang('No Permission'));
-				return;
-			}else{
-				show_error('No Permission');
-			}
-		}
-		 */
-		
 	}
 	
 	function _output($output){
 		
-		$accepts = explode(',', $this->input->get_request_header('Accept'));
-		
-		if(in_array('application/json', $accepts)){
+		if($this->input->accept('application/json')){
 			echo json_encode($output);
 		}
 		else{

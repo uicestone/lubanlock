@@ -115,27 +115,6 @@ class Object extends SS_Controller{
 		}
 	}
 	
-	function relativeMod($object_id){
-		
-		$this->object->id=$object_id;
-		
-		switch ($this->input->method) {
-			case 'GET':
-				$this->output->set_output($this->object->getRelativeMod($this->input->get()));
-				break;
-			
-			case 'PUT':
-			case 'POST':
-				$mod_id=$this->object->addRelativeMod($this->input->data('name'), $this->input->get());
-				$this->output->set_output($this->object->getRelativeMod(array('id'=>$mod_id)));
-				break;
-			
-			case 'DELETE':
-				$this->object->removeRelativeMod($this->input->get());
-				break;
-		}
-	}
-	
 	function status($object_id){
 		
 		$this->object->id=$object_id;

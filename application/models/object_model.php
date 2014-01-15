@@ -12,9 +12,9 @@ class Object_model extends CI_Model{
 	static $fields=array(
 		'name'=>NULL,
 		'type'=>'',
-		'num'=>NULL,
+		'num'=>'',
 		'company'=>NULL,
-		'uid'=>NULL,
+		'user'=>NULL,
 		'time'=>NULL
 	);
 	
@@ -23,7 +23,7 @@ class Object_model extends CI_Model{
 		'key'=>'',
 		'value'=>NULL,
 		'comment'=>NULL,
-		'uid'=>NULL,
+		'user'=>NULL,
 		'time'=>NULL
 	);
 	
@@ -31,26 +31,25 @@ class Object_model extends CI_Model{
 		'object'=>NULL,
 		'relative'=>NULL,
 		'relation'=>NULL,
-		'num'=>NULL,
-		'uid'=>NULL,
+		'num'=>'',
+		'user'=>NULL,
 		'time'=>NULL
 	);
 	
 	static $fields_status=array(
 		'object'=>NULL,
 		'name'=>'',
-		'type'=>NULL,
 		'date'=>NULL,
 		'content'=>NULL,
 		'comment'=>NULL,
-		'uid'=>NULL,
+		'user'=>NULL,
 		'time'=>NULL
 	);
 	
 	static $fields_tag=array(
 		'object'=>NULL,
 		'tag_taxonomy'=>NULL,
-		'uid'=>NULL,
+		'user'=>NULL,
 		'time'=>NULL
 	);
 
@@ -66,7 +65,8 @@ class Object_model extends CI_Model{
 		
 		if(is_null($id)){
 			$id=$this->id;
-		}elseif(!array_key_exists('set_id', $args) || $args['set_id']){
+		}
+		elseif(!array_key_exists('set_id', $args) || $args['set_id']){
 			$this->id=$id;
 		}
 		
@@ -96,8 +96,8 @@ class Object_model extends CI_Model{
 	function add(array $data){
 		
 		$data['company']=$this->company->id;
-		$data['uid']=$this->user->id;
-		$data['time']=time();
+		$data['user']=$this->user->id;
+		$data['time_insert']=date('Y-m-d H:i:s');
 		
 		$this->db->insert('object',array_merge(self::$fields,array_intersect_key($data,self::$fields)));
 		
@@ -249,7 +249,11 @@ class Object_model extends CI_Model{
 			}
 			elseif($arg_name === 'status'){
 				foreach($arg_value as $name => $date){
-					$status_criteria = is_integer($name) ? " {$this->_parse_criteria($date, '`name`')} " : " `name` = {$this->db->escape($name)} AND {$this->_parse_criteria($date, '`date`')} ";
+					if(is_integer($name)){
+						$name = $date;
+						$date = false;
+					}
+					$status_criteria = !$date ? " {$this->_parse_criteria($name, '`name`')} " : " `name` = {$this->db->escape($name)} AND {$this->_parse_criteria($date, '`date`')} ";
 					$where[] = "$field IN ( \nSELECT `object` FROM `object_status` WHERE$status_criteria)";
 				}
 			}
@@ -263,17 +267,22 @@ class Object_model extends CI_Model{
 			elseif($arg_name === 'is_relative_of'){
 				foreach($arg_value as $relation => $relative_args){
 					$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation);
-					$where[] = "$field IN ( \nSELECT `relative` FROM `object_relationship` WHERE $relation_criteria AND ".$this->_parse_criteria($relative_args, '`object_relationship`.`object`')." )";
+					$where[] = "$field IN ( \nSELECT `relative` FROM `object_relationship` WHERE $relation_criteria AND ".$this->_parse_criteria($relative_args, '`object_relationship`.`object`')." \n)";
 				}
 			}
 			elseif($arg_name === 'has_relative_like'){
 				foreach($arg_value as $relation => $relative_args){
-					$where[] = "$field IN ( \nSELECT `object` FROM `object_relationship` WHERE ".$this->_parse_criteria($relative_args, '`object.relationship`.`relative`')." )";
+					$where[] = "$field IN ( \nSELECT `object` FROM `object_relationship` WHERE ".$this->_parse_criteria($relative_args, '`object_relationship`.`relative`')." \n)";
 				}
 			}
 			
-			elseif(in_array($arg_name,array('name','type','uid','time'))){
-				$where[] = $this->_parse_criteria($arg_value, '`object`.'.$arg_name);
+			elseif(in_array($arg_name,array('name','type','user','time'))){
+				if($field === '`object`.`id`'){
+					$where[] = $this->_parse_criteria($arg_value, '`object`.'.$arg_name);
+				}else{
+					$where[] = "$field IN ( \nSELECT id FROM object WHERE  ".$this->_parse_criteria($arg_value, '`object`.'.$arg_name)." \n)";
+				}
+				
 			}
 			
 		}
@@ -441,8 +450,7 @@ class Object_model extends CI_Model{
 		
 		$data['object']=$this->id;
 		$data['company']=$this->company->id;
-		$data['uid']=$this->user->id;
-		$data['time']=time();
+		$data['user']=$this->user->id;
 		
 		$data=array_merge(
 			self::$fields_meta,
@@ -496,7 +504,7 @@ class Object_model extends CI_Model{
 	function updateMeta($data, array $args = array()){
 		
 		$this->db->update('object_meta',array_merge(
-			array('uid'=>$this->user->id,'time'=>time()),
+			array('user'=>$this->user->id),
 			array_intersect_key($data, self::$fields_meta)
 		),$args?$args:array('id'=>$data['id']));
 		
@@ -561,8 +569,7 @@ class Object_model extends CI_Model{
 	function addRelative(array $data){
 		
 		$data['object']=$this->id;
-		$data['uid']=$this->user->id;
-		$data['time']=time();
+		$data['user']=$this->user->id;
 		
 		$this->db->insert('object_relationship',array_merge(
 			self::$fields_relationship,
@@ -589,7 +596,7 @@ class Object_model extends CI_Model{
 	function updateRelative(array $data, array $args=array()){
 		
 		$this->db->update('object_relationship',array_merge(
-				array('uid'=>$this->user->id,'time'=>time()),
+				array('user'=>$this->user->id),
 				array_intersect_key($data, self::$fields_relationship)
 			),$args?$args:array('id'=>$data['id']));
 		
@@ -628,14 +635,26 @@ class Object_model extends CI_Model{
 			return $this->db->get()->row_array();
 		}
 		
-		return $this->db->get()->result_array();
+		$result = $this->db->get()->result_array();
+		
+		if(array_key_exists('as_rows', $args) && $args['as_rows']){
+			return $result;
+		}
+		
+		$status = array();
+		
+		foreach($result as $row){
+			$status[$row['name']] = $row['date'];
+		}
+		
+		return $status;
+		
 	}
 
 	function addStatus(array $data){
 		
 		$data['object']=$this->id;
-		$data['uid']=$this->user->id;
-		$data['time']=time();
+		$data['user']=$this->user->id;
 		
 		if(array_key_exists('date',$data) && is_integer($data['date'])){
 			
@@ -646,7 +665,7 @@ class Object_model extends CI_Model{
 			$data['date'] = date('Y-m-d H:i:s',$data['date']);
 		}
 		
-		empty($data['date']) && $data['date'] = date('Y-m-d H:i:s', time());
+		empty($data['date']) && $data['date'] = date('Y-m-d H:i:s');
 		
 		$this->db->insert('object_status',array_merge(
 			self::$fields_status,
@@ -668,7 +687,7 @@ class Object_model extends CI_Model{
 	function updateStatus(array $data, array $args = array()){
 		
 		$this->db->update('object_status',array_merge(
-			array('uid'=>$this->user->id,'time'=>time()),
+			array('user'=>$this->user->id),
 			array_intersect_key($data, self::$fields_status)
 		),$args?$args:array('id'=>$data['id']));
 		
@@ -690,8 +709,8 @@ class Object_model extends CI_Model{
 	function getTag(array $args = array()){
 		
 		$this->db->from('object_tag')
-			->join('tag_taxonomy','tag_taxonomy.id = object_tag.tag_taxonomy')
-			->join('tag','tag.id = tag_taxonomy.tag')
+			->join('tag_taxonomy','tag_taxonomy.id = object_tag.tag_taxonomy','inner')
+			->join('tag','tag.id = tag_taxonomy.tag','inner')
 			->where('object_tag.object', $this->id)
 			->select('tag.name, tag_taxonomy.taxonomy');
 		
@@ -713,8 +732,7 @@ class Object_model extends CI_Model{
 	function addTag(array $data){
 		
 		$data['object']=$this->id;
-		$data['uid']=$this->user->id;
-		$data['time']=time();
+		$data['user']=$this->user->id;
 		
 		//TODO
 		
