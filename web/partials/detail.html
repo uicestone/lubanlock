@@ -1,4 +1,25 @@
-<form>
-	<p><input type="text" value="{{object.name}}" ng-model="object.name" ng-blur="object.$save({id:object.id})"></p>
-	<p><input type="text" value="{{object.type}}" ng-model="object.type" ng-blur="object.$save({id:object.id})"></p>
-</form>
+<h1>{{object.name}}<label>({{object.type}})</label></h1>
+<ul>
+	<li ng-repeat="(key, values) in object.meta">
+		{{key}}: 
+		<span ng-repeat="value in values">{{value}}</span>
+	</li>
+</ul>
+<ul>
+	<li ng-repeat="(relation, relatives) in object.relative">
+		{{relation}}: 
+		<span ng-repeat="relative in relatives">
+			<a href="#detail/{{relative.id}}">{{relative.name}}</a>
+		</span>
+	</li>
+</ul>
+<ul>
+	<li ng-repeat="(name, date) in object.status">
+		{{name}}: {{date}}
+	</li>
+</ul>
+<ul>
+	<li ng-repeat="(taxonomy, tag) in object.tag">
+		{{taxonomy}}: {{tag}}
+	</li>
+</ul>

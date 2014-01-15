@@ -4,9 +4,9 @@
 
 var lubanlockControllers = angular.module('lubanlockControllers', []);
 
-lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Object',
-	function($scope, $location, Object) {
-		$scope.objects = Object.query({get_status:true, get_tag:true});
+lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$routeParams', 'Object',
+	function($scope, $location, $routeParams, Object) {
+		$scope.objects = Object.query($routeParams);
 		$scope.showDetail = function(objectId){
 			$location.path('/detail/' + objectId);
 		};

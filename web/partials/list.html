@@ -1,6 +1,10 @@
 <ul>
-	<li ng-repeat="object in objects" ng-click="showDetail(object.id)">
-		<p>Name: {{object.name}}</p>
-		<p>Type: {{object.type}}</p>
+	<li ng-repeat="object in objects">
+		<p>
+			<a href="#detail/{{object.id}}">
+				{{object.name}}
+			</a>
+			<label>({{object.type}})</label>
+		</p>
 	</li>
 </ul>
