@@ -13,7 +13,8 @@ var api = [
 				"with_meta":true,
 				"with_relative":true,
 				"with_status":true,
-				"with_tag":true
+				"with_tag":true,
+				"with":["meta","relative","status","tag"]
 			}
 		},
 		"response":{
@@ -383,19 +384,37 @@ var objectData={
 	"type":"",//对象类型如"人员", "联系人", "案件", "事务"
 	"num":"",//对象的编号，字符串
 	"name":"",//对象的显示名称
-	"{additional_fields}":"",//非必有，根据不同type的对象，可能有些额外的根字段（考虑一律去处这些字段）
-	"meta":[//非必有，获得对象时with_meta参数决定
-		meta
-	],
-	"relative":[//非必有，获得对象时with_relative参数决定
-		relative
-	],
+	"meta":{//非必有，获得对象时with_meta参数决定
+		"<metaName>": ["metaValue1", "metaValue2"]
+	},
+	"relative":{//非必有，获得对象时with_relative参数决定
+		"<relation>": [
+			{
+				"id": 0,
+				"type":"",
+				"name": ""
+			},{
+				"id": 0,
+				"type":"",
+				"name": ""
+			}
+		]
+	},
 	"status":[//非必有，获得对象时with_status参数决定
-		status
+		{
+			"name":"",
+			"date":"1970-01-01 00:00:00"
+		},
+		{
+			"name":"",
+			"date":"1970-01-01 00:00:00"
+		},
 	],
-	"tag":[//非必有，获得对象时with_tag参数决定
-		tag
-	]
+	"tag":{//非必有，获得对象时with_tag参数决定
+		"taxonomy": "tag",
+		"领域": "刑事",
+		"阶段": "二审"
+	}
 };
 
 /*
@@ -408,15 +427,6 @@ var meta={
 	"value":"",
 	"comment":""
 };
-
-/*
- * 开关量
- * 在数据库中以整数存放，转换成二进制后每一位表示一个开关量
- * 开关量的名称在后端定义，因此只有“是”和“否”，并没有“未知”，因此只有增删，没有改
- * 对象有开关量，对象与对象的关联也有开关量
- * 如一个对象的读, 写权限, 又如一个日程对于某用户的“删除”状态
- */
-var mod=["read","write"];
 
 /**
  * 关连对象
