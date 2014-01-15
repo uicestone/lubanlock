@@ -346,7 +346,7 @@ class CI_DB_active_record extends CI_DB_driver {
 		$this->_track_aliases($table);
 
 		// Strip apart the condition and protect the identifiers
-		if ($escape_cond && preg_match('/([\w\.]+)([\W\s]+)(.+)/', $cond, $match))//add condition to support unescaped join, useful when join subqueries uicestone 2013/3/20
+		if (preg_match('/([\w\.]+)([\W\s]+)(.+)/', $cond, $match))//add condition to support unescaped join, useful when join subqueries uicestone 2013/3/20
 		{
 			$match[1] = $this->_protect_identifiers($match[1]);
 			$match[3] = $this->_protect_identifiers($match[3]);
