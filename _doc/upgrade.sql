@@ -3,6 +3,12 @@ update people set email = null where email = '无';
 update account set account = id where account is null;
 update schedule set company = 1 where company is null;
 delete from account where type in ('办案奖金','结案奖金','结案奖金储备');
+ALTER TABLE `express` DROP FOREIGN KEY `express_ibfk_5`;
+ALTER TABLE `express` DROP FOREIGN KEY `express_ibfk_3`;
+update people set id = 32 where id = 1;
+delete from company where id = 3;
+update company set id = 3 where id = 1;
+update express set company = 3 where company is null;
 
 -- 将各大对象表的id顺序衔接，以便并表
 ALTER TABLE  `account` DROP FOREIGN KEY  `account_ibfk_12` ;
@@ -25,14 +31,12 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- 导入people
 insert into lubanlock.object (id,type,num,name,company,user,time,time_insert)
-select id, type, num, name, company, if(uid is null, 0 , uid), from_unixtime(time),from_unixtime(time_insert) from people;
+select id, type, num, name, company, if(uid is null, 1 , uid), from_unixtime(time),from_unixtime(time_insert) from people;
 
 -- 导入user
 insert into lubanlock.user (id,name,email,alias,password,`group`,last_ip,last_login,company)
 select user.id,user.name,if(email = '', null, email),alias,password,`group`,lastip,from_unixtime(lastlogin), user.company
 from user inner join people using (id);
-
-SET FOREIGN_KEY_CHECKS=1;
 
 -- 导入其他object
 insert into lubanlock.object (id, type, name, company, user, time, time_insert)
@@ -90,7 +94,7 @@ select account,'备注',`comment`,uid,from_unixtime(time)
 from `account` where `comment` is not null and `comment` != '' group by account;
 
 insert ignore into lubanlock.object_meta (object,`key`,value,user,time)
-select account.account,'发票未开','1',0,0
+select account.account,'发票未开','1',1,0
 from `account_label` inner join account where label_name = '发票未开';
 
 insert ignore into lubanlock.object_meta (object,`key`,value,user,time)
@@ -226,7 +230,7 @@ select id,'备注',`comment`,uid,from_unixtime(time)
 from `score` where `comment` is not null and `comment` != '';
 
 insert ignore into lubanlock.object_meta (object,`key`,value,user,time)
-select id,'职称',title,0,0 from staff where title is not null and title != '';
+select id,'职称',title,1,0 from staff where title is not null and title != '';
 
 -- 导入object_status
 insert into lubanlock.object_status (object,name,date,comment,user,time)
@@ -268,7 +272,7 @@ insert ignore into lubanlock.tag_taxonomy (tag,taxonomy)
 select tag.id,'类型' from account inner join lubanlock.tag on tag.name = account.type group by account.type;
 
 insert ignore into lubanlock.object_tag (object,tag_taxonomy,user,time)
-select account.account,tag_taxonomy.id,0,0
+select account.account,tag_taxonomy.id,1,0
 from account inner join lubanlock.tag on tag.name = account.type inner join lubanlock.tag_taxonomy on tag_taxonomy.tag = tag.id and tag_taxonomy.taxonomy = '类型';
 
 --
@@ -276,30 +280,31 @@ insert ignore into lubanlock.tag_taxonomy (tag,taxonomy)
 select tag.id,'类型' from document_label inner join lubanlock.tag on tag.name = document_label.label_name group by document_label.label_name;
 
 insert ignore into lubanlock.object_tag (object,tag_taxonomy,user,time)
-select document_label.document,tag_taxonomy.id,0,0
+select document_label.document,tag_taxonomy.id,1,0
 from document_label inner join lubanlock.tag on tag.name = document_label.label_name inner join lubanlock.tag_taxonomy on tag_taxonomy.tag = tag.id and tag_taxonomy.taxonomy = '类型';
 --
 insert ignore into lubanlock.tag_taxonomy (tag,taxonomy)
 select tag.id,type from people_label inner join lubanlock.tag on tag.name = people_label.label_name group by people_label.label_name;
 
 insert ignore into lubanlock.object_tag (object,tag_taxonomy,user,time)
-select people_label.people,tag_taxonomy.id,0,0
+select people_label.people,tag_taxonomy.id,1,0
 from people_label inner join lubanlock.tag on tag.name = people_label.label_name inner join lubanlock.tag_taxonomy on tag_taxonomy.tag = tag.id and tag_taxonomy.taxonomy = people_label.type;
 --
 insert ignore into lubanlock.tag_taxonomy (tag,taxonomy)
 select tag.id,type from project_label inner join lubanlock.tag on tag.name = project_label.label_name group by project_label.label_name;
 
 insert ignore into lubanlock.object_tag (object,tag_taxonomy,user,time)
-select project_label.project,tag_taxonomy.id,0,0
+select project_label.project,tag_taxonomy.id,1,0
 from project_label inner join lubanlock.tag on tag.name = project_label.label_name inner join lubanlock.tag_taxonomy on tag_taxonomy.tag = tag.id and tag_taxonomy.taxonomy = project_label.type;
 --
 insert ignore into lubanlock.tag_taxonomy (tag,taxonomy)
 select tag.id,'' from schedule_label inner join lubanlock.tag on tag.name = schedule_label.label_name group by schedule_label.label_name;
 
 insert ignore into lubanlock.object_tag (object,tag_taxonomy,user,time)
-select schedule_label.schedule,tag_taxonomy.id,0,0
+select schedule_label.schedule,tag_taxonomy.id,1,0
 from schedule_label inner join lubanlock.tag on tag.name = schedule_label.label_name inner join lubanlock.tag_taxonomy on tag_taxonomy.tag = tag.id and tag_taxonomy.taxonomy = '';
 
+drop table if exists taxonomy_count ;
 create temporary table taxonomy_count select tag_taxonomy,count(*) count from lubanlock.object_tag group by tag_taxonomy;
 update lubanlock.tag_taxonomy inner join taxonomy_count on taxonomy_count.tag_taxonomy = tag_taxonomy.id
 set tag_taxonomy.count = taxonomy_count.count;
@@ -330,7 +335,7 @@ select project,document,'文档',uid,from_unixtime(time) from project_document;
 
 -- project_relationship
 insert into lubanlock.object_relationship (object,relative,relation,user,time)
-select project,relative,if(relation is null,'',relation),0,0 from project_relationship;
+select project,relative,if(relation is null,'',relation),1,0 from project_relationship;
 
 -- project_people
 insert into lubanlock.object_relationship (object,relative,relation,user,time)
@@ -338,7 +343,7 @@ select project,people,role,uid,from_unixtime(time) from project_people;
 
 -- schedule_people
 insert into lubanlock.object_relationship (object,relative,relation,user,time)
-select schedule,people,'people',0,0 from schedule_people;
+select schedule,people,'people',1,0 from schedule_people;
 
 -- user_config
 insert into lubanlock.user_config (user,`key`,value)
@@ -352,21 +357,23 @@ insert into lubanlock.object (type, company, user, time, time_insert, flag)
 select 'dialog',user.company,uid,from_unixtime(time),from_unixtime(time),dialog.id from dialog inner join user on dialog.uid = user.id;
 
 insert into lubanlock.object_relationship (object, relative, relation,user,time)
-select object.id, dialog_user.user, 'user',0,0 from dialog_user inner join lubanlock.object on object.flag = dialog_user.dialog and object.type = 'dialog';
+select object.id, dialog_user.user, 'user',1,0 from dialog_user inner join lubanlock.object on object.flag = dialog_user.dialog and object.type = 'dialog';
 
 insert into lubanlock.object_relationship (object, relative,relation,user,time)
-select dialog_object.id, message_object.id,'message',0,0
+select dialog_object.id, message_object.id,'message',1,0
 from dialog_message 
 inner join lubanlock.object dialog_object on dialog_object.flag = dialog_message.dialog and dialog_object.type = 'dialog' 
 inner join lubanlock.object message_object on message_object.flag = dialog_message.message and message_object.type = 'message';
 
 insert into lubanlock.object_relationship (object,relative,relation,user,time)
-select message_object.id, message_user.user,'user',0,0
+select message_object.id, message_user.user,'user',1,0
 from message_user 
 inner join lubanlock.object message_object on message_object.flag = message_user.message and message_object.type = 'message';
 
 insert into lubanlock.object_relationship (object,relative,relation,user,time)
-select message_object.id, message_document.document,'document',0,0
+select message_object.id, message_document.document,'document',1,0
 from message_document inner join lubanlock.object message_object on message_object.flag = message_document.message and message_object.type = 'message';
 
--- 将所有user和time为0 的更新为相关值
+SET FOREIGN_KEY_CHECKS=1;
+
+-- 将所有user为1和time为0 的更新为相关值
