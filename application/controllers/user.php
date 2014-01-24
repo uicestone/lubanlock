@@ -11,16 +11,18 @@ class user extends SS_controller{
 	
 	function login(){
 		
-		if($this->input->post()){
-			$user=$this->user->verify($this->input->get_post('username'), $this->input->get_post('password'));
+		if($this->input->get_post('username')){
+			
+			$user = $this->user->verify($this->input->get_post('username'), $this->input->get_post('password'));
 
 			if($user){
 				$this->session->set_userdata('user_id', intval($user['id']));
 				$this->user->updateLoginTime();
 				redirect();
 			}
+			
 			else{
-				$alert[]=array('type'=>'warning','message'=>lang('Wrong username or password.'));
+				throw new Exception('login_info_error', 403);
 			}
 		}
 		
