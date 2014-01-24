@@ -1,14 +1,17 @@
 <?php
 class User_model extends Object_model{
 	
-	var $name='';
-	var $groups=array();
+	var $name = '';
+	var $roles = array();
+	var $groups = array();
+	var $group_ids = array();//当前用户所属组的object id，包含当前用户的user id
 	
 	static $fields=array(
 		'name'=>'',
 		'email'=>'',
 		'alias'=>NULL,//别名
-		'password'=>''//密码
+		'password'=>'',//密码
+		'roles'=>''
 	);
 	
 	function __construct(){
@@ -28,8 +31,36 @@ class User_model extends Object_model{
 		
 		$user=$this->fetch();
 		$this->name=$user['name'];
-		$this->groups=explode(',',$user['group']);
-
+		$user['roles'] && $this->roles=explode(',',$user['roles']);
+		array_push($this->group_ids, $this->id);
+		
+		function get_parent_group($children = array(), &$object){
+			
+			$parents = $object->getList(array(
+				'type'=>'group',
+				'has_relative_like'=>array($children)
+			));
+			
+			$object->groups = array_merge($object->groups, $parents['data']);
+			$parent_group_ids = array_column($parents['data'], 'id');
+			$object->group_ids = array_merge($object->group_ids, $parent_group_ids);
+			
+			if(empty($parent_group_ids)){
+				return;
+			}
+		
+			get_parent_group($parent_group_ids, $object);
+		}
+		
+		get_parent_group(array($this->id), $this);
+		
+		$groups = $this->groups;
+		$this->groups = array();
+		
+		foreach($groups as $value){
+			$this->groups[$value['id']] = $value;
+		}
+		
 		$this->config->user=$this->config();
 	}
 	
@@ -64,13 +95,12 @@ class User_model extends Object_model{
 	function verify($username,$password){
 		
 		$username=$this->db->escape($username);
-		$password=$this->db->escape($password);
 		
 		$this->db
 			->from('user')
 			->where('company',$this->company->id)
 			->where("(name = $username OR alias = $username)",NULL,false)
-			->where("(password = $password OR password IS NULL)",NULL,false);
+			->where('password',$password);
 				
 		$user=$this->db->get()->row_array();
 		
@@ -80,8 +110,8 @@ class User_model extends Object_model{
 	function updateLoginTime(){
 		$this->db->update('user',
 			array(
-				'lastip'=>$this->session->userdata('ip_address'),
-				'lastlogin'=>time()
+				'last_ip'=>$this->session->userdata('ip_address'),
+				'last_login'=>date()
 			),
 			array('id'=>$this->id)
 		);
@@ -132,7 +162,7 @@ class User_model extends Object_model{
 			if(empty($this->id)){
 				return false;
 			}
-		}elseif(empty($this->groups) || !in_array($group,$this->groups)){
+		}elseif(empty($this->roles) || !in_array($group,$this->roles)){
 			return false;
 		}
 

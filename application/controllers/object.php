@@ -3,7 +3,6 @@ class Object extends SS_Controller{
 	
 	function __construct() {
 		parent::__construct();
-		$this->load->model('object_model','object');
 	}
 	
 	function index($id=NULL){

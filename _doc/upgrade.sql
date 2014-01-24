@@ -34,7 +34,7 @@ insert into lubanlock.object (id,type,num,name,company,user,time,time_insert)
 select id, type, num, name, company, if(uid is null, 1 , uid), from_unixtime(time),from_unixtime(time_insert) from people;
 
 -- 导入user
-insert into lubanlock.user (id,name,email,alias,password,`group`,last_ip,last_login,company)
+insert into lubanlock.user (id,name,email,alias,password,`roles`,last_ip,last_login,company)
 select user.id,user.name,if(email = '', null, email),alias,password,`group`,lastip,from_unixtime(lastlogin), user.company
 from user inner join people using (id);
 

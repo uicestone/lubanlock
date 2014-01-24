@@ -264,7 +264,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `email` varchar(255) DEFAULT NULL,
   `alias` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `group` varchar(255) NOT NULL DEFAULT '',
+  `roles` varchar(255) NOT NULL DEFAULT '',
   `last_ip` char(15) NOT NULL DEFAULT '',
   `last_login` timestamp NOT NULL,
   `company` int(11) NOT NULL,
