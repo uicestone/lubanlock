@@ -4,10 +4,9 @@ class Object_model extends CI_Model{
 	var $id;
 	var $data;//具体对象数据
 	var $meta;//具体对象的元数据
-	var $mod=false;
 	var $relative;
 	var $status;
-	var $tags;//具体对象的标签
+	var $tag;//具体对象的标签
 	
 	static $fields=array(
 		'name'=>NULL,
@@ -76,6 +75,14 @@ class Object_model extends CI_Model{
 				'object.id'=>$id,
 				'object.company'=>$this->company->id,
 			));
+		
+		$permission_condition = 'object.id NOT IN ( SELECT `object` FROM `object_permission` )';
+		
+		if(is_array($this->user->group_ids) && !empty($this->user->group_ids)){
+			$permission_condition .= ' OR object.id IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND user IN ( '.implode(', ',$this->user->group_ids).' ) )';
+		}
+		
+		$this->db->where('( '.$permission_condition.' )');
 		
 		$object=$this->db->get()->row_array();
 		
@@ -205,7 +212,7 @@ class Object_model extends CI_Model{
 		}
 		
 		//如果参数数组不为空，且全是数字键，则作in处理
-		if($args && array_reduce(array_keys($args), function($result, $item){
+		if(array_reduce(array_keys($args), function($result, $item){
 			return $result && is_integer($item);
 		}, true)){
 			$args = array('in'=>$args);
@@ -235,7 +242,12 @@ class Object_model extends CI_Model{
 				$where[] = $field.' <= '.$this->db->escape($arg_value);
 			}
 			elseif($arg_name === 'in'){
-				$where[] = $field." IN ( \n".implode(', ', array_map(array($this->db, 'escape'), $arg_value)).' )';
+				if($arg_value === array()){
+					$where[] = ' FALSE';
+				}
+				else{
+					$where[] = $field." IN ( \n".implode(', ', array_map(array($this->db, 'escape'), $arg_value)).' )';
+				}
 			}
 			elseif($arg_name === 'nin'){
 				$where[] = $field." NOT IN ( \n".implode(', ', array_map(array($this->db, 'escape'), $arg_value)).' )';
@@ -266,13 +278,14 @@ class Object_model extends CI_Model{
 			
 			elseif($arg_name === 'is_relative_of'){
 				foreach($arg_value as $relation => $relative_args){
-					$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation);
-					$where[] = "$field IN ( \nSELECT `relative` FROM `object_relationship` WHERE $relation_criteria AND ".$this->_parse_criteria($relative_args, '`object_relationship`.`object`')." \n)";
+					$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation).' AND ';
+					$where[] = "$field IN ( \nSELECT `relative` FROM `object_relationship` WHERE $relation_criteria".$this->_parse_criteria($relative_args, '`object_relationship`.`object`')." \n)";
 				}
 			}
 			elseif($arg_name === 'has_relative_like'){
 				foreach($arg_value as $relation => $relative_args){
-					$where[] = "$field IN ( \nSELECT `object` FROM `object_relationship` WHERE ".$this->_parse_criteria($relative_args, '`object_relationship`.`relative`')." \n)";
+					$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation).' AND ';
+					$where[] = "$field IN ( \nSELECT `object` FROM `object_relationship` WHERE $relation_criteria".$this->_parse_criteria($relative_args, '`object_relationship`.`relative`')." \n)";
 				}
 			}
 			
@@ -340,6 +353,14 @@ class Object_model extends CI_Model{
 		
 		$this->db->where($this->_parse_criteria($args), null, false);
 		
+		$permission_condition = '`object`.`id` NOT IN ( SELECT `object` FROM `object_permission` )';
+		
+		if(is_array($this->user->group_ids) && !empty($this->user->group_ids)){
+			$permission_condition .= ' OR `object`.`id` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( '.implode(', ',$this->user->group_ids).' ) )';
+		}
+		
+		$this->db->where('( '.$permission_condition.' )');
+		
 		if(!array_key_exists('order_by', $args)){
 			$args['order_by'] = 'object.id desc';
 		}
@@ -404,11 +425,34 @@ class Object_model extends CI_Model{
 	function getRow(array $args=array()){
 		!array_key_exists('limit',$args) && $args['limit']=1;
 		$result=$this->getList($args);
-		if(isset($result[0])){
-			return $result[0];
+		if(isset($result['data'][0])){
+			return $result['data'][0];
 		}else{
 			return array();
 		}
+	}
+	
+	/**
+	 * 生成一个SQL表达式条件，用于确认某种对象属性的权限
+	 * @param string $property
+	 */
+	function _property_permission_conditions($property){
+		$permission_condition = "`object_$property`.`id` NOT IN ( SELECT `object_$property` FROM `object_{$property}_permission` ) AND (";
+		
+		$permission_condition .= "\n`object_$property`.`object` NOT IN ( SELECT `object` FROM `object_permission` )";
+		
+		if(!empty($this->user->group_ids)){
+			$permission_condition .= " OR `object_$property`.`object` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( ".implode(', ', $this->user->group_ids).' ) )';
+		}
+		
+		$permission_condition .= "\n)";
+		
+		if(!empty($this->user->group_ids)){
+			$permission_condition ."\nOR `object_$property`.`id` IN ( SELECT `object_$property` FROM `object_{$property}_permission` WHERE `read` = TRUE AND `user` IN ( ".implode(', ', $this->user->group_ids).' ) )';
+		}
+		
+		return '( '.$permission_condition.' )';
+		
 	}
 	
 	/**
@@ -419,10 +463,12 @@ class Object_model extends CI_Model{
 		
 		$this->db->select('object_meta.*')
 			->from('object_meta')
-			->where("object_meta.object",$this->id);
+			->where("`object_meta`.`object`",$this->id);
+		
+		$this->db->where($this->_property_permission_conditions('meta'));
 		
 		if(array_key_exists('id', $args)){
-			$this->db->where('object_meta.id',$args['id']);
+			$this->db->where('`object_meta`.`id`',$args['id']);
 			return $this->db->get()->row_array();
 		}
 		
@@ -486,7 +532,7 @@ class Object_model extends CI_Model{
 		$meta = $this->getMeta();
 		if(array_key_exists($key, $meta)){
 			$this->db->set("`value` = `value` + ".$this->db->escape($value), null, false)
-				->where('object_meta.object', $this->id)
+				->where('`object_meta`.`object`', $this->id)
 				->where('object_meta.key', $key)
 				->update('object_meta')
 				->limit(1);
@@ -540,6 +586,8 @@ class Object_model extends CI_Model{
 		$this->db
 			->from('object_relationship')
 			->where('object_relationship.object',$this->id);
+		
+		$this->db->where($this->_property_permission_conditions('relationship'));
 		
 		if(array_key_exists('relation', $args)){
 			$this->db->where('object_relationship.relation',$args['relation']);
@@ -624,11 +672,13 @@ class Object_model extends CI_Model{
 	function getStatus(array $args = array()){
 		
 		$this->db->select('object_status.*')
-			->select('UNIX_TIMESTAMP(date) timestamp', false)
+			->select('UNIX_TIMESTAMP(`date`) `timestamp`', false)
 			->select('date')
 			->from('object_status')
 			->where('object',$this->id)
 			->order_by('date');
+		
+		$this->db->where($this->_property_permission_conditions('status'));
 		
 		if(array_key_exists('id', $args)){
 			$this->db->where('object_status.id',$args['id']);
@@ -713,6 +763,8 @@ class Object_model extends CI_Model{
 			->join('tag','tag.id = tag_taxonomy.tag','inner')
 			->where('object_tag.object', $this->id)
 			->select('tag.name, tag_taxonomy.taxonomy');
+		
+		$this->db->where($this->_property_permission_conditions('tag'));
 		
 		$result = $this->db->get()->result_array();
 		
