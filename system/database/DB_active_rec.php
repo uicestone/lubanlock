@@ -2082,6 +2082,7 @@ class CI_DB_active_record extends CI_DB_driver {
 	{
 		$ar_reset_items = array(
 			'ar_select'			=> array(),
+			'ar_found_rows'	=> FALSE,
 			'ar_from'			=> array(),
 			'ar_join'			=> array(),
 			'ar_where'			=> array(),
