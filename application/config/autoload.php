@@ -96,7 +96,7 @@ $autoload['config'] = array();
 |
 */
 
-$autoload['language'] = array('controllers','error');
+$autoload['language'] = array('message');
 
 
 /*
