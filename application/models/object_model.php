@@ -60,7 +60,7 @@ class Object_model extends CI_Model{
 	 * 
 	 * @throws Exception 'not_found'
 	 */
-	function fetch($id=NULL, array $args=array()){
+	function fetch($id=NULL, array $args=array(), $permission_check = true){
 		
 		if(is_null($id)){
 			$id=$this->id;
@@ -76,13 +76,16 @@ class Object_model extends CI_Model{
 				'object.company'=>$this->company->id,
 			));
 		
-		$permission_condition = 'object.id NOT IN ( SELECT `object` FROM `object_permission` )';
+		if($permission_check){
 		
-		if(is_array($this->user->group_ids) && !empty($this->user->group_ids)){
-			$permission_condition .= ' OR object.id IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND user IN ( '.implode(', ',$this->user->group_ids).' ) )';
+			$permission_condition = 'object.id NOT IN ( SELECT `object` FROM `object_permission` )';
+
+			if(is_array($this->user->group_ids) && !empty($this->user->group_ids)){
+				$permission_condition .= ' OR object.id IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND user IN ( '.implode(', ',$this->user->group_ids).' ) )';
+			}
+
+			$this->db->where('( '.$permission_condition.' )');
 		}
-		
-		$this->db->where('( '.$permission_condition.' )');
 		
 		$object=$this->db->get()->row_array();
 		
@@ -92,7 +95,8 @@ class Object_model extends CI_Model{
 		
 		foreach(array('meta','relative','status','tag') as $field){
 			if(!array_key_exists('with_'.$field,$args) || $args['with_'.$field]){
-				$object[$field]=call_user_func(array($this,'get'.$field));
+				$property_args = array_key_exists('with_'.$field,$args) && is_array($args['with_'.$field]) ? $args['with_'.$field] : array();
+				$object[$field]=call_user_func(array($this,'get'.$field), $property_args);
 			}
 		}
 		
@@ -109,6 +113,8 @@ class Object_model extends CI_Model{
 		$this->db->insert('object',array_merge(self::$fields,array_intersect_key($data,self::$fields)));
 		
 		$this->id=$this->db->insert_id();
+		
+		$this->authorize(array('read'=>true,'write'=>true,'grant'=>true), $this->user->id, false);
 		
 		if(isset($data['meta'])){
 			$this->addMetas($data['meta']);
@@ -133,7 +139,7 @@ class Object_model extends CI_Model{
 
 		$data=array_intersect_key($data, self::$fields);
 		
-		if(empty($data)){
+		if(empty($data) || !$this->allow('write')){
 			return false;
 		}
 		
@@ -195,7 +201,7 @@ class Object_model extends CI_Model{
 			->get();
 
 		if($result->num_rows()>1){
-			throw new Exception(lang('duplicated_matches').' '.$part_of_name);
+			throw new Exception(lang('duplicated_matches').' '.$part_of_name, 400);
 		}
 		elseif($result->num_rows===0){
 			throw new Exception($part_of_name.' '.lang('not_found'));
@@ -203,6 +209,155 @@ class Object_model extends CI_Model{
 		else{
 			return $result->row()->id;
 		}
+	}
+	
+	/**
+	 * 判断一个对象对于一些用户或组来说是否具有某种权限
+	 * 权限表中没有此对象，默认有权限
+	 * @param string $permission	read | write | grant
+	 * @param array|int $users	默认为$this->user->group_ids，即当前用户和递归所属组
+	 * @return boolean
+	 * @throws Exception	argument_error
+	 */
+	function allow($permission = 'read', $users = null){
+		
+		if(!in_array($permission, array('read', 'write', 'grant'))){
+			throw new Exception('argument_error', 400);
+		}
+		
+		if(is_null($users)){
+			$users = $this->user->group_ids;
+		}
+		
+		if(!is_array($users)){
+			$users = array($users);
+		}
+		
+		$result = $this->db->from('object_permission')->where('object',$this->id)->where_in('user',$users)->get()->row();
+		
+		if($result === array() || (bool)$result->$permission === true){
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 判断一个对象属性对于一些用户或组来说是否具有某种权限
+	 * 权限表中没有此对象属性，默认有权限
+	 * @param string $property	meta|relative|status|tag
+	 * @param string $permission	read | write | grant
+	 * @param type $property_id
+	 * @param array|int $users	默认为$this->user->group_ids，即当前用户和递归所属组
+	 * @return boolean
+	 * @throws Exception	argument_error
+	 */
+	function allow_property($property, $permission = 'read', $property_id = null, $users = null){
+		
+		if(!in_array($property, array('meta', 'relative', 'status', 'tag'))){
+			throw new Exception('property_name_error', 400);
+		}
+		
+		if(!in_array($permission, array('read', 'write', 'grant'))){
+			throw new Exception('argument_error', 400);
+		}
+		
+		if(is_null($property_id)){
+			$property_id = $this->$property->id;
+		}
+		
+		if(is_null($users)){
+			$users = $this->user->group_ids;
+		}
+		
+		if(!is_array($users)){
+			$users = array($users);
+		}
+		
+		$result = $this->db->from("object_{$property}_permission")->where('object_'.$property,$property_id)->where_in('user',$users)->get()->row();
+		
+		if($result === array() || (bool)$result->$permission === true){
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 对某用户或组赋予/取消赋予一个对象某种权限
+	 * @param array|string $permission	可选健包括array('read'=>true,'write'=>true,'grant'=>true)，为string时自动转换成array(string=>true)
+	 * @param array|int $users	默认为$this->user->id，即当前用户
+	 * @param bool $permission_check
+	 * @throws Exception
+	 */
+	function authorize($permission = array('read'=>true), $users = null, $permission_check = true){
+		
+		if(is_null($users)){
+			$users = array($this->user->id);
+		}
+		
+		if(!is_array($users)){
+			$users = array($users);
+		}
+		
+		if($permission_check && !$this->allow('grant')){
+			throw new Exception('no_permission_to_grant', 403);
+		}
+		
+		if(!is_array($permission)){
+			$permission = array($permission => true);
+		}
+		
+		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
+		
+		foreach($users as $user){
+			$this->db->upsert('object_permission', array('user'=>$user, 'object'=>$this->id) + $permission);
+		}
+		
+	}
+	
+	/**
+	 * 对某用户或组赋予/取消赋予一个对象属性某种权限
+	 * @param string $property	meta|relative|status|tag
+	 * @param array|string $permission	可选健包括array('read'=>true,'write'=>true,'grant'=>true)，为string时自动转换成array(string=>true)
+	 * @param type $property_id
+	 * @param array|int $users	默认为$this->user->id，即当前用户
+	 * @param bool $permission_check
+	 * @throws Exception
+	 */
+	function authorize_property($property, $permission = array('read'=>true), $property_id = null, $users = null, $permission_check = true){
+		
+		if(!in_array($property, array('meta', 'relative', 'status', 'tag'))){
+			throw new Exception('property_name_error', 400);
+		}
+		
+		if(!is_array($permission)){
+			$permission = array($permission => true);
+		}
+		
+		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
+		
+		if(is_null($property_id)){
+			$property_id = $this->$property->id;
+		}
+		
+		if(is_null($users)){
+			$users = array($this->user->id);
+		}
+		
+		if(!is_array($users)){
+			$users = array($users);
+		}
+		
+		if($permission_check && (!$this->allow('grant') || !$this->allow_property($property, 'grant', $property_id))){
+			throw new Exception('no_permission_to_grant', 403);
+		}
+		
+		foreach($users as $user){
+			$this->db->upsert("object_{$property}_permission", array('user'=>$user, 'object_'.$property=>$property_id) + $permission);
+			echo $this->db->last_query()."\n";
+		}
+		
 	}
 	
 	function _parse_criteria($args, $field='`object`.`id`', $logical_operator = 'AND'){
@@ -403,11 +558,12 @@ class Object_model extends CI_Model{
 		$result = array();
 		$result['total'] = $this->db->query('SELECT FOUND_ROWS() rows')->row()->rows;
 		
-		foreach(array('meta','mod','relative','status','tag') as $field){
+		foreach(array('meta','relative','status','tag') as $field){
 			if(array_key_exists('with_'.$field,$args) && $args['with_'.$field]){
-				array_walk($result_array,function(&$row, $index, $field){
+				array_walk($result_array,function(&$row, $index, $field, $args){
 					$this->id = $row['id'];
-					$row[$field]=call_user_func(array($this,'get'.$field));
+					$property_args = is_array($args['with_'.$field]) ? $args['with_'.$field] : array();
+					$row[$field] = call_user_func(array($this,'get'.$field), $property_args);
 				},$field);
 			}
 		}
@@ -434,6 +590,7 @@ class Object_model extends CI_Model{
 	
 	/**
 	 * 生成一个SQL表达式条件，用于确认某种对象属性的权限
+	 * 对象属性权限表有权限读，如果无记录，则看对象是否有权限读，如果无记录，则视为有权
 	 * @param string $property
 	 */
 	function _property_permission_conditions($property){
@@ -448,7 +605,7 @@ class Object_model extends CI_Model{
 		$permission_condition .= "\n)";
 		
 		if(!empty($this->user->group_ids)){
-			$permission_condition ."\nOR `object_$property`.`id` IN ( SELECT `object_$property` FROM `object_{$property}_permission` WHERE `read` = TRUE AND `user` IN ( ".implode(', ', $this->user->group_ids).' ) )';
+			$permission_condition .= "\nOR `object_$property`.`id` IN ( SELECT `object_$property` FROM `object_{$property}_permission` WHERE `read` = TRUE AND `user` IN ( ".implode(', ', $this->user->group_ids).' ) )';
 		}
 		
 		return '( '.$permission_condition.' )';

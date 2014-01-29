@@ -29,7 +29,7 @@ class User_model extends Object_model{
 			return;
 		}
 		
-		$user=$this->fetch();
+		$user=$this->fetch($this->id, array(), false);
 		$this->name=$user['name'];
 		$user['roles'] && $this->roles=explode(',',$user['roles']);
 		array_push($this->group_ids, $this->id);
@@ -64,9 +64,9 @@ class User_model extends Object_model{
 		$this->config->user=$this->config();
 	}
 	
-	function fetch($id=null, $args = array()){
+	function fetch($id=null, $args = array(), $permission_check = true){
 		$this->db->join('user','user.id = object.id','inner');
-		return parent::fetch($id, $args);
+		return parent::fetch($id, $args, $permission_check);
 	}
 	
 	function getList(array $args=array()){
@@ -103,6 +103,10 @@ class User_model extends Object_model{
 			->where('password',$password);
 				
 		$user=$this->db->get()->row_array();
+		
+		if(!$user){
+			throw new Exception('login_info_error', 403);
+		}
 		
 		return $user;
 	}

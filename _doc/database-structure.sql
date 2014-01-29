@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `company_config` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `company-key` (`company`,`key`),
   KEY `name` (`key`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `ip` char(15) NOT NULL,
   `company` varchar(255) DEFAULT NULL,
   `username` varchar(255) DEFAULT NULL,
-  `time` timestamp NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=ARCHIVE DEFAULT CHARSET=utf8;
 
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `nav` (
   `name` varchar(16) NOT NULL,
   `params` text,
   `parent` int(11) DEFAULT NULL,
-  `order` int(11) NOT NULL DEFAULT 0,
+  `order` int(11) NOT NULL DEFAULT '0'
   PRIMARY KEY (`id`),
   KEY `parent` (`parent`),
   KEY `order` (`order`),
@@ -59,8 +59,8 @@ CREATE TABLE IF NOT EXISTS `object` (
   `name` varchar(255) NOT NULL DEFAULT '',
   `company` int(11) NOT NULL,
   `user` int(11) NOT NULL,
-  `time` timestamp NOT NULL,
-  `time_insert` timestamp NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `time_insert` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `flag` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `company` (`company`),
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `object_meta` (
   `value` longtext NOT NULL,
   `comment` text,
   `user` int(11) NOT NULL,
-  `time` timestamp NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `object-key-value` (`object`,`key`,`value`(255)),
   KEY `user` (`user`),
@@ -87,18 +87,18 @@ CREATE TABLE IF NOT EXISTS `object_meta` (
   KEY `object` (`object`),
   KEY `value` (`value`(255)),
   KEY `key-value` (`key`,`value`(255))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_meta_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object_meta` int(11) NOT NULL,
   `user` int(11) NOT NULL,
-  `read` tinyint(1) NOT NULL,
-  `write` tinyint(1) NOT NULL,
-  `grant` tinyint(1) NOT NULL,
-  `time` timestamp NOT NULL,
+  `read` tinyint(1) NOT NULL DEFAULT '0',
+  `write` tinyint(1) NOT NULL DEFAULT '0',
+  `grant` tinyint(1) NOT NULL DEFAULT '0',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `object_meta` (`object_meta`),
+  UNIQUE KEY `object_meta-user` (`object_meta`,`user`),
   KEY `user` (`user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -106,24 +106,24 @@ CREATE TABLE IF NOT EXISTS `object_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object` int(11) NOT NULL,
   `user` int(11) NOT NULL,
-  `read` tinyint(1) NOT NULL,
-  `write` tinyint(1) NOT NULL,
-  `grant` tinyint(1) NOT NULL,
-  `time` timestamp NOT NULL,
+  `read` tinyint(1) NOT NULL DEFAULT '0',
+  `write` tinyint(1) NOT NULL DEFAULT '0',
+  `grant` tinyint(1) NOT NULL DEFAULT '0',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `object` (`object`),
+  UNIQUE KEY `object-user` (`object`,`user`),
   KEY `user` (`user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_relationship` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object` int(11) NOT NULL,
   `relative` int(11) NOT NULL,
   `relation` varchar(255) DEFAULT '',
-  `is_on` boolean DEFAULT NULL,
+  `is_on` tinyint(1) DEFAULT NULL,
   `num` varchar(255) NOT NULL DEFAULT '',
   `user` int(11) NOT NULL,
-  `time` timestamp NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `people-relative-relation-is_on` (`object`,`relative`,`relation`,`is_on`),
   KEY `user` (`user`),
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `object_relationship` (
   KEY `relative` (`relative`),
   KEY `relation` (`relation`),
   KEY `num` (`num`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_relationship_meta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -139,40 +139,40 @@ CREATE TABLE IF NOT EXISTS `object_relationship_meta` (
   `key` varchar(255) NOT NULL,
   `value` longtext NOT NULL,
   `user` int(11) NOT NULL,
-  `time` timestamp NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `relationship` (`relationship`,`key`),
   KEY `user` (`user`),
   KEY `time` (`time`),
   KEY `key-value` (`key`,`value`(255)),
   KEY `value` (`value`(255))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_relationship_meta_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object_relationship_meta` int(11) NOT NULL,
   `user` int(11) NOT NULL,
-  `read` tinyint(1) NOT NULL,
-  `write` tinyint(1) NOT NULL,
-  `grant` tinyint(1) NOT NULL,
-  `time` timestamp NOT NULL,
+  `read` tinyint(1) NOT NULL DEFAULT '0',
+  `write` tinyint(1) NOT NULL DEFAULT '0',
+  `grant` tinyint(1) NOT NULL DEFAULT '0',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `object_relationship_meta` (`object_relationship_meta`),
+  UNIQUE KEY `object_relationship_meta-user` (`object_relationship_meta`,`user`),
   KEY `user` (`user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_relationship_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object_relationship` int(11) NOT NULL,
   `user` int(11) NOT NULL,
-  `read` tinyint(1) NOT NULL,
-  `write` tinyint(1) NOT NULL,
-  `grant` tinyint(1) NOT NULL,
-  `time` timestamp NOT NULL,
+  `read` tinyint(1) NOT NULL DEFAULT '0',
+  `write` tinyint(1) NOT NULL DEFAULT '0',
+  `grant` tinyint(1) NOT NULL DEFAULT '0',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `object_relationship` (`object_relationship`),
+  UNIQUE KEY `object_relationship-user` (`object_relationship`,`user`),
   KEY `user` (`user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS `object_status` (
   `content` text,
   `comment` text,
   `user` int(11) NOT NULL,
-  `time` timestamp NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `student` (`object`),
   KEY `date` (`date`),
@@ -194,21 +194,21 @@ CREATE TABLE IF NOT EXISTS `object_status_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object_status` int(11) NOT NULL,
   `user` int(11) NOT NULL,
-  `read` tinyint(1) NOT NULL,
-  `write` tinyint(1) NOT NULL,
-  `grant` tinyint(1) NOT NULL,
-  `time` timestamp NOT NULL,
+  `read` tinyint(1) NOT NULL DEFAULT '0',
+  `write` tinyint(1) NOT NULL DEFAULT '0',
+  `grant` tinyint(1) NOT NULL DEFAULT '0',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `object_status` (`object_status`),
+  UNIQUE KEY `object_status-user` (`object_status`,`user`),
   KEY `user` (`user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_tag` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object` int(11) NOT NULL,
   `tag_taxonomy` int(11) NOT NULL,
   `user` int(11) NOT NULL,
-  `time` timestamp NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `object-tag_taxonomy` (`object`,`tag_taxonomy`),
   KEY `user` (`user`),
@@ -220,21 +220,21 @@ CREATE TABLE IF NOT EXISTS `object_tag_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object_tag` int(11) NOT NULL,
   `user` int(11) NOT NULL,
-  `read` tinyint(1) NOT NULL,
-  `write` tinyint(1) NOT NULL,
-  `grant` tinyint(1) NOT NULL,
-  `time` timestamp NOT NULL,
+  `read` tinyint(1) NOT NULL DEFAULT '0',
+  `write` tinyint(1) NOT NULL DEFAULT '0',
+  `grant` tinyint(1) NOT NULL DEFAULT '0',
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `object_tag` (`object_tag`),
+  UNIQUE KEY `object_tag-user` (`object_tag`,`user`),
   KEY `user` (`user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sessions` (
-  `session_id` CHAR(32) NOT NULL,
-  `ip_address` CHAR(15) NOT NULL,
-  `user_agent` CHAR(255) NOT NULL,
-  `last_activity` INT(11) NOT NULL,
-  `user_data` CHAR(255) NOT NULL,
+  `session_id` char(32) NOT NULL,
+  `ip_address` char(15) NOT NULL,
+  `user_agent` char(255) NOT NULL,
+  `last_activity` int(11) NOT NULL,
+  `user_data` char(255) NOT NULL,
   PRIMARY KEY (`session_id`),
   KEY `last_activity` (`last_activity`)
 ) ENGINE=MEMORY DEFAULT CHARSET=utf8;
@@ -266,7 +266,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `password` varchar(255) DEFAULT NULL,
   `roles` varchar(255) NOT NULL DEFAULT '',
   `last_ip` char(15) NOT NULL DEFAULT '',
-  `last_login` timestamp NOT NULL,
+  `last_login` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `company` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`,`company`),
