@@ -3,8 +3,8 @@
 缩进：		tab＊1
 
 命名：		不使用缩写
-类名：		大写字母开头，加框架前缀（SS_Table）
-类文件名		小写字母，加框架前缀（SS_table.php）
+类名：		大写字母开头，加框架前缀（LB_Table）
+类文件名		小写字母，加框架前缀（LB_table.php）
 方法名：		小写字母开头，驼峰分隔（updatePassword()）
 变量名：		小写字母，下划线分隔（$require_head）
 

@@ -1,5 +1,5 @@
 <?php
-class Tag extends SS_Controller{
+class Tag extends LB_Controller{
 	function __construct() {
 		parent::__construct();
 	}

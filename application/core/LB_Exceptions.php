@@ -1,5 +1,5 @@
 <?php
-class SS_Exceptions extends CI_Exceptions{
+class LB_Exceptions extends CI_Exceptions{
 	function __construct() {
 		parent::__construct();
 	}

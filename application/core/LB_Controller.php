@@ -1,5 +1,5 @@
 <?php
-class SS_Controller extends CI_Controller{
+class LB_Controller extends CI_Controller{
 	
 	var $default_method='index';
 	

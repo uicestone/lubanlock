@@ -1,5 +1,5 @@
 <?php
-class SS_Loader extends CI_Loader{
+class LB_Loader extends CI_Loader{
 	
 	function __construct(){
 		parent::__construct();

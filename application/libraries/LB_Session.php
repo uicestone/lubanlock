@@ -1,5 +1,5 @@
 <?php
-class SS_Session extends CI_Session{
+class LB_Session extends CI_Session{
 	
 	var $db;
 	

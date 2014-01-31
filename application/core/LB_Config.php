@@ -3,7 +3,7 @@
  * 一个分层的配置存取方式
  * 系统(脚本)<公司(数据库)<用户(数据库)<公司(数据库，控制器方法)<用户(数据库，控制器方法)<session(控制器方法)<post
  */
-class SS_Config extends CI_Config{
+class LB_Config extends CI_Config{
 	
 	var $company;
 	var $user;

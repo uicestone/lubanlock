@@ -1,5 +1,5 @@
 <?php
-class Index extends SS_Controller{
+class Index extends LB_Controller{
 	function __construct() {
 		parent::__construct();
 	}

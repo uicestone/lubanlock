@@ -1,5 +1,5 @@
 <?php
-class Nav extends SS_Controller{
+class Nav extends LB_Controller{
 	function __construct() {
 		parent::__construct();
 		$this->load->model('nav_model','nav');

@@ -1,5 +1,5 @@
 <?php
-class SS_Lang extends CI_Lang{
+class LB_Lang extends CI_Lang{
 	function __construct() {
 		parent::__construct();
 	}

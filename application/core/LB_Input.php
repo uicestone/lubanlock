@@ -1,5 +1,5 @@
 <?php
-class SS_input extends CI_Input{
+class LB_input extends CI_Input{
 	
 	var $method;
 	

@@ -1,5 +1,5 @@
 <?php
-class Status extends SS_Controller{
+class Status extends LB_Controller{
 	function __construct() {
 		parent::__construct();
 	}

@@ -29,7 +29,7 @@
  * uicestone 2013/4/4注：此类中采用引用$CI->dbde方式来操作数据库，这会打断控制器中操作到一半的数据库。
  * 我将此处全部换成独立的数据库对象。
  * 调用从$this->CI->db改为了$this->db
- * $db定义写在了SS_Session::construct()内
+ * $db定义写在了LB_Session::construct()内
  */
 class CI_Session {
 

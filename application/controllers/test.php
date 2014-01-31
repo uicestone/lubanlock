@@ -1,5 +1,5 @@
 <?php
-class Test extends SS_Controller{
+class Test extends LB_Controller{
 	function __construct() {
 		parent::__construct();
 		$this->load->library('unit_test');

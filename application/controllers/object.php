@@ -1,5 +1,5 @@
 <?php
-class Object extends SS_Controller{
+class Object extends LB_Controller{
 	
 	function __construct() {
 		parent::__construct();

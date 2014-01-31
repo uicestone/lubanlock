@@ -1,5 +1,5 @@
 <?php
-class SS_Email extends CI_Email{
+class LB_Email extends CI_Email{
 	function __construct() {
 		parent::__construct();
 	}

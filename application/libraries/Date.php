@@ -1,5 +1,5 @@
 <?php
-class SS_Date{
+class LB_Date{
 	
 	var $db;
 	var $now;

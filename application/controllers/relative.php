@@ -1,5 +1,5 @@
 <?php
-class Relative extends SS_Controller{
+class Relative extends LB_Controller{
 	function __construct() {
 		parent::__construct();
 	}

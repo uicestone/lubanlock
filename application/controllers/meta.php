@@ -1,5 +1,5 @@
 <?php
-class Meta extends SS_Controller{
+class Meta extends LB_Controller{
 	function __construct() {
 		parent::__construct();
 	}
