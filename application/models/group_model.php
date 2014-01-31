@@ -1,5 +1,5 @@
 <?php
-class Group_model extends People_model{
+class Group_model extends Object_model{
 	
 	function __construct() {
 		parent::__construct();
