@@ -26,16 +26,6 @@ class Object_model extends CI_Model{
 		'time'=>NULL
 	);
 	
-	static $fields_status=array(
-		'object'=>NULL,
-		'name'=>'',
-		'date'=>NULL,
-		'content'=>NULL,
-		'comment'=>NULL,
-		'user'=>NULL,
-		'time'=>NULL
-	);
-	
 	static $fields_tag=array(
 		'object'=>NULL,
 		'tag_taxonomy'=>NULL,
@@ -738,83 +728,36 @@ class Object_model extends CI_Model{
 		
 	}
 
-	function addStatus(array $data){
+	function addStatus($name, $date = null, $content = null, $comment = null){
 		
-		$data['object']=$this->id;
-		$data['user']=$this->user->id;
-		
-		if(array_key_exists('date',$data) && is_integer($data['date'])){
-			
-			if($data['date'] >= 1E12){
-				$data['date'] = $data['date']/1000;
-			}
-			
-			$data['date'] = date('Y-m-d H:i:s',$data['date']);
+		if(empty($date)){
+			$date = date('Y-m-d H:i:s');
 		}
 		
-		empty($data['date']) && $data['date'] = date('Y-m-d H:i:s');
+		elseif(is_integer($date)){
+			
+			if($date >= 1E12){
+				$date = $date/1000;
+			}
+			
+			$date = date('Y-m-d H:i:s', $date);
+		}
 		
-		$this->db->insert('object_status',array_merge(
-			self::$fields_status,
-			array_intersect_key($data, self::$fields_status)
+		$this->db->insert('object_status',array(
+			'object'=>$this->id,
+			'name'=>$name,
+			'date'=>$date,
+			'content'=>$content,
+			'comment'=>$comment,
+			'user'=>$this->user->id
 		));
 		
 		return $this->db->insert_id();
 	}
 	
-	function updateStatus(array $data, array $args = array()){
-		
-		$this->db->update('object_status',array_merge(
-			array('user'=>$this->user->id),
-			array_intersect_key($data, self::$fields_status)
-		),$args?$args:array('id'=>$data['id']));
-		
-		return $this;
-	}
-	
 	function removeStatus(array $args = array()){
 		
-		$this->db->delete('object_status',array('id'=>$args['id']));
-		
-		return $this;
-	}
-	
-	/**
-	 * 获得一个对象的所有标签
-	 * @param string $type
-	 * @return array([type=>]name,...)
-	 */
-	function getTag(array $args = array()){
-		
-		$this->db->from('object_tag')
-			->join('tag_taxonomy','tag_taxonomy.id = object_tag.tag_taxonomy','inner')
-			->join('tag','tag.id = tag_taxonomy.tag','inner')
-			->where('object_tag.object', $this->id)
-			->select('tag.name, tag_taxonomy.taxonomy');
-		
-		$result = $this->db->get()->result_array();
-		
-		$tags = array_column($result, 'name', 'taxonomy');
-		
-		return $tags;
-	}
-	
-	/**
-	 * 为一个对象添加标签一个标签
-	 * 不在tag表中将被自动注册
-	 * 重复标签被将忽略
-	 * 同type标签将被更新
-	 * @param string $name
-	 * @param string $type default: NULL 标签内容在此类对象的应用的意义，如案件的”阶段“等
-	 */
-	function addTag(array $data){
-		
-		$data['object']=$this->id;
-		$data['user']=$this->user->id;
-		
-		//TODO
-		
-		return $this->db->insert_id();
+		return $this->db->delete('object_status',array('id'=>$args['id']));
 	}
 	
 	function removeTag(array $args = array()){
