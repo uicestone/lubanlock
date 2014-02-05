@@ -760,13 +760,8 @@ class Object_model extends CI_Model{
 		return $this->db->delete('object_status',array('id'=>$args['id']));
 	}
 	
-	function removeTag(array $args = array()){
+	function setTags($tags, $taxonomy, $append = false){
 		
-		$args['object']=$this->id;
-		
-		//TODO
-		
-		return $this;
 	}
 	
 }
