@@ -17,15 +17,6 @@ class Object_model extends CI_Model{
 		'time'=>NULL
 	);
 	
-	static $fields_meta=array(
-		'object'=>NULL,
-		'key'=>'',
-		'value'=>NULL,
-		'comment'=>NULL,
-		'user'=>NULL,
-		'time'=>NULL
-	);
-	
 	static $fields_relationship=array(
 		'object'=>NULL,
 		'relative'=>NULL,
@@ -69,23 +60,16 @@ class Object_model extends CI_Model{
 			$this->id=$id;
 		}
 		
+		if($permission_check && !$this->allow()){
+			throw new Exception('no_permission', 403);
+		}
+		
 		$this->db
 			->from('object')
 			->where(array(
 				'object.id'=>$id,
 				'object.company'=>$this->company->id,
 			));
-		
-		if($permission_check){
-		
-			$permission_condition = 'object.id NOT IN ( SELECT `object` FROM `object_permission` )';
-
-			if(is_array($this->user->group_ids) && !empty($this->user->group_ids)){
-				$permission_condition .= ' OR object.id IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND user IN ( '.implode(', ',$this->user->group_ids).' ) )';
-			}
-
-			$this->db->where('( '.$permission_condition.' )');
-		}
 		
 		$object=$this->db->get()->row_array();
 		
@@ -188,30 +172,6 @@ class Object_model extends CI_Model{
 	}
 	
 	/**
-	 * 根据部分名称，返回唯一的id
-	 * @param type $part_of_name
-	 * @return type
-	 * @throws Exception 'not_found','duplicated_matches'
-	 */
-	function check($part_of_name){
-		$result=$this->db
-			->from('object')
-			->where('object.company',$this->company->id)
-			->like('name',$part_of_name)
-			->get();
-
-		if($result->num_rows()>1){
-			throw new Exception(lang('duplicated_matches').' '.$part_of_name, 400);
-		}
-		elseif($result->num_rows===0){
-			throw new Exception($part_of_name.' '.lang('not_found'));
-		}
-		else{
-			return $result->row()->id;
-		}
-	}
-	
-	/**
 	 * 判断一个对象对于一些用户或组来说是否具有某种权限
 	 * 权限表中没有此对象，默认有权限
 	 * @param string $permission	read | write | grant
@@ -222,7 +182,7 @@ class Object_model extends CI_Model{
 	function allow($permission = 'read', $users = null){
 		
 		if(!in_array($permission, array('read', 'write', 'grant'))){
-			throw new Exception('argument_error', 400);
+			throw new Exception('permission_name_error', 400);
 		}
 		
 		if(is_null($users)){
@@ -243,54 +203,19 @@ class Object_model extends CI_Model{
 	}
 	
 	/**
-	 * 判断一个对象属性对于一些用户或组来说是否具有某种权限
-	 * 权限表中没有此对象属性，默认有权限
-	 * @param string $property	meta|relative|status|tag
-	 * @param string $permission	read | write | grant
-	 * @param type $property_id
-	 * @param array|int $users	默认为$this->user->group_ids，即当前用户和递归所属组
-	 * @return boolean
-	 * @throws Exception	argument_error
-	 */
-	function allow_property($property, $permission = 'read', $property_id = null, $users = null){
-		
-		if(!in_array($property, array('meta', 'relative', 'status', 'tag'))){
-			throw new Exception('property_name_error', 400);
-		}
-		
-		if(!in_array($permission, array('read', 'write', 'grant'))){
-			throw new Exception('argument_error', 400);
-		}
-		
-		if(is_null($property_id)){
-			$property_id = $this->$property->id;
-		}
-		
-		if(is_null($users)){
-			$users = $this->user->group_ids;
-		}
-		
-		if(!is_array($users)){
-			$users = array($users);
-		}
-		
-		$result = $this->db->from("object_{$property}_permission")->where('object_'.$property,$property_id)->where_in('user',$users)->get()->row();
-		
-		if($result === array() || (bool)$result->$permission === true){
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
 	 * 对某用户或组赋予/取消赋予一个对象某种权限
 	 * @param array|string $permission	可选健包括array('read'=>true,'write'=>true,'grant'=>true)，为string时自动转换成array(string=>true)
 	 * @param array|int $users	默认为$this->user->id，即当前用户
-	 * @param bool $permission_check
-	 * @throws Exception
+	 * @param boolean $permission_check 授权时是否检查当前用户的grant权限
+	 * @throws Exception no_permission_to_grant
 	 */
 	function authorize($permission = array('read'=>true), $users = null, $permission_check = true){
+		
+		if(!is_array($permission)){
+			$permission = array($permission => true);
+		}
+		
+		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
 		
 		if(is_null($users)){
 			$users = array($this->user->id);
@@ -304,12 +229,6 @@ class Object_model extends CI_Model{
 			throw new Exception('no_permission_to_grant', 403);
 		}
 		
-		if(!is_array($permission)){
-			$permission = array($permission => true);
-		}
-		
-		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
-		
 		foreach($users as $user){
 			$this->db->upsert('object_permission', array('user'=>$user, 'object'=>$this->id) + $permission);
 		}
@@ -317,29 +236,52 @@ class Object_model extends CI_Model{
 	}
 	
 	/**
-	 * 对某用户或组赋予/取消赋予一个对象属性某种权限
-	 * @param string $property	meta|relative|status|tag
-	 * @param array|string $permission	可选健包括array('read'=>true,'write'=>true,'grant'=>true)，为string时自动转换成array(string=>true)
-	 * @param type $property_id
-	 * @param array|int $users	默认为$this->user->id，即当前用户
-	 * @param bool $permission_check
-	 * @throws Exception
+	 * 检测某一用户或组对当前对象的某一元数据是否有某种权限
+	 * @param string $key 键名
+	 * @param string $permission 权限值 read|write|grant
+	 * @param array|int $users 要检测的用户或组，默认为$this->user->group_ids，即当前用户和递归所属组
 	 */
-	function authorize_property($property, $permission = array('read'=>true), $property_id = null, $users = null, $permission_check = true){
+	function allow_meta($key, $permission = 'read', $users = null){
 		
-		if(!in_array($property, array('meta', 'relative', 'status', 'tag'))){
-			throw new Exception('property_name_error', 400);
+		if(!in_array($permission, array('read', 'write', 'grant'))){
+			throw new Exception('permission_name_error', 400);
 		}
+		
+		if(is_null($users)){
+			$users = $this->user->group_ids;
+		}
+		
+		if(!is_array($users)){
+			$users = array($users);
+		}
+		
+		if(empty($users)){
+			return false;
+		}
+		
+		$result = $this->db->from('object_meta_permission')->where('object', $this->id)->where('key', $key)->where_in('user', $users)->get()->row();
+		
+		if($result === array() || (bool)$result->$permission === true){
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
+	/**
+	 * 就当前对象的某一元数据，授予某些用户或组某些权限
+	 * @param string $key 键名
+	 * @param array $permission 权限值 array(read|write|grant => true|false)
+	 * @param array|int $users 要授权的用户或组，默认为$this->user->id，即当前用户
+	 */
+	function authorize_meta($key, array $permission = array(), $users = null, $permission_check = true){
 		
 		if(!is_array($permission)){
 			$permission = array($permission => true);
 		}
 		
 		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
-		
-		if(is_null($property_id)){
-			$property_id = $this->$property->id;
-		}
 		
 		if(is_null($users)){
 			$users = array($this->user->id);
@@ -349,13 +291,12 @@ class Object_model extends CI_Model{
 			$users = array($users);
 		}
 		
-		if($permission_check && (!$this->allow('grant') || !$this->allow_property($property, 'grant', $property_id))){
+		if($permission_check && (!$this->allow('grant') || !$this->allow_meta($key, 'grant'))){
 			throw new Exception('no_permission_to_grant', 403);
 		}
 		
 		foreach($users as $user){
-			$this->db->upsert("object_{$property}_permission", array('user'=>$user, 'object_'.$property=>$property_id) + $permission);
-			echo $this->db->last_query()."\n";
+			$this->db->upsert('object_meta_permission', array('object'=>$this->id, 'key'=>$key, 'user'=>$user) + $permission);
 		}
 		
 	}
@@ -589,45 +530,18 @@ class Object_model extends CI_Model{
 	}
 	
 	/**
-	 * 生成一个SQL表达式条件，用于确认某种对象属性的权限
-	 * 对象属性权限表有权限读，如果无记录，则看对象是否有权限读，如果无记录，则视为有权
-	 * @param string $property
-	 */
-	function _property_permission_conditions($property){
-		$permission_condition = "`object_$property`.`id` NOT IN ( SELECT `object_$property` FROM `object_{$property}_permission` ) AND (";
-		
-		$permission_condition .= "\n`object_$property`.`object` NOT IN ( SELECT `object` FROM `object_permission` )";
-		
-		if(!empty($this->user->group_ids)){
-			$permission_condition .= " OR `object_$property`.`object` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( ".implode(', ', $this->user->group_ids).' ) )';
-		}
-		
-		$permission_condition .= "\n)";
-		
-		if(!empty($this->user->group_ids)){
-			$permission_condition .= "\nOR `object_$property`.`id` IN ( SELECT `object_$property` FROM `object_{$property}_permission` WHERE `read` = TRUE AND `user` IN ( ".implode(', ', $this->user->group_ids).' ) )';
-		}
-		
-		return '( '.$permission_condition.' )';
-		
-	}
-	
-	/**
 	 * 返回一个对象的资料项列表
 	 * @return array
 	 */
 	function getMeta(array $args = array()){
 		
+		if(!$this->allow()){
+			throw new Exception('no_permission', 403);
+		}
+		
 		$this->db->select('object_meta.*')
 			->from('object_meta')
 			->where("`object_meta`.`object`",$this->id);
-		
-		$this->db->where($this->_property_permission_conditions('meta'));
-		
-		if(array_key_exists('id', $args)){
-			$this->db->where('`object_meta`.`id`',$args['id']);
-			return $this->db->get()->row_array();
-		}
 		
 		$result = $this->db->get()->result_array();
 		
@@ -638,7 +552,9 @@ class Object_model extends CI_Model{
 		$meta = array();
 		
 		foreach($result as $row){
-			$meta[$row['key']][] = $row['value'];
+			if($this->allow_meta($row['key'])){
+				$meta[$row['key']][] = $row['value'];
+			}
 		}
 		
 		return $meta;
@@ -650,9 +566,14 @@ class Object_model extends CI_Model{
 	 * 即使键已经存在，仍将添加，除非$unique为true，那样的话不执行任何写入
 	 * @param string $key
 	 * @param string $value
+	 * @param boolean $unique
 	 * @return boolean
 	 */
 	function addMeta($key, $value, $unique = false){
+		
+		if(!$this->allow('write') || !$this->allow_meta($key, 'write')){
+			throw new Exception('no_permission', 403);
+		}
 		
 		if($unique){
 			$metas = $this->getMeta();
@@ -684,6 +605,10 @@ class Object_model extends CI_Model{
 	 */
 	function updateMeta($key, $value, $prev_value = null){
 		
+		if(!$this->allow('write') || !$this->allow_meta($key, 'write')){
+			throw new Exception('no_permission', 403);
+		}
+		
 		$metas = $this->getMeta();
 		
 		if(!array_key_exists($key, $metas)){
@@ -707,6 +632,10 @@ class Object_model extends CI_Model{
 	 */
 	function removeMeta($key, $value = null){
 		
+		if(!$this->allow('write') || !$this->allow_meta($key, 'write')){
+			throw new Exception('no_permission', 403);
+		}
+		
 		$condition = array('key'=>$key);
 		
 		if(!is_null($value)){
@@ -721,8 +650,6 @@ class Object_model extends CI_Model{
 		$this->db
 			->from('object_relationship')
 			->where('object_relationship.object',$this->id);
-		
-		$this->db->where($this->_property_permission_conditions('relationship'));
 		
 		if(array_key_exists('relation', $args)){
 			$this->db->where('object_relationship.relation',$args['relation']);
@@ -762,35 +689,12 @@ class Object_model extends CI_Model{
 		return $this->db->insert_id();
 	}
 	
-	function addRelatives(array $data){
-		
-		foreach($data as $index => $row){
-			if(is_integer($index)){
-				$this->addRelative($row);
-			}
-			else{
-				$this->addRelative(array('relation'=>$index,'relative'=>$row));
-			}
-		}
-		
-		return $this;
-	}
-	
 	function updateRelative(array $data, array $args=array()){
 		
 		$this->db->update('object_relationship',array_merge(
 				array('user'=>$this->user->id),
 				array_intersect_key($data, self::$fields_relationship)
 			),$args?$args:array('id'=>$data['id']));
-		
-		return $this;
-	}
-	
-	function updateRelatives(array $data){
-		
-		foreach($data as $row){
-			$this->updateRelative($row);
-		}
 		
 		return $this;
 	}
@@ -812,8 +716,6 @@ class Object_model extends CI_Model{
 			->from('object_status')
 			->where('object',$this->id)
 			->order_by('date');
-		
-		$this->db->where($this->_property_permission_conditions('status'));
 		
 		if(array_key_exists('id', $args)){
 			$this->db->where('object_status.id',$args['id']);
@@ -860,15 +762,6 @@ class Object_model extends CI_Model{
 		return $this->db->insert_id();
 	}
 	
-	function addStatuses(array $data){
-		
-		foreach($data as $row){
-			$this->addStatus($row);
-		}
-		
-		return $this;
-	}
-	
 	function updateStatus(array $data, array $args = array()){
 		
 		$this->db->update('object_status',array_merge(
@@ -899,8 +792,6 @@ class Object_model extends CI_Model{
 			->where('object_tag.object', $this->id)
 			->select('tag.name, tag_taxonomy.taxonomy');
 		
-		$this->db->where($this->_property_permission_conditions('tag'));
-		
 		$result = $this->db->get()->result_array();
 		
 		$tags = array_column($result, 'name', 'taxonomy');
@@ -924,18 +815,6 @@ class Object_model extends CI_Model{
 		//TODO
 		
 		return $this->db->insert_id();
-	}
-	
-	/**
-	 * 为一个对象添加一组标签
-	 * @param array $tags
-	 */
-	function addTags(array $tags){
-		foreach($tags as $tag){
-			$this->addTag($tag);
-		}
-		
-		return $this;
 	}
 	
 	function removeTag(array $args = array()){
