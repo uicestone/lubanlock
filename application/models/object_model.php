@@ -646,96 +646,74 @@ class Object_model extends CI_Model{
 	}
 	
 	/**
-	 * 给当前对象添加一个资料项
-	 * @return Object_model
-	 */
-	function addMeta(array $data){
-		
-		$data['object']=$this->id;
-		$data['company']=$this->company->id;
-		$data['user']=$this->user->id;
-		
-		$data=array_merge(
-			self::$fields_meta,
-			array_intersect_key($data, self::$fields_meta)
-		);
-		
-		$this->db->upsert('object_meta',$data);
-		
-		return $this->db->insert_id();
-	}
-	
-	function addMetas(array $data){
-		
-		foreach($data as $id => $row){
-			if(is_integer($id)){
-				$this->addMeta($row);
-			}else{
-				$this->addMeta(array('key'=>$id, 'value'=>$row));
-			}
-			
-		}
-		
-		return $this;
-	}
-	
-	/**
-	 * 给$key项增加$value
-	 * 若$key项不存在则先创建
+	 * 给当前对象添加一个元数据
+	 * 即使键已经存在，仍将添加，除非$unique为true，那样的话不执行任何写入
 	 * @param string $key
 	 * @param string $value
+	 * @return boolean
 	 */
-	function increaseMeta($key, $value){
-		$meta = $this->getMeta();
-		if(array_key_exists($key, $meta)){
-			$this->db->set("`value` = `value` + ".$this->db->escape($value), null, false)
-				->where('`object_meta`.`object`', $this->id)
-				->where('object_meta.key', $key)
-				->update('object_meta')
-				->limit(1);
+	function addMeta($key, $value, $unique = false){
+		
+		if($unique){
+			$metas = $this->getMeta();
+			if(array_key_exists($key, $metas)){
+				return false;
+			}
 		}
-		else{
-			$this->addMeta(compact('key', 'value'));
-		}
+		
+		$this->db->insert('object_meta', array(
+			'object'=>$this->id,
+			'key'=>$key,
+			'value'=>$value,
+			'company'=>$this->company->id,
+			'user'=>$this->user->id
+		));
+		
+		$meta_id = $this->db->insert_id();
+		
+		return $meta_id;
 	}
 	
 	/**
-	 * 更新对象的单条meta，须已知object_meta.id
-	 * @param array $data
-	 * @return Object_model
+	 * 更新对象元数据
+	 * 首先检查键名是否存在，如果不存在则执行addMeta()
+	 * @param string $key
+	 * @param string $value
+	 * @param string $prev_value optional 如果不为null，则只更新原来值为$prev_value的记录
+	 * @return boolean
 	 */
-	function updateMeta($data, array $args = array()){
+	function updateMeta($key, $value, $prev_value = null){
 		
-		$this->db->update('object_meta',array_merge(
-			array('user'=>$this->user->id),
-			array_intersect_key($data, self::$fields_meta)
-		),$args?$args:array('id'=>$data['id']));
+		$metas = $this->getMeta();
 		
-		return $this;
-	}
-	
-	/**
-	 * 为指定对象写入一组资料项
-	 * 遇不存在的meta name则插入，遇存在的meta name则更新
-	 * 虽然一个对象可以容纳多个相同meta name的content
-	 * 但使用此方法并遇到存在的meta name时进行更新操作
-	 * @param array $meta: array($name=>$content,...)
-	 */
-	function updateMetas(array $data){
-		
-		foreach($data as $row){
-			$this->updateMeta($row);
+		if(!array_key_exists($key, $metas)){
+			return $this->addMeta($key, $value);
 		}
+		
+		$condition = array('key'=>$key);
+		
+		if(!is_null($prev_value)){
+			$condition += array('value'=>$prev_value);
+		}
+		
+		return $this->db->update('object_meta', array('value'=>$value), $condition);
 	}
 	
 	/**
 	 * 删除对象元数据
-	 * @param int $meta_id
-	 * @return Object_model
+	 * @param string $key
+	 * @param string $value optional
+	 * @return boolean
 	 */
-	function removeMeta(array $args = array()){
-		$this->db->delete('object_meta',array('id'=>$args['id']));
-		return $this;
+	function removeMeta($key, $value = null){
+		
+		$condition = array('key'=>$key);
+		
+		if(!is_null($value)){
+			$condition += array('value'=>$value);
+		}
+		
+		return $this->db->delete('object_meta', $condition);
 	}
 	
 	function getRelative(array $args = array()){
