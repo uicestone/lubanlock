@@ -760,7 +760,25 @@ class Object_model extends CI_Model{
 		return $this->db->delete('object_status',array('id'=>$args['id']));
 	}
 	
-	function setTags($tags, $taxonomy, $append = false){
+	/**
+	 * 获得一个对象的所有标签
+	 */
+	function getTag(array $args = array()){
+		
+		$this->db->from('object_tag')
+			->join('tag_taxonomy','tag_taxonomy.id = object_tag.tag_taxonomy','inner')
+			->join('tag','tag.id = tag_taxonomy.tag','inner')
+			->where('object_tag.object', $this->id)
+			->select('tag.name, tag_taxonomy.taxonomy');
+		
+		$result = $this->db->get()->result_array();
+		
+		$tags = array_column($result, 'name', 'taxonomy');
+		
+		return $tags;
+	}
+	
+	function setTag($tags, $taxonomy, $append = false){
 		
 	}
 	
