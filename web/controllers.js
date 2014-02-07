@@ -18,3 +18,21 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 		$scope.object = Object.get({id: $routeParams.id});
 	}
 ]);
+
+lubanlockControllers.controller('JobsCtrl', ['$scope',
+	function($scope){
+		
+	}
+]);
+
+lubanlockControllers.controller('JobDetailCtrl', ['$scope',
+	function($scope){
+		
+	}
+]);
+
+lubanlockControllers.controller('MyResumeCtrl', ['$scope',
+	function($scope){
+
+	}
+]);
