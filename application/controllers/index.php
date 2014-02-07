@@ -5,6 +5,11 @@ class Index extends LB_Controller{
 	}
 	
 	function index(){
+		
+		if(!$this->user->isLogged()){
+			redirect('login');
+		}
+		
 		$this->load->view('index');
 	}
 	

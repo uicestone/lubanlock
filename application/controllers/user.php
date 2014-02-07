@@ -7,6 +7,7 @@ class user extends LB_controller{
 	
 	function logout(){
 		$this->user->sessionLogout();
+		redirect();
 	}
 	
 	function login(){
