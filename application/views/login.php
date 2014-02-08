@@ -4,41 +4,42 @@
 		<meta charset="utf-8" />
 		<title>登录 - <?=$this->company->sysname?></title>
 
-		<meta name="description" content="User login page" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-		<!-- basic styles -->
-
-		<link href="css/bootstrap.min.css" rel="stylesheet" />
-		<link rel="stylesheet" href="css/font-awesome.min.css" />
-
-		<!--[if IE 7]>
-		  <link rel="stylesheet" href="css/font-awesome-ie7.min.css" />
+		
+		<!--[if !IE]> -->
+		<script type="text/javascript" src="js/jquery/jquery-2.1.0.js"></script>
+		<!-- <![endif]-->
+		<!--[if IE]>
+		<script type="text/javascript" src="js/jquery/jquery-1.11.0.js"></script>
 		<![endif]-->
+					
+		<script src="js/bootstrap.min.js"></script>
 
-		<!-- page specific plugin styles -->
-
-		<!-- fonts -->
-
-		<link rel="stylesheet" href="css/ace-fonts.css" />
-
-		<!-- ace styles -->
-
-		<link rel="stylesheet" href="css/ace.min.css" />
-		<link rel="stylesheet" href="css/ace-rtl.min.css" />
-
-		<!--[if lte IE 8]>
-		  <link rel="stylesheet" href="css/ace-ie.min.css" />
-		<![endif]-->
-
-		<!-- inline styles related to this page -->
-
-		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<script src="js/ace.min.js"></script>
+		<script src="js/ace-elements.min.js"></script>
+		<script src="js/ace-extra.min.js"></script>
 
 		<!--[if lt IE 9]>
 		<script src="js/html5shiv.js"></script>
 		<script src="js/respond.min.js"></script>
 		<![endif]-->
+
+		<link rel="stylesheet" href="css/font-awesome.min.css" />
+		
+		<!--[if IE 7]>
+		<link rel="stylesheet" href="css/font-awesome-ie7.min.css" />
+		<![endif]-->
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+
+		<link rel="stylesheet" href="css/ace-fonts.css" />
+		<link rel="stylesheet" href="css/ace.min.css" />
+		
+		<!--[if lte IE 8]>
+		<link rel="stylesheet" href="css/ace-ie.min.css" />
+		<![endif]-->
+
+		<link rel="stylesheet" href="css/style.css" />
 	</head>
 
 	<body class="login-layout">
@@ -110,28 +111,6 @@
 				</div><!-- /.row -->
 			</div>
 		</div><!-- /.main-container -->
-
-		<!-- basic scripts -->
-
-		<!--[if !IE]> -->
-
-		<script type="text/javascript">
-			window.jQuery || document.write("<script src='js/jquery/jquery-2.0.3.min.js'>"+"<"+"/script>");
-		</script>
-
-		<!-- <![endif]-->
-
-		<!--[if IE]>
-<script type="text/javascript">
- window.jQuery || document.write("<script src='js/jquery/jquery-1.10.2.min.js'>"+"<"+"/script>");
-</script>
-<![endif]-->
-
-		<script type="text/javascript">
-			if("ontouchend" in document) document.write("<script src='js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
-		</script>
-
-		<!-- inline scripts related to this page -->
 
 		<script type="text/javascript">
 			function show_box(id) {

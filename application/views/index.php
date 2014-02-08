@@ -7,13 +7,15 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
 		<!--[if !IE]> -->
-		<script type="text/javascript" src="js/jquery/jquery-2.0.3.min.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-2.1.0.js"></script>
 		<!-- <![endif]-->
-
 		<!--[if IE]>
-		  <script type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-1.11.0.js"></script>
 		<![endif]-->
 					
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/dropzone.js"></script>
+
 		<script type="text/javascript" src="js/angular/angular.js"></script>
 		<script type="text/javascript" src="js/angular/angular-route.js"></script>
 		<script type="text/javascript" src="js/angular/angular-resource.js"></script>
@@ -24,54 +26,42 @@
 		<script type="text/javascript" src="filters.js"></script>
 		<script type="text/javascript" src="services.js"></script>
 
-		<!-- basic styles -->
-
-		<link rel="stylesheet" href="css/bootstrap.min.css" />
-		<link rel="stylesheet" href="css/font-awesome.min.css" />
-		<link rel="stylesheet" href="css/dropzone.css" />
-
-		<!--[if IE 7]>
-		  <link rel="stylesheet" href="css/font-awesome-ie7.min.css" />
-		<![endif]-->
-
-		<!-- page specific plugin styles -->
-
-		<!-- fonts -->
-
-		<link rel="stylesheet" href="css/ace-fonts.css" />
-
-		<!-- ace styles -->
-
-		<link rel="stylesheet" href="css/ace.min.css" />
-		<link rel="stylesheet" href="css/ace-rtl.min.css" />
-		<link rel="stylesheet" href="css/ace-skins.min.css" />
-
-		<!--[if lte IE 8]>
-		  <link rel="stylesheet" href="css/ace-ie.min.css" />
-		<![endif]-->
-
-		<!-- inline styles related to this page -->
-
-		<!-- ace settings handler -->
-
+		<script src="js/ace.min.js"></script>
+		<script src="js/ace-elements.min.js"></script>
 		<script src="js/ace-extra.min.js"></script>
-
-		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 
 		<!--[if lt IE 9]>
 		<script src="js/html5shiv.js"></script>
 		<script src="js/respond.min.js"></script>
 		<![endif]-->
 
+		<link rel="stylesheet" href="css/font-awesome.min.css" />
+		
+		<!--[if IE 7]>
+		<link rel="stylesheet" href="css/font-awesome-ie7.min.css" />
+		<![endif]-->
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/dropzone.css" />
+
+		<link rel="stylesheet" href="css/ace-fonts.css" />
+		<link rel="stylesheet" href="css/ace.min.css" />
+		
+		<!--[if lte IE 8]>
+		<link rel="stylesheet" href="css/ace-ie.min.css" />
+		<![endif]-->
+
+		<link rel="stylesheet" href="css/style.css" />
+		
 	</head>
 	
-	<body>
+	<body class="navbar-fixed">
 		
 		<div class="navbar navbar-default navbar-fixed-top" id="navbar">
 
 			<div class="navbar-container" id="navbar-container">
 				<div class="navbar-header pull-left">
-					<a href="#" class="navbar-brand">
+					<a href="" class="navbar-brand">
 						<small>
 							<i class="icon-book"></i>
 							<?=$this->company->sysname?>
@@ -82,80 +72,8 @@
 				<div class="navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
 
-<!--						<li>
-							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
-								<i class="icon-envelope icon-animated-vertical"></i>
-								<span class="badge badge-success">5</span>
-							</a>
-
-							<ul class="pull-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
-								<li class="dropdown-header">
-									<i class="icon-envelope-alt"></i>
-									5 Messages
-								</li>
-
-								<li>
-									<a href="#">
-										<img src="" class="msg-photo" alt="Alex's Avatar" />
-										<span class="msg-body">
-											<span class="msg-title">
-												<span class="blue">Alex:</span>
-												Ciao sociis natoque penatibus et auctor ...
-											</span>
-
-											<span class="msg-time">
-												<i class="icon-time"></i>
-												<span>a moment ago</span>
-											</span>
-										</span>
-									</a>
-								</li>
-
-								<li>
-									<a href="#">
-										<img src="" class="msg-photo" alt="Susan's Avatar" />
-										<span class="msg-body">
-											<span class="msg-title">
-												<span class="blue">Susan:</span>
-												Vestibulum id ligula porta felis euismod ...
-											</span>
-
-											<span class="msg-time">
-												<i class="icon-time"></i>
-												<span>20 minutes ago</span>
-											</span>
-										</span>
-									</a>
-								</li>
-
-								<li>
-									<a href="#">
-										<img src="" class="msg-photo" alt="Bob's Avatar" />
-										<span class="msg-body">
-											<span class="msg-title">
-												<span class="blue">Bob:</span>
-												Nullam quis risus eget urna mollis ornare ...
-											</span>
-
-											<span class="msg-time">
-												<i class="icon-time"></i>
-												<span>3:15 pm</span>
-											</span>
-										</span>
-									</a>
-								</li>
-
-								<li>
-									<a href="inbox.html">
-										See all messages
-										<i class="icon-arrow-right"></i>
-									</a>
-								</li>
-							</ul>
-						</li>
--->
 						<li class="light-blue">
-							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
+							<a data-toggle="dropdown" href="" class="dropdown-toggle">
 								<span class="user-info">
 									<small>你好,</small>
 									<?=$this->user->name?>
@@ -166,14 +84,14 @@
 
 							<ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
 								<li>
-									<a href="#">
+									<a href="">
 										<i class="icon-cog"></i>
 										设置
 									</a>
 								</li>
 
 								<li>
-									<a href="#">
+									<a href="">
 										<i class="icon-user"></i>
 										个人信息
 									</a>
@@ -197,7 +115,7 @@
 		<div class="main-container" id="main-container">
 
 			<div class="main-container-inner">
-				<a class="menu-toggler" id="menu-toggler" href="#">
+				<a class="menu-toggler" id="menu-toggler" href="">
 					<span class="menu-text"></span>
 				</a>
 
@@ -246,28 +164,11 @@
 
 			</div><!-- /.main-container-inner -->
 
-			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+			<a href="" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
 				<i class="icon-double-angle-up icon-only bigger-110"></i>
 			</a>
 		</div><!-- /.main-container -->
 		
-		<!-- basic scripts -->
-
-		<script type="text/javascript">
-			if("ontouchend" in document) document.write("<script src='js/jquery/jquery.mobile.custom.min.js'>"+"<"+"/script>");
-		</script>
-		<script src="js/bootstrap.min.js"></script>
-		<!--<script src="js/typeahead-bs2.min.js"></script>-->
-
-		<!-- page specific plugin scripts -->
-		<script src="js/dropzone.js"></script>
-
-		<!-- ace scripts -->
-
-		<script src="js/ace-elements.min.js"></script>
-		<script src="js/ace.min.js"></script>
-
-		<!-- inline scripts related to this page -->
 	</body>
 
 </html>
