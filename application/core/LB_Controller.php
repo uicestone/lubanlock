@@ -35,7 +35,6 @@ class LB_Controller extends CI_Controller{
 		 */
 		$this->load->model('company_model','company');
 		$this->load->model('object_model','object');
-		$this->load->model('group_model','group');
 		$this->load->model('user_model','user');
 		$this->load->model('tag_model','tag');
 		$this->load->model('message_model','message');

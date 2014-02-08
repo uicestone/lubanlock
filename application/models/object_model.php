@@ -90,20 +90,10 @@ class Object_model extends CI_Model{
 		
 		$this->authorize(array('read'=>true,'write'=>true,'grant'=>true), $this->user->id, false);
 		
-		if(isset($data['meta'])){
-			$this->addMetas($data['meta']);
-		}
-		
-		if(isset($data['relative'])){
-			$this->addRelatives($data['relative']);
-		}
-		
-		if(isset($data['status'])){
-			$this->addStatuses($data['status']);
-		}
-		
-		if(isset($data['tag'])){
-			$this->addTags($data['tag']);
+		foreach(array('meta', 'relative', 'status', 'tag') as $property){
+			if(array_key_exists($property, $data)){
+				call_user_func(array($this, 'add'.$property), $data[$property]);
+			}
 		}
 		
 		return $this->id;
@@ -552,14 +542,42 @@ class Object_model extends CI_Model{
 	}
 	
 	/**
-	 * 给当前对象添加一个元数据
+	 * 给当前对象添加一个或多个元数据
 	 * 即使键已经存在，仍将添加，除非$unique为true，那样的话不执行任何写入
-	 * @param string $key
+	 * 支持通过单个数组参数的方式一次添加多个元数据
+	 * @param string|array $key
+	 *	单数组参数一次添加多个元数据的参数格式：
+	 *	array(
+	 *		key=>value,
+	 *			array('key'=>key,
+	 *			'value'=>value,
+	 *			'unique'=>unique
+	 *		)
+	 *	)
 	 * @param string $value
 	 * @param boolean $unique
 	 * @return boolean
 	 */
-	function addMeta($key, $value, $unique = false){
+	function addMeta($key, $value = null, $unique = false){
+		
+		if(is_array($key)){
+			
+			$meta_ids = array();
+			
+			foreach($key as $k => $v){
+				if(is_array($v)){
+					if(!array_key_exists('key', $v) || !array_key_exists('value', $v)){
+						throw new Exception('argument_error', 400);
+					}
+					$meta_ids[] = $this->addMeta($v['key'], $v['value'], array_key_exists('unique', $v) ? $v['unique'] : false);
+				}
+				else{
+					$meta_ids[] = $this->addMeta($k, $v);
+				}
+			}
+			
+			return $meta_ids;
+		}
 		
 		if(!$this->allow('write') || !$this->allow_meta($key, 'write')){
 			throw new Exception('no_permission', 403);
@@ -576,7 +594,6 @@ class Object_model extends CI_Model{
 			'object'=>$this->id,
 			'key'=>$key,
 			'value'=>$value,
-			'company'=>$this->company->id,
 			'user'=>$this->user->id
 		));
 		
