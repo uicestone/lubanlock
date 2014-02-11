@@ -13,11 +13,11 @@ var lubanlockApp = angular.module('lubanlockApp', [
 lubanlockApp.config(['$routeProvider',
 	function($routeProvider) {
 		$routeProvider
-			.when('/jobs', {
+			.when('/jobs/:favorite?', {
 				templateUrl: 'partials/list_job.html',
 				controller: 'JobsCtrl'
 			})
-			.when('/job-detail/:id', {
+			.when('/job/:id', {
 				templateUrl: 'partials/detail_job.html',
 				controller: 'JobDetailCtrl'
 			})

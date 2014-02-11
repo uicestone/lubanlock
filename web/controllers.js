@@ -19,9 +19,22 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 	}
 ]);
 
-lubanlockControllers.controller('JobsCtrl', ['$scope',
-	function($scope){
+lubanlockControllers.controller('JobsCtrl', ['$scope', 'Object', '$routeParams', 
+	function($scope, Object, $routeParams){
+		var query = {
+			type: 'job',
+			with_meta: true
+		};
 		
+		if($routeParams.favorite === 'favorite'){
+			query.is_relative_of = user.id
+		}
+		
+		$scope.jobs = Object.query(query);
+		
+		$scope.showJobDetail = function(id){
+			window.location.hash = '/job/' + id;
+		}
 	}
 ]);
 

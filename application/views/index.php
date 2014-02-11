@@ -53,6 +53,11 @@
 
 		<link rel="stylesheet" href="css/style.css" />
 		
+		<script type="text/javascript">
+			var company = <?=json_encode($this->company)?>;
+			var user = <?=json_encode($this->user)?>;
+		</script>
+		
 	</head>
 	
 	<body class="navbar-fixed">
@@ -123,7 +128,7 @@
 
 					<ul class="nav nav-list">
 						<li>
-							<a href="#/jobs" class="dropdown-toggle">
+							<a class="dropdown-toggle">
 								<i class="icon-list"></i>
 								<span class="menu-text"> 职位信息 </span>
 
@@ -134,10 +139,15 @@
 								<li>
 									<a href="#/jobs">
 										<i class="icon-double-angle-right"></i>
+										所有职位
+									</a>
+								</li>
+								<li>
+									<a href="#/jobs/favorite">
+										<i class="icon-double-angle-right"></i>
 										已投递的职位
 									</a>
 								</li>
-
 							</ul>
 						</li>
 

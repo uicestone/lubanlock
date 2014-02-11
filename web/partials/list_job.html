@@ -1,10 +1,18 @@
-<ul>
-	<li ng-repeat="object in objects">
-		<p>
-			<a href="#detail/{{object.id}}">
-				{{object.name}}
-			</a>
-			<label>({{object.type}})</label>
-		</p>
-	</li>
-</ul>
+<table class="table table-bordered table-striped pointer-cursur">
+	<thead>
+		<tr>
+			<th>职位</th>
+			<th>公司</th>
+			<th>人数</th>
+			<th>工作地点</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="job in jobs" ng-click="showJobDetail(job.id)">
+			<td>{{job.meta['职位'].slice(-1).pop()}}</td>
+			<td>{{job.meta['公司'].slice(-1).pop()}}</td>
+			<td>{{job.meta['人数'].slice(-1).pop()}}</td>
+			<td>{{job.meta['工作地点'].slice(-1).pop()}}</td>
+		</tr>
+	</tbody>
+</table>
