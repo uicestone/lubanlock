@@ -353,15 +353,23 @@ class Object_model extends CI_Model{
 			}
 			
 			elseif($arg_name === 'is_relative_of'){
-				foreach($arg_value as $relation => $relative_args){
-					$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation).' AND ';
-					$where[] = "$field IN ( \nSELECT `relative` FROM `object_relationship` WHERE $relation_criteria".$this->_parse_criteria($relative_args, '`object_relationship`.`object`')." \n)";
+				if(is_array($arg_value)){
+					foreach($arg_value as $relation => $relative_args){
+						$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation).' AND ';
+						$where[] = "$field IN ( \nSELECT `relative` FROM `object_relationship` WHERE $relation_criteria".$this->_parse_criteria($relative_args, '`object_relationship`.`object`')." \n)";
+					}
+				}else{
+					$where[] = "$field IN ( \nSELECT `relative` FROM `object_relationship` WHERE ".$this->_parse_criteria($arg_value, '`object_relationship`.`object`')." \n)";
 				}
 			}
 			elseif($arg_name === 'has_relative_like'){
-				foreach($arg_value as $relation => $relative_args){
-					$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation).' AND ';
-					$where[] = "$field IN ( \nSELECT `object` FROM `object_relationship` WHERE $relation_criteria".$this->_parse_criteria($relative_args, '`object_relationship`.`relative`')." \n)";
+				if(is_array($arg_value)){
+					foreach($arg_value as $relation => $relative_args){
+						$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation).' AND ';
+						$where[] = "$field IN ( \nSELECT `object` FROM `object_relationship` WHERE $relation_criteria".$this->_parse_criteria($relative_args, '`object_relationship`.`relative`')." \n)";
+					}
+				}else{
+					$where[] = "$field IN ( \nSELECT `object` FROM `object_relationship` WHERE ".$this->_parse_criteria($arg_value, '`object_relationship`.`relative`')." \n)";
 				}
 			}
 			
@@ -481,9 +489,9 @@ class Object_model extends CI_Model{
 		
 		foreach(array('meta','relative','status','tag') as $field){
 			if(array_key_exists('with_'.$field,$args) && $args['with_'.$field]){
-				array_walk($result_array,function(&$row, $index, $field, $args){
+				array_walk($result_array,function(&$row, $index, $field, array $args = array()){
 					$this->id = $row['id'];
-					$property_args = is_array($args['with_'.$field]) ? $args['with_'.$field] : array();
+					$property_args = array_key_exists('with_'.$field, $args) && is_array($args['with_'.$field]) ? $args['with_'.$field] : array();
 					$row[$field] = call_user_func(array($this,'get'.$field), $property_args);
 				},$field);
 			}
@@ -521,7 +529,8 @@ class Object_model extends CI_Model{
 		
 		$this->db->select('object_meta.*')
 			->from('object_meta')
-			->where("`object_meta`.`object`",$this->id);
+			->where("`object_meta`.`object`",$this->id)
+			->order_by('`object_meta`.`time`');
 		
 		$result = $this->db->get()->result_array();
 		
@@ -549,7 +558,8 @@ class Object_model extends CI_Model{
 	 *	单数组参数一次添加多个元数据的参数格式：
 	 *	array(
 	 *		key=>value,
-	 *			array('key'=>key,
+	 *		array(
+	 *			'key'=>key,
 	 *			'value'=>value,
 	 *			'unique'=>unique
 	 *		)
@@ -569,10 +579,10 @@ class Object_model extends CI_Model{
 					if(!array_key_exists('key', $v) || !array_key_exists('value', $v)){
 						throw new Exception('argument_error', 400);
 					}
-					$meta_ids[] = $this->addMeta($v['key'], $v['value'], array_key_exists('unique', $v) ? $v['unique'] : false);
+					$meta_ids[] = $this->addMeta($v['key'], $v['value'], array_key_exists('unique', $v) ? $v['unique'] : $unique);
 				}
 				else{
-					$meta_ids[] = $this->addMeta($k, $v);
+					$meta_ids[] = $this->addMeta($k, $v, $unique);
 				}
 			}
 			
@@ -583,11 +593,16 @@ class Object_model extends CI_Model{
 			throw new Exception('no_permission', 403);
 		}
 		
+		$metas = $this->getMeta();
+		
 		if($unique){
-			$metas = $this->getMeta();
 			if(array_key_exists($key, $metas)){
-				return false;
+				throw new Exception('duplicated_meta_key', 400);
 			}
+		}
+		
+		if(array_key_exists($key, $metas) && in_array($value, $metas[$key])){
+			throw new Exception('duplicated_meta_key_value', 400);
 		}
 		
 		$this->db->insert('object_meta', array(
@@ -618,17 +633,30 @@ class Object_model extends CI_Model{
 		
 		$metas = $this->getMeta();
 		
+		if(is_array($value)){
+			if(array_key_exists('value', $value)){
+				$value = $value['value'];
+			}
+			else{
+				throw new Exception('argument_error', 400);
+			}
+		}
+		
 		if(!array_key_exists($key, $metas)){
 			return $this->addMeta($key, $value);
 		}
 		
-		$condition = array('key'=>$key);
+		if(array_key_exists($key, $metas) && in_array($value, $metas[$key])){
+			throw new Exception('duplicated_meta_key_value', 400);
+		}
+		
+		$condition = array('object'=>$this->object->id, 'key'=>$key);
 		
 		if(!is_null($prev_value)){
 			$condition += array('value'=>$prev_value);
 		}
 		
-		return $this->db->update('object_meta', array('value'=>$value), $condition);
+		return $this->db->order_by('time')->limit(1)->update('object_meta', array('value'=>$value), $condition);
 	}
 	
 	/**

@@ -68,24 +68,23 @@ class Object extends LB_Controller{
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output($this->object->getMeta());
-				break;
-			
-			case 'PUT':
-			case 'POST' && $this->input->data('id') === false:
-				$meta_id=$this->object->addMeta($this->input->data());
-				$this->output->set_output($this->object->getMeta(array('id'=>$meta_id)));
 				break;
 			
 			case 'POST':
-				$this->object->updateMeta($this->input->data());
-				$this->output->set_output($this->object->getMeta(array('id'=>$this->input->data('id'))));
+				$this->object->addMeta($this->input->data(), null, $this->input->get('unique'));
+				break;
+			
+			case 'PUT':
+				$this->object->updateMeta($this->input->get('key'), $this->input->data(), $this->input->get('prev_value') ? $this->input->get('prev_value') : null);
 				break;
 			
 			case 'DELETE':
-				$this->object->removeMeta($this->input->get());
+				$this->object->removeMeta($this->input->get('key'), $this->input->get('value') ? $this->input->get('value') : null);
 				break;
 		}
+		
+		$this->output->set_output($this->object->getMeta());
+		
 	}
 	
 	function relative($object_id){
