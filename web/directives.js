@@ -27,12 +27,14 @@ lubanlockDirectives.directive('lubanDropzone', function(){
 lubanlockDirectives.directive('lubanEditable', ['Object', function(Object){
 	return {
 		restrict: 'A',
-		template: '<p ng-hide="isEditing" ng-click="edit()" class="value">&nbsp;{{value}}&nbsp;</p>'
-				+ '<input id="editable" ng-model="value" ng-change="save()" ng-show="isEditing" ng-blur="editCompleted()" luban-enter="editCompleted()" luban-esc="editCanceled()">',
+		templateUrl: 'partials/editable.html',
 		transclude: true,
 		scope:{
 			object: '=',
 			value: '=lubanEditable',
+			type: '@',
+			options: '=',
+			name: '@lubanEditable'
 		},
 		link: function(scope, element, attr){
 			
@@ -54,7 +56,7 @@ lubanlockDirectives.directive('lubanEditable', ['Object', function(Object){
 				scope.isEditing = true;
 				scope.oldValue = scope.value;
 				setTimeout(function(){//解决click事件触发之后不能自动focus
-					element.children('input').trigger('focus');
+					element.find('input').trigger('focus');
 				});
 			}
 			
@@ -69,6 +71,7 @@ lubanlockDirectives.directive('lubanEditable', ['Object', function(Object){
 			}
 			
 			scope.save = function(){
+				
 				var prop = attr.lubanEditable.match(/\.([^.^\[]*)/)[1];
 				
 				var data = {};
