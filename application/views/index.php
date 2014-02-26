@@ -157,7 +157,21 @@
 								<span class="menu-text"> 我的简历 </span>
 							</a>
 						</li>
-
+						
+						<li>
+							<a href="#/user">
+								<i class="icon-user"></i>
+								<span class="menu-text"> 用户管理 </span>
+							</a>
+						</li>
+						
+						<li>
+							<a href="#/list">
+								<i class="icon-cloud"></i>
+								<span class="menu-text"> 所有数据 </span>
+							</a>
+						</li>
+						
 					</ul><!-- /.nav-list -->
 
 					<div class="sidebar-collapse" id="sidebar-collapse">

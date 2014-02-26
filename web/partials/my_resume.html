@@ -4,10 +4,7 @@
 		<form class="form-horizontal" role="form">
 			<div class="form-group">
 				<label class="col-sm-3 control-label" for="姓名"> 姓名 </label>
-
-				<div class="col-sm-9">
-					<input id="姓名" type="text" placeholder="您的真实姓名" class="col-xs-10 col-sm-5">
-				</div>
+				<div class="col-sm-9" luban-editable="my.meta['姓名']" object="my" on-object-fetched="checkObject()"></div>
 			</div>
 			
 			<div class="form-group">
@@ -15,12 +12,12 @@
 
 				<div class="col-sm-9">
 					<label class="radio-inline">
-						<input name="性别" value="男" type="radio" class="ace">
+						<input name="性别" value="男" type="radio" class="ace" ng-model="my.meta['性别'][0]" ng-checked="my.meta['性别'][0] === '男'" ng-change="save()">
 						<span class="lbl"> 男</span>
 					</label>
 
 					<label class="radio-inline">
-						<input name="性别" value="女" type="radio" class="ace">
+						<input name="性别" value="女" type="radio" class="ace" ng-model="my.meta['性别'][0]" ng-checked="my.meta['性别'][0] === '女'" ng-change="save()">
 						<span class="lbl"> 女</span>
 					</label>
 				</div>
@@ -28,49 +25,34 @@
 			
 			<div class="form-group">
 				<label class="col-sm-3 control-label" for="专业"> 专业 </label>
-
-				<div class="col-sm-9">
-					<input id="专业" type="text" placeholder="专业" class="col-xs-10 col-sm-5">
-				</div>
+				<div class="col-sm-9" luban-editable="my.meta['专业']" object="my"></div>
 			</div>
 			
 			<div class="form-group">
 				<label class="col-sm-3 control-label" for="年级"> 年级 </label>
-
-				<div class="col-sm-9">
-					<input id="年级" type="text" placeholder="年级" class="col-xs-10 col-sm-5">
-				</div>
+				<div class="col-sm-9" luban-editable="my.meta['年级']" object="my"></div>
 			</div>
 			
 			<div class="form-group">
 				<label class="col-sm-3 control-label" for="英语水平"> 英语水平 </label>
-
-				<div class="col-sm-9">
-					<input id="英语水平" type="text" placeholder="英语水平" class="col-xs-10 col-sm-5">
-				</div>
+				<div class="col-sm-9" luban-editable="my.meta['英语水平']" object="my"></div>
 			</div>
 			
 			<div class="form-group">
 				<label class="col-sm-3 control-label" for="户籍"> 户籍 </label>
-
-				<div class="col-sm-9">
-					<input id="户籍" type="text" placeholder="户籍" class="col-xs-10 col-sm-5">
-				</div>
+				<div class="col-sm-9" luban-editable="my.meta['户籍']" object="my"></div>
 			</div>
 			
 			<div class="form-group">
 				<label class="col-sm-3 control-label" for="绩点"> 绩点 </label>
-
-				<div class="col-sm-9">
-					<input id="绩点" type="text" placeholder="绩点" class="col-xs-10 col-sm-5">
-				</div>
+				<div class="col-sm-9" luban-editable="my.meta['绩点']" object="my"></div>
 			</div>
 			
 			<div class="hr hr-24"></div>
 			<!-- /row -->
 
 		</form>
-		<div data-lu-dropzone class="dropzone"></div>
+		<div luban-dropzone class="dropzone"></div>
 		<!-- PAGE CONTENT ENDS -->
 	</div><!-- /.col -->
 </div><!-- /.row -->

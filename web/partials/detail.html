@@ -1,4 +1,4 @@
-<h1>{{object.name}}<label>({{object.type}})</label></h1>
+<h1 luban-editable="object.name" object="object"></h1><sub luban-editable="object.type" object="object">{{object.type}}</sub>
 <ul>
 	<li ng-repeat="(key, values) in object.meta">
 		{{key}}: 

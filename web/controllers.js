@@ -4,12 +4,9 @@
 
 var lubanlockControllers = angular.module('lubanlockControllers', []);
 
-lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$routeParams', 'Object',
-	function($scope, $location, $routeParams, Object) {
+lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object',
+	function($scope, $routeParams, Object) {
 		$scope.objects = Object.query($routeParams);
-		$scope.showDetail = function(objectId){
-			$location.path('/detail/' + objectId);
-		};
 	}
 ]);
 
@@ -38,14 +35,14 @@ lubanlockControllers.controller('JobsCtrl', ['$scope', 'Object', '$routeParams',
 	}
 ]);
 
-lubanlockControllers.controller('JobDetailCtrl', ['$scope',
-	function($scope){
-		
+lubanlockControllers.controller('JobDetailCtrl', ['$scope', 'Object', '$routeParams',
+	function($scope, Object, $routeParams){
+		$scope.object = Object.get({id: $routeParams.id});
 	}
 ]);
 
-lubanlockControllers.controller('MyResumeCtrl', ['$scope',
-	function($scope){
-
+lubanlockControllers.controller('MyResumeCtrl', ['$scope', 'Object',
+	function($scope, Object){
+		$scope.my = Object.get({id: user.id});
 	}
 ]);
