@@ -5,21 +5,37 @@ var lubanlockDirectives = angular.module('lubanlockDirectives', []);
 
 lubanlockDirectives.directive('lubanDropzone', function(){
 	return {
-		compile: function(tElement, tAttrs, transclude){
-			tElement.dropzone({
-				paramName: "file", // The name that will be used to transfer the file
-				maxFilesize: 10, // MB
-				url: 'file/upload',
-				addRemoveLinks : true,
-				dictDefaultMessage :
-				'<span class="bigger-150 bolder"><i class="icon-caret-right red"></i> 上传你的简历</span>  拖放到这里\
-				<span class="smaller-80 grey">（或点击选择文件）</span> <br /> \
-				<i class="upload-icon icon-cloud-upload blue icon-3x"></i>',
-				dictResponseError: 'Error while uploading file!',
+		scope: {
+			files: '='
+		},
+		link: function(scope, element){
+			console.log(scope.files);
+			scope.$watch('files', function(files){
+				if(files.$resolved){
+					element.dropzone({
+						paramName: "file", // The name that will be used to transfer the file
+						maxFilesize: 10, // MB
+						url: 'file/upload',
+						addRemoveLinks : true,
+						dictDefaultMessage :
+						'<span class="bigger-150 bolder"><i class="icon-caret-right red"></i> 上传你的简历</span>  拖放到这里\
+						<span class="smaller-80 grey">（或点击选择文件）</span> <br /> \
+						<i class="upload-icon icon-cloud-upload blue icon-3x"></i>',
+						dictResponseError: '上传文件错误',
 
-				//change the previewTemplate to use Bootstrap progress bars
-				previewTemplate: "<div class=\"dz-preview dz-file-preview\">\n  <div class=\"dz-details\">\n    <div class=\"dz-filename\"><span data-dz-name></span></div>\n    <div class=\"dz-size\" data-dz-size></div>\n    <img data-dz-thumbnail />\n  </div>\n  <div class=\"progress progress-small progress-striped active\"><div class=\"progress-bar progress-bar-success\" data-dz-uploadprogress></div></div>\n  <div class=\"dz-success-mark\"><span></span></div>\n  <div class=\"dz-error-mark\"><span></span></div>\n  <div class=\"dz-error-message\"><span data-dz-errormessage></span></div>\n</div>"
-			});
+						//change the previewTemplate to use Bootstrap progress bars
+						init: function(){
+							var _this = this;
+							angular.forEach(files, function(file){
+								_this.emit('addedfile', {name: file.name, size: file.meta['file_size'][0]});
+//								this.options.thumbnail.call(this, mockFile, "http://someserver.com/myimage.jpg");
+							});
+						}
+					});
+				}
+			}, true);
+			
+			
 		}
 	}
 });
@@ -46,8 +62,8 @@ lubanlockDirectives.directive('lubanEditable', ['Object', function(Object){
 				}
 			});
 			
-			scope.$watch('object.id', function(newValue){
-				if(newValue !== undefined && scope.value === undefined){
+			scope.$watch('object', function(object){
+				if(object.$resolved && scope.value === undefined){
 					scope.isEditing = true;
 				}
 			});
