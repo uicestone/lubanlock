@@ -103,8 +103,12 @@ class Object_model extends CI_Model{
 
 		$data=array_intersect_key($data, self::$fields);
 		
-		if(empty($data) || !$this->allow('write')){
-			return false;
+		if(empty($data)){
+			throw new Exception('argument_error', 400);
+		}
+		
+		if(!$this->allow('write')){
+			throw new Exception('no_permission', 403);
 		}
 		
 		if(isset($condition)){
@@ -120,19 +124,13 @@ class Object_model extends CI_Model{
 	
 	function remove($condition=NULL){
 
-		$this->db->start_cache();
-		
 		if(isset($condition)){
 			$this->db->where($condition);
 		}else{
 			$this->db->where('id',$this->id);
 		}
 		
-		$this->db->stop_cache();
-		
-		$this->db->delete('object');
-		
-		$this->db->flush_cache();
+		return $this->db->delete('object');
 		
 	}
 	

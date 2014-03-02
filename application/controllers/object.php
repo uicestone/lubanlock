@@ -25,6 +25,9 @@ class Object extends LB_Controller{
 				$this->update($id);
 				break;
 			
+			case 'DELETE':
+				$this->remove($id);
+				break;
 		}
 	}
 	
@@ -33,6 +36,16 @@ class Object extends LB_Controller{
 		$args=$this->input->get();
 		
 		$this->output->set_output($this->object->fetch($id,$args));
+	}
+	
+	function getList(){
+		
+		$args=$this->input->get();
+		
+		$result=$this->object->getList($args);
+
+		$this->output->set_output($result['data']);
+		$this->output->set_status_header(200, 'OK, '.$result['total'].' Objects in Total');
 	}
 	
 	function update($id){
@@ -52,14 +65,9 @@ class Object extends LB_Controller{
 		$this->fetch($this->object->id);
 	}
 	
-	function getList(){
-		
-		$args=$this->input->get();
-		
-		$result=$this->object->getList($args);
-
-		$this->output->set_output($result['data']);
-		$this->output->set_status_header(200, 'OK, '.$result['total'].' Objects in Total');
+	function remove($id){
+		$this->object->id = $id;
+		$this->object->remove();
 	}
 	
 	function meta($object_id){
