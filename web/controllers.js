@@ -44,7 +44,6 @@ lubanlockControllers.controller('JobDetailCtrl', ['$scope', 'Object', '$routePar
 
 lubanlockControllers.controller('MyResumeCtrl', ['$scope', 'Object',
 	function($scope, Object){
-		$scope.value = '女';
 		$scope.my = Object.get({id: user.id});
 		$scope.genders = ["男","女"];
 		$scope.grades = ["2010级","2011级","2012级"];

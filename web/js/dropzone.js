@@ -550,11 +550,10 @@ require.register("dropzone/lib/dropzone.js", function(exports, require, module){
           node.innerHTML = this.filesize(file.size);
         }
         if (this.options.addRemoveLinks) {
-          //add a download link
-		  console.log(file);
+          //add a download link -- uicestone
           file._openLink = Dropzone.createElement('<a class="btn btn-primary" href="/file/download/' + file.id + '" target="_blank">下载</a>');
           file._removeLink = Dropzone.createElement("<a class=\"btn btn-danger\" href=\"javascript:undefined;\" data-dz-remove>" + this.options.dictRemoveFile + "</a>");
-          //add a download link
+          //add a download link -- uicestone
           file.previewElement.appendChild(file._openLink);
           file.previewElement.appendChild(file._removeLink);
         }
