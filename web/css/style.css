@@ -1,3 +1,7 @@
+.btn{
+	padding: 2px 12px;
+}
+
 .page-content{
 	padding-top: 16px;
 }
@@ -27,4 +31,8 @@ textarea, input[type="text"], input[type="password"], input[type="datetime"], in
 
 .pointer-cursur{
 	cursor: pointer;
+}
+
+.dropzone .dz-preview .dz-details, .dropzone-previews .dz-preview .dz-details{
+	width: 125px;
 }

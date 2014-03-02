@@ -22,12 +22,12 @@ lubanlockDirectives.directive('lubanDropzone', function(){
 						<span class="smaller-80 grey">（或点击选择文件）</span> <br /> \
 						<i class="upload-icon icon-cloud-upload blue icon-3x"></i>',
 						dictResponseError: '上传文件错误',
-
+						dictRemoveFile: '删除',
 						//change the previewTemplate to use Bootstrap progress bars
 						init: function(){
 							var _this = this;
 							angular.forEach(files, function(file){
-								_this.emit('addedfile', {name: file.name, size: file.meta['file_size'][0]});
+								_this.emit('addedfile', {id: file.id, name: file.name, size: file.meta['file_size'][0] * 1024});
 //								this.options.thumbnail.call(this, mockFile, "http://someserver.com/myimage.jpg");
 							});
 						}

@@ -48,8 +48,6 @@ lubanlockControllers.controller('MyResumeCtrl', ['$scope', 'Object',
 		$scope.my = Object.get({id: user.id});
 		$scope.genders = ["男","女"];
 		$scope.grades = ["2010级","2011级","2012级"];
-		$scope.resumes = Object.query({type: 'file', user: user.id, with_meta: true}, function(){
-			console.log('resource resolved');
-		});
+		$scope.resumes = Object.query({type: 'file', user: user.id, with_meta: true});
 	}
 ]);

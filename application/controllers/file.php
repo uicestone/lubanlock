@@ -22,11 +22,13 @@ class File extends LB_Controller{
 
 		$file_info['mail_name']=substr($file_info['client_name'], 0, -strlen($file_info['file_ext']));
 
-		$this->object->add(array(
+		$file_id = $this->object->add(array(
 			'type'=>'file',
 			'name'=>$file_info['mail_name'],
 			'meta'=>$file_info
 		));
+		
+		$this->output->set_output($this->object->fetch($file_id));
 		
 	}
 	
