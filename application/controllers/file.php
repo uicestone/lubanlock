@@ -36,9 +36,11 @@ class File extends LB_Controller{
 		
 		$path = end($file['meta']['full_path']);
 		
-		$this->output->set_header('Content-Type: ' . end($file['meta']['file_type']));
-		$this->output->set_header('Content-Length: ' . end($file['meta']['file_size']) * 1024);
-		$this->output->set_header('Expires: 0');
+		header('Content-Type: ' . end($file['meta']['file_type']));
+		header('Content-Length: ' . end($file['meta']['file_size']) * 1024);
+		header('Content-Disposition: attachment; filename="'.end($file['meta']['orig_name']).'"');
+		header('Expires: 0');
+		
 		
 		readfile($path);
 
