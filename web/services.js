@@ -8,10 +8,38 @@ lubanlockServices.factory('Object', ['$resource',
 	function($resource){
 		return $resource('object/:id', {id: '@id'}, {
 			update: {method: 'PUT'},
-			getMeta: {method: 'GET', url: 'object/:id/meta'},
-			saveMeta: {method: 'POST', url: 'object/:id/meta'},
-			updateMeta: {method: 'PUT', url: 'object/:id/meta'},
-			removeMeta: {method: 'DELETE', url: 'object/:id/meta'},
+		});
+	}
+]);
+
+lubanlockServices.factory('ObjectMeta', ['$resource',
+	function($resource){
+		return $resource('object/:object/meta/:key?', {object: '@object', key: '@key'}, {
+			update: {method: 'PUT'}
+		});
+	}
+]);
+
+lubanlockServices.factory('ObjectRelative', ['$resource',
+	function($resource){
+		return $resource('object/:object/relative/:relation', {object: '@object'}, {
+			update: {method: 'PUT'}
+		});
+	}
+]);
+
+lubanlockServices.factory('ObjectStatus', ['$resource',
+	function($resource){
+		return $resource('object/:object/status/:name', {object: '@object'}, {
+			update: {method: 'PUT'}
+		});
+	}
+]);
+
+lubanlockServices.factory('ObjectTag', ['$resource',
+	function($resource){
+		return $resource('object/:object/tag', {object: '@object'}, {
+			update: {method: 'PUT'}
 		});
 	}
 ]);

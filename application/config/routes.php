@@ -50,6 +50,7 @@ $route['reception']='index/reception';
 
 $route['object/(:num)']='object/index/$1';
 $route['object/(:num)/meta']='object/meta/$1';
+$route['object/(:num)/meta/(:any)']='object/meta/$1/$2';
 $route['object/(:num)/relative']='object/relative/$1';
 $route['object/(:num)/relativemod']='object/relativemod/$1';
 $route['object/(:num)/status']='object/status/$1';
