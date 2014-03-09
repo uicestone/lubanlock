@@ -709,14 +709,44 @@ class Object_model extends CI_Model{
 		
 	}
 	
-	function addRelative(array $data){
+	/**
+	 * 为一个对象添加一个或多个关联对象
+	 * @param string $relation 关系
+	 * @param string $relative 关联对象id
+	 * @param string $num optional, 关系的编号
+	 * @return int|array new meta id(s)
+	 * @throws Exception
+	 */
+	function addRelative($relation, $relative, $num = ''){
 		
-		$data['object']=$this->id;
-		$data['user']=$this->user->id;
+		if(is_array($relation)){
+			
+			$meta_ids = array();
+			
+			foreach($relation as $key => $value){
+				if(is_integer($key)){
+					if(!array_key_exists('relation', $value) || !array_key_exists('relative', $value)){
+						throw new Exception('argument_error', 400);
+					}
+					$meta_ids[] = $this->addRelative($value['relation'], $value);
+				}
+				elseif(is_array($value)){
+					$meta_ids[] = $this->addRelative($key, $value['relative'], array_key_exists('num', $value) ? $value['num'] : '');
+				}
+				else{
+					$meta_ids[] = $this->addRelative($key, $value);
+				}
+			}
+			
+			return $meta_ids;
+		}
 		
-		$this->db->insert('object_relationship',array_merge(
-			self::$fields_relationship,
-			array_intersect_key($data, self::$fields_relationship)
+		$this->db->insert('object_relationship', array(
+			'object'=>$this->id,
+			'relative'=>$relative,
+			'relation'=>$relation,
+			'num'=>$num,
+			'user'=>$this->user->id
 		));
 		
 		return $this->db->insert_id();
