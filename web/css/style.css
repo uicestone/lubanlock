@@ -1,11 +1,26 @@
+/*common*/
 .btn{
 	padding: 2px 12px;
 }
 
+.pointer-cursur{
+	cursor: pointer;
+}
+
+/*page*/
 .page-content{
 	padding-top: 16px;
 }
 
+.nav-list li.open .submenu {
+	display: block;
+}
+
+.nav, .pagination, .carousel, .panel-title a {
+	cursor: pointer;
+}
+
+/*form*/
 .form-horizontal .radio-inline, .form-horizontal .checkbox-inline{
 	padding-top: 3px;
 }
@@ -29,18 +44,7 @@ textarea, input[type="text"], input[type="password"], input[type="datetime"], in
 	padding-top: 4px;
 }
 
-.pointer-cursur{
-	cursor: pointer;
-}
-
+/*my_resume dropzone*/
 .dropzone .dz-preview .dz-details, .dropzone-previews .dz-preview .dz-details{
 	width: 125px;
-}
-
-.nav-list li.open .submenu {
-	display: block;
-}
-
-.nav, .pagination, .carousel, .panel-title a {
-	cursor: pointer;
 }
