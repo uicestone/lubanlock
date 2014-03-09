@@ -8,10 +8,19 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object',
 	function($scope, $routeParams, Object, $location) {
 		
 		$scope.objects = Object.query($routeParams);
+		$scope.currentPage = $location.search().page || 1;
 		
 		$scope.showDetail = function(id){
 			//因为使用了表格，无法使用a，因此绑定ng-click
 			$location.path('/detail/' + id);
+		}
+		
+		$scope.nextPage = function(){
+			$location.search('page', ++$scope.currentPage);
+		}
+		
+		$scope.previousPage = function(){
+			$location.search('page', --$scope.currentPage);
 		}
 	}
 ]);

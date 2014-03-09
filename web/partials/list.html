@@ -1,10 +1,10 @@
 <a href="#/detail" class="btn btn-primary">添加</a>
 <span id="paginator" class="pull-right">
-	<button class="btn icon-chevron-left"></button>
-	<button class="btn icon-chevron-right"></button>
+	<button class="btn icon-chevron-left" ng-click="previousPage()" ng-disabled="!currentPage || currentPage === 1"></button>
+	<button class="btn icon-chevron-right" ng-click="nextPage()"></button>
 </span>
 <hr>
-<table class="table table-bordered table-striped pointer-cursur">
+<table class="table table-bordered table-striped table-hover">
 	<thead>
 		<tr>
 			<th>名称</th>
@@ -14,7 +14,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="object in objects" ng-click="showDetail(object.id)">
+		<tr class="pointer-cursur" ng-repeat="object in objects" ng-click="showDetail(object.id)">
 			<td>{{object.name}}</td>
 			<td>{{object.type}}</td>
 			<td>{{object.status}}</td>
