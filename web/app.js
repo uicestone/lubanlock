@@ -7,7 +7,8 @@ var lubanlockApp = angular.module('lubanlockApp', [
 	'lubanlockControllers',
 	'lubanlockDirectives',
 	'lubanlockFilters',
-	'lubanlockServices'
+	'lubanlockServices',
+	'ui.bootstrap'
 ]);
 
 lubanlockApp.config(['$routeProvider',
@@ -25,11 +26,19 @@ lubanlockApp.config(['$routeProvider',
 				templateUrl: 'partials/my_resume.html',
 				controller: 'MyResumeCtrl'
 			})
+			.when('/user', {
+				templateUrl: 'partials/list_user.html',
+				controller: 'UsersCtrl'
+			})
+			.when('/user/:id', {
+				templateUrl: 'partials/detail_user.html',
+				controller: 'UserDetailCtrl'
+			})
 			.when('/list', {
 				templateUrl: 'partials/list.html',
 				controller: 'ListCtrl'
 			})
-			.when('/detail/:id', {
+			.when('/detail/:id?', {
 				templateUrl: 'partials/detail.html',
 				controller: 'DetailCtrl'
 			})

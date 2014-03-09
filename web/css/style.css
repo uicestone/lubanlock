@@ -36,3 +36,11 @@ textarea, input[type="text"], input[type="password"], input[type="datetime"], in
 .dropzone .dz-preview .dz-details, .dropzone-previews .dz-preview .dz-details{
 	width: 125px;
 }
+
+.nav-list li.open .submenu {
+	display: block;
+}
+
+.nav, .pagination, .carousel, .panel-title a {
+	cursor: pointer;
+}

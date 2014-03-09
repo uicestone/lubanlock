@@ -2,8 +2,14 @@
 
 /* Filters */
 
-angular.module('lubanlockFilters', []).filter('checkmark', function() {
-  return function(input) {
-    return input ? '\u2713' : '\u2718';
-  };
+var lubanlockFilters = angular.module('lubanlockFilters', []);
+
+lubanlockFilters.filter('plain', function(){
+	return function(input){
+		if(angular.isArray(input)){
+			return input.join(', ');
+		}
+		
+		return input;
+	}
 });

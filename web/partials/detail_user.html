@@ -1,0 +1,25 @@
+<h1 luban-editable="user.name" user="user"></h1><sub luban-editable="user.type" user="user">{{user.type}}</sub>
+<ul>
+	<li ng-repeat="(key, values) in user.meta">
+		{{key}}: 
+		<span ng-repeat="value in values">{{value}}</span>
+	</li>
+</ul>
+<ul>
+	<li ng-repeat="(relation, relatives) in user.relative">
+		{{relation}}: 
+		<span ng-repeat="relative in relatives">
+			<a href="#detail/{{relative.id}}">{{relative.name}}</a>
+		</span>
+	</li>
+</ul>
+<ul>
+	<li ng-repeat="(name, date) in user.status">
+		{{name}}: {{date}}
+	</li>
+</ul>
+<ul>
+	<li ng-repeat="(taxonomy, tag) in user.tag">
+		{{taxonomy}}: {{tag}}
+	</li>
+</ul>

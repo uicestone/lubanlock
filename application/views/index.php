@@ -13,12 +13,12 @@
 		<script type="text/javascript" src="js/jquery/jquery-1.11.0.js"></script>
 		<![endif]-->
 					
-		<script src="js/bootstrap.min.js"></script>
 		<script src="js/dropzone.js"></script>
 
 		<script type="text/javascript" src="js/angular/angular.js"></script>
 		<script type="text/javascript" src="js/angular/angular-route.js"></script>
 		<script type="text/javascript" src="js/angular/angular-resource.js"></script>
+		<script type="text/javascript" src="js/ui-bootstrap-tpls-0.10.0.js"></script>
 		
 		<script type="text/javascript" src="app.js"></script>
 		<script type="text/javascript" src="controllers.js"></script>
@@ -78,7 +78,7 @@
 					<ul class="nav ace-nav">
 
 						<li class="light-blue">
-							<a data-toggle="dropdown" href="" class="dropdown-toggle">
+							<a href="" dropdown-toggle>
 								<span class="user-info">
 									<small>你好,</small>
 									<?=$this->user->name?>
@@ -127,7 +127,7 @@
 				<div class="sidebar sidebar-fixed" id="sidebar">
 
 					<ul class="nav nav-list">
-						<li>
+						<li class="dropdown">
 							<a class="dropdown-toggle">
 								<i class="icon-list"></i>
 								<span class="menu-text"> 职位信息 </span>
@@ -135,7 +135,7 @@
 								<b class="arrow icon-angle-down"></b>
 							</a>
 
-							<ul class="submenu">
+							<ul class="submenu" dropdown-menu>
 								<li>
 									<a href="#/jobs">
 										<i class="icon-double-angle-right"></i>

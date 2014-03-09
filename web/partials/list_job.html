@@ -9,7 +9,7 @@
 	</thead>
 	<tbody>
 		<tr ng-repeat="job in jobs" ng-click="showJobDetail(job.id)">
-			<td>{{job.meta['职位'].slice(-1).pop()}}</td>
+			<td>{{job.name}}</td>
 			<td>{{job.meta['公司'].slice(-1).pop()}}</td>
 			<td>{{job.meta['人数'].slice(-1).pop()}}</td>
 			<td>{{job.meta['工作地点'].slice(-1).pop()}}</td>

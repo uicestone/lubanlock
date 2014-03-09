@@ -24,8 +24,8 @@ lubanlockDirectives.directive('lubanDropzone', ['Object', function(Object){
 					dictResponseError: '上传文件错误',
 					dictRemoveFile: '删除',
 					init: function(){
-						console.log('init()');
 						var _this = this;
+						
 						angular.forEach(scope.files, function(file){
 							_this.emit('addedfile', {id: file.id, name: file.name, size: file.meta['file_size'][0] * 1024});
 //							this.options.thumbnail.call(this, mockFile, "http://someserver.com/myimage.jpg");
@@ -50,7 +50,7 @@ lubanlockDirectives.directive('lubanDropzone', ['Object', function(Object){
 	}
 }]);
 
-lubanlockDirectives.directive('lubanEditable', ['Object', function(Object){
+lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$location', function(Object, ObjectMeta, $location){
 	return {
 		restrict: 'A',
 		templateUrl: 'partials/editable.html',
@@ -58,22 +58,19 @@ lubanlockDirectives.directive('lubanEditable', ['Object', function(Object){
 		scope:{
 			object: '=',
 			value: '=lubanEditable',
-			type: '@',
 			options: '=',
+			key:'=',//在模版中手动指定的meta key
+			type: '@',
 			name: '@lubanEditable'
 		},
 		link: function(scope, element, attr){
 			
-			scope.isEditing = false;
+			scope.prop = attr.lubanEditable.match(/\.([^.^\[]*)/)[1];
+				
+			scope.isEditing = scope.object === undefined ? true : false;//如果整个object都是undefined，说明没get过，则需要在首次更改时创建对象
 			
-			scope.$watch('value', function(newValue){
-				if(angular.isArray(newValue)){
-					scope.value = newValue.pop();
-				}
-			});
-			
-			scope.$watch('object', function(object){
-				if(object.$resolved && scope.value === undefined){
+			scope.$watch('object.$resolved', function($resolved){
+				if($resolved === true && scope.value === undefined){
 					scope.isEditing = true;
 				}
 			});
@@ -98,32 +95,38 @@ lubanlockDirectives.directive('lubanEditable', ['Object', function(Object){
 			
 			scope.save = function(){
 				
-				var prop = attr.lubanEditable.match(/\.([^.^\[]*)/)[1];
-				
 				var data = {};
 				
-				switch(prop){
+				switch(scope.prop){
 					case 'meta':
-						var key = attr.lubanEditable.match(/\['(.*?)'\]/)[1];
-						data = scope.value;
-						Object.updateMeta({id: scope.object.id, key: key}, data);
+						var key = scope.key === undefined ? attr.lubanEditable.match(/\['(.*?)'\]/)[1] : scope.key;
+						ObjectMeta.update({object: scope.object.id, key: key}, scope.value);
 						break;
-					
+
 					case 'status':
 						//TODO
 						break;
-					
+
 					case 'relative':
 						//TODO
 						break;
-					
+
 					case 'tag':
 						//TODO
 						break;
-					
+
 					default:
-						data[prop] = scope.value;
-						Object.update({id: scope.object.id}, data);
+						data[scope.prop] = scope.value;
+						
+						if(scope.object === undefined){//TODO 新建对象时，首次保存信息即跳转到编辑，不完美
+							Object.save(data, function(value){
+								$location.path('detail/' + value.id);
+							});
+						}
+						else{
+							scope.object.$update({id: scope.object.id}, data);
+						}
+						
 				}
 			}
 			

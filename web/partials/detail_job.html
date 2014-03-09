@@ -1,25 +1,51 @@
-<h1>{{object.name}}<label>({{object.type}})</label></h1>
-<ul>
-	<li ng-repeat="(key, values) in object.meta">
-		{{key}}: 
-		<span ng-repeat="value in values">{{value}}</span>
-	</li>
-</ul>
-<ul>
-	<li ng-repeat="(relation, relatives) in object.relative">
-		{{relation}}: 
-		<span ng-repeat="relative in relatives">
-			<a href="#detail/{{relative.id}}">{{relative.name}}</a>
-		</span>
-	</li>
-</ul>
-<ul>
-	<li ng-repeat="(name, date) in object.status">
-		{{name}}: {{date}}
-	</li>
-</ul>
-<ul>
-	<li ng-repeat="(taxonomy, tag) in object.tag">
-		{{taxonomy}}: {{tag}}
-	</li>
-</ul>
+<div class="page-header">
+	<h1>
+		{{job.name}}
+		<small>
+			<i class="icon-double-angle-right"></i>
+			{{job.meta['人数'] || 0 | plain}} 人
+		</small>
+	</h1>
+</div><!-- /.page-header -->
+
+<div class="row">
+	<div class="col-xs-12">
+		<!-- PAGE CONTENT BEGINS -->
+
+		<div>
+			<div id="user-profile-1" class="user-profile row">
+				<div class="col-xs-12 col-sm-3 center">
+					<div>
+
+						<div class="width-80 label label-info label-xlg arrowed-in arrowed-in-right">
+							<div class="inline position-relative">
+								<span class="white">{{job.meta['公司'] | plain}}</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="hr hr16 dotted"></div>
+					
+					<a class="btn btn-sm btn-primary" ng-click="showApplyForm()">
+						<i class="icon-file-text bigger-150 middle"></i>
+						<span class="bigger-110"> 投递简历 </span>
+						<i class="icon-on-right icon-arrow-right"></i>
+					</a>
+				</div>
+
+				<div class="col-xs-12 col-sm-9">
+					
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row" ng-repeat="(metaKey, metaValue) in job.meta">
+							<div class="profile-info-name"> {{metaKey}} </div>
+							<div class="profile-info-value"> {{metaValue | plain}} </div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<!-- PAGE CONTENT ENDS -->
+	</div><!-- /.col -->
+</div><!-- /.row -->

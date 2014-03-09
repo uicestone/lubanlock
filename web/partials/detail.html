@@ -1,25 +1,47 @@
-<h1 luban-editable="object.name" object="object"></h1><sub luban-editable="object.type" object="object">{{object.type}}</sub>
-<ul>
-	<li ng-repeat="(key, values) in object.meta">
-		{{key}}: 
-		<span ng-repeat="value in values">{{value}}</span>
-	</li>
-</ul>
-<ul>
-	<li ng-repeat="(relation, relatives) in object.relative">
-		{{relation}}: 
-		<span ng-repeat="relative in relatives">
-			<a href="#detail/{{relative.id}}">{{relative.name}}</a>
-		</span>
-	</li>
-</ul>
-<ul>
-	<li ng-repeat="(name, date) in object.status">
-		{{name}}: {{date}}
-	</li>
-</ul>
-<ul>
-	<li ng-repeat="(taxonomy, tag) in object.tag">
-		{{taxonomy}}: {{tag}}
-	</li>
-</ul>
+<h1 luban-editable="object.name" object="object"></h1>
+<h2 luban-editable="object.type" object="object"></h2>
+
+<div id="meta">
+	<ul>
+		<li ng-repeat="(key, values) in object.meta">
+			{{key}}: 
+			<span luban-editable="object.meta[key]" object="object" key="key"></span>
+			<button class="btn btn-danger btn-xs icon-trash" ng-click="removeMeta(key)"></button>
+		</li>
+	</ul>
+
+	<form class="form-inline" ng-show="addingMeta" ng-submit="submitMeta()">
+		<input type="text" placeholder="属性名称" ng-model="newMetaKey" />
+		<input type="text" placeholder="属性值" ng-model="newMetaValue" />
+		<button class="btn btn-primary">提交</button>
+	</form>
+
+	<button class="btn btn-info" ng-click="addMeta()" ng-hide="addingMeta">+</button>
+</div>
+
+<div id="relative">
+	<ul>
+		<li ng-repeat="(relation, relatives) in object.relative">
+			{{relation}}: 
+			<span ng-repeat="relative in relatives">
+				<a href="#detail/{{relative.id}}">{{relative.name}}</a>
+			</span>
+		</li>
+	</ul>
+</div>
+
+<div id="status">
+	<ul>
+		<li ng-repeat="(name, date) in object.status">
+			{{name}}: {{date}}
+		</li>
+	</ul>
+</div>
+
+<div id="tag">
+	<ul>
+		<li ng-repeat="(taxonomy, tag) in object.tag">
+			{{taxonomy}}: {{tag}}
+		</li>
+	</ul>
+</div>

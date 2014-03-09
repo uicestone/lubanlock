@@ -1,15 +1,15 @@
-<div ng-if="!isEditing" ng-click="edit()" class="value">&nbsp;{{value}}&nbsp;</div>
-<div ng-if="isEditing">
-	<div ng-if="type === undefined || type === 'text'">
+<span ng-if="!isEditing" ng-click="edit()" class="value">&nbsp;{{value | plain}}&nbsp;</span>
+<span ng-if="isEditing">
+	<span ng-if="type === undefined || type === 'text'">
 		<input type="text" ng-model="$parent.$parent.value" ng-change="save()" ng-blur="editCompleted()" luban-enter="editCompleted()" luban-esc="editCanceled()">
-	</div>
-	<div ng-if="type === 'radio'">
-		<label class="radio-inline" ng-repeat="option in options">
+	</span>
+	<span ng-if="type === 'radio'">{{}}
+		<label class="radio-inline" ng-repeat="option in $parent.$parent.options">
 			<input type="radio" name="{{name}}" class="ace" ng-value="option" ng-model="$parent.$parent.$parent.value" ng-change="save(); editCompleted()" luban-enter="editCompleted()" luban-esc="editCanceled()">
 			<span class="lbl">{{option}}</span>
 		</label>
-	</div>
-	<div ng-if="type === 'select'">
-		<select ng-model="$parent.$parent.value" ng-options="name for name in options" ng-change="save(); editCompleted()" ng-blur="editCompleted()"></select>
-	</div>
-</div>
+	</span>
+	<span ng-if="type === 'select'">
+		<select ng-model="$parent.$parent.value" ng-options="name for name in $parent.$parent.options" ng-change="save(); editCompleted()" ng-blur="editCompleted()"></select>
+	</span>
+</span>
