@@ -17,15 +17,6 @@ class Object_model extends CI_Model{
 		'time'=>NULL
 	);
 	
-	static $fields_relationship=array(
-		'object'=>NULL,
-		'relative'=>NULL,
-		'relation'=>NULL,
-		'num'=>'',
-		'user'=>NULL,
-		'time'=>NULL
-	);
-	
 	static $fields_tag=array(
 		'object'=>NULL,
 		'tag_taxonomy'=>NULL,
@@ -286,7 +277,7 @@ class Object_model extends CI_Model{
 		}
 		
 		//如果参数数组不为空，且全是数字键，则作in处理
-		if(array_reduce(array_keys($args), function($result, $item){
+		if(!empty($args) && array_reduce(array_keys($args), function($result, $item){
 			return $result && is_integer($item);
 		}, true)){
 			$args = array('in'=>$args);
