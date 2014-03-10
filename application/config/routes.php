@@ -45,6 +45,7 @@ $route['login']='user/login';
 $route['logout']='user/logout';
 $route['profile']='user/profile';
 $route['signup']='user/signup';
+$route['user/(:num)']='user/index/$1';
 $route['browser']='index/browser';
 $route['reception']='index/reception';
 

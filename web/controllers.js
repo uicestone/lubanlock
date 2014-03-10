@@ -58,9 +58,24 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 	}
 ]);
 
-lubanlockControllers.controller('UsersCtrl', ['$scope', 'Object',
-	function($scope, Object){
-		$scope.users = Object.query({type: 'user'});
+lubanlockControllers.controller('UsersCtrl', ['$scope', '$routeParams', 'User', '$location',
+	function($scope, $routeParams, User, $location) {
+		
+		$scope.users = User.query($routeParams);
+		$scope.currentPage = $location.search().page || 1;
+		
+		$scope.showDetail = function(id){
+			//因为使用了表格，无法使用a，因此绑定ng-click
+			$location.url('detail/' + id);
+		}
+		
+		$scope.nextPage = function(){
+			$location.search('page', ++$scope.currentPage);
+		}
+		
+		$scope.previousPage = function(){
+			$location.search('page', --$scope.currentPage);
+		}
 	}
 ]);
 

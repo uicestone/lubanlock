@@ -43,3 +43,29 @@ lubanlockServices.factory('ObjectTag', ['$resource',
 		});
 	}
 ]);
+
+lubanlockServices.factory('User', ['$resource',
+	function($resource){
+		return $resource('user/:id', {id: '@id'}, {
+			updatePassword: {method: 'PUT'},
+		});
+	}
+]);
+
+lubanlockServices.factory('UserConfig', ['$resource',
+	function($resource){
+		return $resource('user/:user/config/:item', {user: '@user', item: '@item'});
+	}
+]);
+
+lubanlockServices.factory('Company', ['$resource',
+	function($resource){
+		return $resource('company/:id', {id: '@id'});
+	}
+]);
+
+lubanlockServices.factory('CompanyConfig', ['$resource',
+	function($resource){
+		return $resource('company/:company/config/:item', {user: 'company', item: '@item'});
+	}
+]);

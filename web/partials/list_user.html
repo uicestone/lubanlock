@@ -1,9 +1,24 @@
-<ul>
-	<li ng-repeat="user in users">
-		<p>
-			<a href="#/user/{{user.id}}">
-				{{user.name}}
-			</a>
-		</p>
-	</li>
-</ul>
+<a href="#/detail" class="btn btn-primary">添加</a>
+<span id="paginator" class="pull-right">
+	<button class="btn icon-chevron-left" ng-click="previousPage()" ng-disabled="!currentPage || currentPage === 1"></button>
+	<button class="btn icon-chevron-right" ng-click="nextPage()"></button>
+</span>
+<hr>
+<table class="table table-bordered table-striped table-hover">
+	<thead>
+		<tr>
+			<th>名称</th>
+			<th>类型</th>
+			<th>电子邮件</th>
+			<th>最后登录时间</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr class="pointer-cursur" ng-repeat="user in users" ng-click="showDetail(user.id)">
+			<td>{{user.name}}</td>
+			<td>{{user.type}}</td>
+			<td>{{user.email}}</td>
+			<td>{{user.last_login}}</td>
+		</tr>
+	</tbody>
+</table>
