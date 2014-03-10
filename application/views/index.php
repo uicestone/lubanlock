@@ -139,7 +139,7 @@
 									</a>
 								</li>
 								<li>
-									<a href="#/jobs/favorite">
+									<a href="#/list?type=%E8%81%8C%E4%BD%8D%E7%94%B3%E8%AF%B7">
 										<i class="icon-double-angle-right"></i>
 										已投递的职位
 									</a>
