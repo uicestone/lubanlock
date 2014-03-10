@@ -59,17 +59,23 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 			object: '=',
 			value: '=lubanEditable',
 			options: '=',
+			placeholder: '@',
 			key:'=',//在模版中手动指定的meta key
 			type: '@',
 			name: '@lubanEditable'
 		},
 		link: function(scope, element, attr){
 			
+			//从值表达式中获得属性名，为.之后[之前的字符串
 			scope.prop = attr.lubanEditable.match(/\.([^.^\[]*)/)[1];
-				
-			scope.isEditing = scope.object === undefined ? true : false;//如果整个object都是undefined，说明没get过，则需要在首次更改时创建对象
 			
+			//如果整个object都是undefined，说明没get过，则需要在首次更改时创建对象
+			scope.inAddMode = scope.object === undefined;
+			scope.isEditing = scope.inAddMode;
+			
+			//监控对象资源的请求状态
 			scope.$watch('object.$resolved', function($resolved){
+				//资源
 				if($resolved === true && scope.value === undefined){
 					scope.isEditing = true;
 				}
@@ -120,11 +126,12 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 						
 						if(scope.object === undefined){//TODO 新建对象时，首次保存信息即跳转到编辑，不完美
 							Object.save(data, function(value){
-								$location.path('detail/' + value.id);
+								$location.url('detail/' + value.id);
 							});
 						}
 						else{
-							scope.object.$update({id: scope.object.id}, data);
+							scope.object[scope.prop] = scope.value;
+							scope.object.$update();
 						}
 						
 				}

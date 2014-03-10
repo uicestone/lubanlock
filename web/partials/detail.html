@@ -1,47 +1,142 @@
-<h1 luban-editable="object.name" object="object"></h1>
-<h2 luban-editable="object.type" object="object"></h2>
+<div class="page-header">
+	<h1 luban-editable="object.name" object="object" placeholder="对象名称">
+		<small>
+			<i class="icon-double-angle-right"></i>
+			<span luban-editable="object.type" object="object" placeholder="对象类型"></span>
+		</small>
+	</h1>
+</div><!-- /.page-header -->
 
-<div id="meta">
-	<ul>
-		<li ng-repeat="(key, values) in object.meta">
-			{{key}}: 
-			<span luban-editable="object.meta[key]" object="object" key="key"></span>
-			<button class="btn btn-danger btn-xs icon-trash" ng-click="removeMeta(key)"></button>
-		</li>
-	</ul>
+<div class="row">
+	<div class="col-xs-12">
 
-	<form class="form-inline" ng-show="addingMeta" ng-submit="submitMeta()">
-		<input type="text" placeholder="属性名称" ng-model="newMetaKey" />
-		<input type="text" placeholder="属性值" ng-model="newMetaValue" />
-		<button class="btn btn-primary">提交</button>
-	</form>
+		<div id="user-profile-1" class="user-profile row">
+			<div class="col-xs-12 col-sm-3 center">
 
-	<button class="btn btn-info" ng-click="addMeta()" ng-hide="addingMeta">+</button>
-</div>
+				<div class="profile-contact-info">
+					<div class="profile-contact-links align-left">
+						<a class="btn btn-link" ng-repeat="(taxonomy, tag) in object.tag">
+							<i class="light-blue">{{taxonomy}}</i>
+							<span class="bigger-120 ">{{tag}}</span>
+						</a>
+					</div>
 
-<div id="relative">
-	<ul>
-		<li ng-repeat="(relation, relatives) in object.relative">
-			{{relation}}: 
-			<span ng-repeat="relative in relatives">
-				<a href="#detail/{{relative.id}}">{{relative.name}}</a>
-			</span>
-		</li>
-	</ul>
-</div>
+				</div>
 
-<div id="status">
-	<ul>
-		<li ng-repeat="(name, date) in object.status">
-			{{name}}: {{date}}
-		</li>
-	</ul>
-</div>
+				<div class="hr hr16 dotted"></div>
+				
+<!--					<div class="profile-users clearfix">
+					<div class="itemdiv memberdiv">
+						<div class="inline position-relative">
+							<div class="user">
+								<a href="#">
+									<img src="img/avatar-example.png" alt="Bob Doe's avatar">
+								</a>
+							</div>
 
-<div id="tag">
-	<ul>
-		<li ng-repeat="(taxonomy, tag) in object.tag">
-			{{taxonomy}}: {{tag}}
-		</li>
-	</ul>
-</div>
+							<div class="body">
+								<div class="name">
+									<a href="#">
+										<span class="user-status status-online"></span>
+										Bob Doe
+									</a>
+								</div>
+							</div>
+
+						<div class="popover">
+								<div class="arrow"></div>
+
+								<div class="popover-content">
+									<div class="bolder">Content Editor</div>
+
+									<div class="time">
+										<i class="icon-time middle bigger-120 orange"></i>
+										<span class="green"> 20 mins ago </span>
+									</div>
+
+									<div class="hr dotted hr-8"></div>
+
+									<div class="tools action-buttons">
+										<a href="#">
+											<i class="icon-facebook-sign blue bigger-150"></i>
+										</a>
+
+										<a href="#">
+											<i class="icon-twitter-sign light-blue bigger-150"></i>
+										</a>
+
+										<a href="#">
+											<i class="icon-google-plus-sign red bigger-150"></i>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>-->
+			</div>
+
+			<div class="col-xs-12 col-sm-9">
+				
+				<div class="profile-user-info">
+					<div class="profile-info-row" ng-repeat="(key, values) in object.meta">
+						<div class="profile-info-name"> {{key}} </div>
+
+						<div class="profile-info-value">
+							<span luban-editable="object.meta[key]" object="object" key="key"></span>
+							<a class="icon-trash pointer-cursur pull-right" ng-click="removeMeta(key)"></a>
+						</div>
+					</div>
+				</div>
+
+				<form class="form-inline" ng-show="addingMeta" ng-submit="submitMeta()">
+					<input type="text" placeholder="属性名称" ng-model="newMetaKey" />
+					<input type="text" placeholder="属性值" ng-model="newMetaValue" />
+					<button class="btn btn-primary btn-xs icon-save"></button>
+				</form>
+				<button class="btn btn-info btn-xs icon-plus" ng-click="addMeta()" ng-hide="addingMeta"></button>
+				
+				<hr>
+
+				<div class="profile-user-info" ng-repeat="(relation, relatives) in object.relative">
+					<div class="profile-info-row">
+						<div class="profile-info-name"> {{relation}} </div>
+
+						<div class="profile-info-value">
+							<a href="#/detail/{{relative.id}}" ng-repeat="relative in relatives">{{relative.name}}</a>
+						</div>
+					</div>
+				</div>
+				
+				<hr>
+
+				<div class="row">
+					<div class="col-xs-12 col-sm-10 col-sm-offset-1">
+						<div class="timeline-container timeline-style2">
+							<div class="timeline-items">
+								<div class="timeline-item clearfix" ng-repeat="status in object.status">
+									<div class="timeline-info">
+										<span class="timeline-date"> {{status.date.replace(' 00:00:00','')}} </span>
+
+										<i class="timeline-indicator btn btn-info no-hover"></i>
+									</div>
+
+									<div class="widget-box transparent">
+										<div class="widget-body">
+											<div class="widget-main no-padding">
+												<span class="bigger-110">
+													{{status.name}}
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div><!-- /.timeline-items -->
+						</div><!-- /.timeline-container -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div><!-- /.col -->
+</div><!-- /.row -->

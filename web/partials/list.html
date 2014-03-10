@@ -17,8 +17,8 @@
 		<tr class="pointer-cursur" ng-repeat="object in objects" ng-click="showDetail(object.id)">
 			<td>{{object.name}}</td>
 			<td>{{object.type}}</td>
-			<td>{{object.status}}</td>
-			<td>{{object.tag}}</td>
+			<td>{{object.status | orderBy:'date':true | limitTo:1 | select:'name' | plain}}</td>
+			<td>{{object.tag | plain}}</td>
 		</tr>
 	</tbody>
 </table>

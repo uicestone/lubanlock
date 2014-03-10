@@ -7,12 +7,12 @@ var lubanlockControllers = angular.module('lubanlockControllers', []);
 lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object', '$location',
 	function($scope, $routeParams, Object, $location) {
 		
-		$scope.objects = Object.query($routeParams);
+		$scope.objects = Object.query(angular.extend({with_status: {as_rows: true}, with_tag: true}, $routeParams));
 		$scope.currentPage = $location.search().page || 1;
 		
 		$scope.showDetail = function(id){
 			//因为使用了表格，无法使用a，因此绑定ng-click
-			$location.path('/detail/' + id);
+			$location.url('detail/' + id);
 		}
 		
 		$scope.nextPage = function(){
@@ -29,7 +29,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 	function($scope, $routeParams, Object, ObjectMeta) {
 		
 		if($routeParams.id !== undefined){
-			$scope.object = Object.get({id: $routeParams.id});
+			$scope.object = Object.get({id: $routeParams.id, with_status: {as_rows: true, order_by:'date desc'}});
 		}
 		
 		$scope.addingMeta = false;
@@ -46,13 +46,13 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 			
 			$scope.object.meta[$scope.newMetaKey].push($scope.newMetaValue);
 			
-			//$scope.object.$saveMeta();
+			ObjectMeta.save({object: $scope.object.id, key: $scope.newMetaKey}, $scope.newMetaValue);
+			
 		}
 		
 		$scope.removeMeta = function(key, value){
-			$scope.object.$removeMeta({key: key, value: value}, {}, function(){
-				$scope.object
-				//$scope.object.meta = meta === [] ? {} : meta;
+			ObjectMeta.remove({object: $scope.object.id, key: key, value: value}, function(meta){
+				$scope.object.meta = meta;
 			});
 		}
 	}
@@ -84,7 +84,7 @@ lubanlockControllers.controller('JobsCtrl', ['$scope', 'Object', '$routeParams',
 		$scope.jobs = Object.query(query);
 		
 		$scope.showJobDetail = function(id){
-			$location.path('job/' + id);
+			$location.url('job/' + id);
 		}
 		
 	}
