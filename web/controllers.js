@@ -10,8 +10,13 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object',
 		$scope.objects = Object.query(angular.extend({with_status: {as_rows: true}, with_tag: true}, $routeParams));
 		$scope.currentPage = $location.search().page || 1;
 		
-		$scope.showDetail = function(id){
-			//因为使用了表格，无法使用a，因此绑定ng-click
+		$scope.showDetail = function(id, type){
+			
+			if(type === 'file'){
+				window.open('/file/download/' + id);
+				return;
+			}
+			
 			$location.url('detail/' + id);
 		}
 		
@@ -25,8 +30,8 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object',
 	}
 ]);
 
-lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object', 'ObjectMeta',
-	function($scope, $routeParams, Object, ObjectMeta) {
+lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object', 'ObjectMeta', '$location',
+	function($scope, $routeParams, Object, ObjectMeta, $location) {
 		
 		if($routeParams.id !== undefined){
 			$scope.object = Object.get({id: $routeParams.id, with_status: {as_rows: true, order_by:'date desc'}});
@@ -55,6 +60,17 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 				$scope.object.meta = meta;
 			});
 		}
+		
+		$scope.showDetail = function(id, type){
+			
+			if(type === 'file'){
+				window.open('/file/download/' + id);
+				return;
+			}
+			
+			$location.url('detail/' + id);
+		}
+		
 	}
 ]);
 

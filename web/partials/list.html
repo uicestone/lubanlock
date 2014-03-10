@@ -14,7 +14,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr class="pointer-cursur" ng-repeat="object in objects" ng-click="showDetail(object.id)">
+		<tr class="pointer-cursur" ng-repeat="object in objects" ng-click="showDetail(object.id, object.type)">
 			<td>{{object.name}}</td>
 			<td>{{object.type}}</td>
 			<td>{{object.status | orderBy:'date':true | limitTo:1 | select:'name' | plain}}</td>

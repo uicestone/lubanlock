@@ -103,7 +103,7 @@
 						<div class="profile-info-name"> {{relation}} </div>
 
 						<div class="profile-info-value">
-							<a href="#/detail/{{relative.id}}" ng-repeat="relative in relatives">{{relative.name}}</a>
+							<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)" ng-repeat="relative in relatives">{{relative.name}}</a>
 						</div>
 					</div>
 				</div>
