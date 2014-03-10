@@ -435,7 +435,7 @@ class Object_model extends CI_Model{
 		$this->db->where('( '.$permission_condition.' )');
 		
 		if(!array_key_exists('order_by', $args)){
-			$args['order_by'] = 'object.id desc';
+			$args['order_by'] = 'object.time desc';
 		}
 		
 		if(array_key_exists('order_by',$args) && $args['order_by']){
@@ -479,13 +479,15 @@ class Object_model extends CI_Model{
 		$result = array();
 		$result['total'] = $this->db->query('SELECT FOUND_ROWS() rows')->row()->rows;
 		
-		foreach(array('meta','relative','status','tag') as $field){
-			if(array_key_exists('with_'.$field,$args) && $args['with_'.$field]){
-				array_walk($result_array,function(&$row, $index, $field, array $args = array()){
+		//获得四属性的参数，决定是否为对象列表获取属性
+		foreach(array('meta','relative','status','tag') as $property){
+			if(array_key_exists('with_'.$property, $args) && $args['with_'.$property]){
+				array_walk($result_array,function(&$row, $index, $userdata){
 					$this->id = $row['id'];
-					$property_args = array_key_exists('with_'.$field, $args) && is_array($args['with_'.$field]) ? $args['with_'.$field] : array();
-					$row[$field] = call_user_func(array($this,'get'.$field), $property_args);
-				},$field);
+					//参数值可以不是true而是一个数组，那样的话这个数组将被传递给get{property}()方法作为参数
+					!is_array($userdata['property_args']) && $userdata['property_args'] = array();
+					$row[$userdata['property']] = call_user_func(array($this, 'get'.$userdata['property']), $userdata['property_args']);
+				}, array('property'=>$property, 'property_args'=>$args['with_'.$property]));
 			}
 		}
 
@@ -764,6 +766,9 @@ class Object_model extends CI_Model{
 	
 	/**
 	 * 获得对象的当前状态或者状态列表
+	 * @property array $args
+	 *	as_rows bool default: false 对象属性是无序的，需要有序序列时，将本参数设置为true来获得一个数组
+	 * $return array|object
 	 */
 	function getStatus(array $args = array()){
 		
@@ -771,8 +776,9 @@ class Object_model extends CI_Model{
 			->select('UNIX_TIMESTAMP(`date`) `timestamp`', false)
 			->select('date')
 			->from('object_status')
-			->where('object',$this->id)
-			->order_by('date');
+			->where('object',$this->id);
+		
+		array_key_exists('order_by', $args) ? $this->db->order_by($args['order_by']) : $this->db->order_by('date');
 		
 		if(array_key_exists('id', $args)){
 			$this->db->where('object_status.id',$args['id']);
