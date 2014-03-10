@@ -54,6 +54,17 @@ class LB_input extends CI_Input{
 			$get = parent::get($index, $xss_clean);
 		}
 		
+		if(is_array($get)){
+			array_walk($get, function(&$value){
+				$decoded = json_decode($value, JSON_OBJECT_AS_ARRAY);
+				!is_null($decoded) && $value = $decoded;
+			});
+		}
+		else{
+			$decoded = json_decode($get, JSON_OBJECT_AS_ARRAY);
+			!is_null($decoded) && $get = $decoded;
+		}
+		
 		$_GET = $get_temp;
 		
 		if(is_null($index) && $get===false){
