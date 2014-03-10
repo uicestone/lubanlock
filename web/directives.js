@@ -52,21 +52,21 @@ lubanlockDirectives.directive('lubanDropzone', ['Object', function(Object){
 
 lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$location', function(Object, ObjectMeta, $location){
 	return {
-		restrict: 'A',
+		restrict: 'A', //此指令通过HTML属性方式调用
 		templateUrl: 'partials/editable.html',
-		transclude: true,
+		transclude: true, //支持将HTML标签内部的内容追加到可编辑内容之后
 		scope:{
-			object: '=',
-			value: '=lubanEditable',
-			options: '=',
-			placeholder: '@',
-			key:'=',//在模版中手动指定的meta key
-			type: '@',
-			name: '@lubanEditable'
+			object: '=',				//正在编辑的对象
+			value: '=lubanEditable',	//可编辑字段的值
+			options: '=',				//input:radio和select的可用选项
+			placeholder: '@',		//input:text的placeholder
+			key:'=',					//在模版中手动指定的meta key
+			type: '@',				//input的类型，可选text, radio, select
+			name: '@lubanEditable'		//字段的值表达式，用以正则匹配获取属性类型或属性键名
 		},
 		link: function(scope, element, attr){
 			
-			//从值表达式中获得属性名，为.之后[之前的字符串
+			//从值表达式中获得属性类型，为.之后[之前的字符串
 			scope.prop = attr.lubanEditable.match(/\.([^.^\[]*)/)[1];
 			
 			//如果整个object都是undefined，说明没get过，则需要在首次更改时创建对象
@@ -75,7 +75,7 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 			
 			//监控对象资源的请求状态
 			scope.$watch('object.$resolved', function($resolved){
-				//资源
+				//资源请求完成，需求属性仍然没有，则需要编辑来创建此属性
 				if($resolved === true && scope.value === undefined){
 					scope.isEditing = true;
 				}
@@ -90,7 +90,25 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 			}
 			
 			scope.editCompleted = function(){
+				
+				//失焦时值仍然为undefined，说明未曾编辑，则不保存
+				if(scope.value === undefined){
+					return;
+				}
+				
 				scope.isEditing = false;
+				
+				//首次添加时，失焦为首次保存的时间点
+				if(scope.inAddMode){
+
+					var data = {}; data[scope.prop] = scope.value;
+
+					Object.save(data, function(value){
+						//保存后跳转到对象编辑页
+						$location.url('detail/' + value.id);
+					});
+				}
+				
 			}
 			
 			scope.editCanceled = function(){
@@ -101,10 +119,14 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 			
 			scope.save = function(){
 				
-				var data = {};
+				//首次添加对象时，不在每次变化时保存，而是在首次失焦时保存
+				if(scope.inAddMode){
+					return;
+				}
 				
 				switch(scope.prop){
 					case 'meta':
+						//接受手动传入的键名，没有的话再去键值表达式中匹配
 						var key = scope.key === undefined ? attr.lubanEditable.match(/\['(.*?)'\]/)[1] : scope.key;
 						ObjectMeta.update({object: scope.object.id, key: key}, scope.value);
 						break;
@@ -122,17 +144,8 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 						break;
 
 					default:
-						data[scope.prop] = scope.value;
-						
-						if(scope.object === undefined){//TODO 新建对象时，首次保存信息即跳转到编辑，不完美
-							Object.save(data, function(value){
-								$location.url('detail/' + value.id);
-							});
-						}
-						else{
-							scope.object[scope.prop] = scope.value;
-							scope.object.$update();
-						}
+						scope.object[scope.prop] = scope.value;
+						scope.object.$update();
 						
 				}
 			}
