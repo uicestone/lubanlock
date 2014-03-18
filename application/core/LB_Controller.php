@@ -14,39 +14,11 @@ class LB_Controller extends CI_Controller{
 	
 	function __construct(){
 		parent::__construct();
-		/*
-		 * 处理$class和$method，并定义为常量
-		 */
-		global $class,$method;
-		
-		//使用controller中自定义的默认method
-		if($method=='index'){
-			$method=$this->default_method;
-		}
-		
-		//定义$class常量，即控制器的名称
-		define('CONTROLLER',$class);
-		define('METHOD',$method);
-		
-		//CONTROLLER !=='index' && $this->output->enable_profiler(TRUE);
-		
-		/*
-		 * 自动载入的资源，没有使用autoload.php是因为后者载入以后不能起简称...
-		 */
-		$this->load->model('company_model','company');
-		$this->load->model('object_model','object');
-		$this->load->model('user_model','user');
-		$this->load->model('tag_model','tag');
-		$this->load->model('message_model','message');
 		
 		$this->user->initialize();
 		
 		if($this->input->accept('application/json')){
 			$this->output->set_content_type('application/json');
-		}
-		
-		if(file_exists(APPPATH.'language/chinese/'.$this->company->syscode.'_lang.php')){
-			$this->load->language($this->company->syscode);
 		}
 		
 	}

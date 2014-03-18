@@ -1,5 +1,5 @@
 <?php
-class user extends LB_controller{
+class user extends LB_Controller{
 	
 	function __construct(){
 		parent::__construct();

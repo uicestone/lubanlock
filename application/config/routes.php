@@ -78,5 +78,20 @@ $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
+$route['login']='user/login';
+$route['logout']='user/logout';
+$route['profile']='user/profile';
+$route['signup']='user/signup';
+$route['browser']='index/browser';
+$route['reception']='index/reception';
+
+$route['object/(:num)']='object/index/$1';
+$route['object/(:num)/meta']='object/meta/$1';
+$route['object/(:num)/meta/(:any)']='object/meta/$1/$2';
+$route['object/(:num)/relative']='object/relative/$1';
+$route['object/(:num)/relativemod']='object/relativemod/$1';
+$route['object/(:num)/status']='object/status/$1';
+$route['object/(:num)/tag']='object/tag/$1';
+
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
