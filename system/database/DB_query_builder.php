@@ -1472,6 +1472,41 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	// --------------------------------------------------------------------
 
 	/**
+	 * ON DUPLICATE UPDATE statement
+	 * 
+	 * Generates a platform-specific on duplicate key update string from the supplied data
+	 * For MySQLi driver only
+	 * 
+	 * @author    Chris Miller <chrismill03@hotmail.com>
+	 * @since     1.6.2
+	 * @access    public
+	 * @param     string   the table name
+	 * @param     array    the update/insert data
+	 * @return    string
+	 */
+	function _upsert($table, $values)
+	{
+		$updatestr = array();
+		$keystr    = array();
+		$valstr    = array();
+
+		foreach($values as $key => $val)
+		{
+			$updatestr[] = $key." = ".$val;
+			$keystr[]    = $key;
+			$valstr[]    = $val;
+		}
+
+		$sql  = "INSERT INTO " . $table . " (" . implode(', ', $keystr) . ") ";
+		$sql .= "VALUES (" . implode(', ', $valstr) . ") ";
+		$sql .= "ON DUPLICATE KEY UPDATE " . implode(', ', $updatestr);
+
+		return $sql;
+	}
+	
+	// --------------------------------------------------------------------
+
+	/**
 	 * Insert batch statement
 	 *
 	 * Generates a platform-specific insert string from the supplied data.
@@ -1747,6 +1782,59 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		}
 
 		return $sql;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * On Duplicate Key Update
+	 *
+	 * Compiles an on duplicate key update string and runs the query
+	 * Only supports MySQLi driver for now
+	 * 
+	 * @author    Chris Miller <chrismill03@hotmail.com>
+	 * @since     1.6.2
+	 * @access    public
+	 * @param     string    the table to retrieve the results from
+	 * @param     array     an associative array of update value
+	 * @return    object
+	 */
+
+	function upsert($table = '', $set = NULL )
+	{
+		if ( ! is_null($set))
+		{
+			$this->set($set);
+		}
+
+		if (count($this->qb_set) == 0)
+		{
+				if ($this->db_debug)
+			{
+					return $this->display_error('db_must_use_set');
+			}
+				return FALSE;
+		}
+
+		if ($table == '')
+		{
+			if ( ! isset($this->qb_from[0]))
+			{
+				if ($this->db_debug)
+				{
+					return $this->display_error('db_must_set_table');
+				}
+				return FALSE;
+			}
+
+			$table = $this->qb_from[0];
+		}
+
+
+		$sql = $this->_upsert($this->protect_identifiers($this->dbprefix.$table), $this->qb_set );
+
+		$this->_reset_write();
+		return $this->query($sql);
 	}
 
 	// --------------------------------------------------------------------
