@@ -69,15 +69,30 @@ class Object_model extends CI_Model{
 
 	}
 	
+	/**
+	 * 
+	 * @param array $data
+	 *	keys in self::$field
+	 *	permission bool|array
+	 *		array(user_id=>permission_name, ...)
+	 *		array(user_id=>array(permission_name=>false), ...)
+	 * @return int insert id
+	 */
 	function add(array $data){
 		
 		$data['company']=$this->company->id;
 		$data['user']=$this->user->id;
 		$data['time_insert']=date('Y-m-d H:i:s');
 		
-		$this->db->insert('object',array_merge(self::$fields,array_intersect_key($data,self::$fields)));
+		$this->db->insert('object', array_merge(self::$fields, array_intersect_key($data, self::$fields)));
 		
 		$this->id=$this->db->insert_id();
+		
+		if(array_key_exists('permission', $data)){
+			foreach($data['permission'] as $user => $permissions){
+				$this->authorize($permissions, $user);
+			}
+		}
 		
 		$this->authorize(array('read'=>true,'write'=>true,'grant'=>true), $this->user->id, false);
 		
