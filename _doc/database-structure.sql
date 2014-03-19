@@ -1,8 +1,3 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-CREATE DATABASE IF NOT EXISTS `lubanlock` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `lubanlock`;
-
 CREATE TABLE IF NOT EXISTS `company` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -44,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `nav` (
   `name` varchar(16) NOT NULL,
   `params` text,
   `parent` int(11) DEFAULT NULL,
-  `order` int(11) NOT NULL DEFAULT '0'
+  `order` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `parent` (`parent`),
   KEY `order` (`order`),
