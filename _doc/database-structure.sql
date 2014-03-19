@@ -1,8 +1,3 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-CREATE DATABASE IF NOT EXISTS `lubanlock` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `lubanlock`;
-
 CREATE TABLE IF NOT EXISTS `company` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -11,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `company` (
   `syscode` varchar(255) NOT NULL,
   `sysname` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `company_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -44,13 +39,13 @@ CREATE TABLE IF NOT EXISTS `nav` (
   `name` varchar(16) NOT NULL,
   `params` text,
   `parent` int(11) DEFAULT NULL,
-  `order` int(11) NOT NULL DEFAULT '0'
+  `order` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `parent` (`parent`),
   KEY `order` (`order`),
   KEY `user` (`user`),
   KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -61,7 +56,6 @@ CREATE TABLE IF NOT EXISTS `object` (
   `user` int(11) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `time_insert` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `flag` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `company` (`company`),
   KEY `user` (`user`),
@@ -70,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `object` (
   KEY `name` (`name`),
   KEY `type` (`type`),
   KEY `num` (`num`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_meta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -87,20 +81,22 @@ CREATE TABLE IF NOT EXISTS `object_meta` (
   KEY `object` (`object`),
   KEY `value` (`value`(255)),
   KEY `key-value` (`key`,`value`(255))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_meta_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `object_meta` int(11) NOT NULL,
+  `object` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
   `user` int(11) NOT NULL,
   `read` tinyint(1) NOT NULL DEFAULT '0',
   `write` tinyint(1) NOT NULL DEFAULT '0',
   `grant` tinyint(1) NOT NULL DEFAULT '0',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `object_meta-user` (`object_meta`,`user`),
-  KEY `user` (`user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  UNIQUE KEY `object-key-user` (`object`,`key`,`user`),
+  KEY `user` (`user`),
+  KEY `key` (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -131,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `object_relationship` (
   KEY `relative` (`relative`),
   KEY `relation` (`relation`),
   KEY `num` (`num`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_relationship_meta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -148,32 +144,6 @@ CREATE TABLE IF NOT EXISTS `object_relationship_meta` (
   KEY `value` (`value`(255))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `object_relationship_meta_permission` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `object_relationship_meta` int(11) NOT NULL,
-  `user` int(11) NOT NULL,
-  `read` tinyint(1) NOT NULL DEFAULT '0',
-  `write` tinyint(1) NOT NULL DEFAULT '0',
-  `grant` tinyint(1) NOT NULL DEFAULT '0',
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `object_relationship_meta-user` (`object_relationship_meta`,`user`),
-  KEY `user` (`user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `object_relationship_permission` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `object_relationship` int(11) NOT NULL,
-  `user` int(11) NOT NULL,
-  `read` tinyint(1) NOT NULL DEFAULT '0',
-  `write` tinyint(1) NOT NULL DEFAULT '0',
-  `grant` tinyint(1) NOT NULL DEFAULT '0',
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `object_relationship-user` (`object_relationship`,`user`),
-  KEY `user` (`user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE IF NOT EXISTS `object_status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object` int(11) NOT NULL,
@@ -184,23 +154,11 @@ CREATE TABLE IF NOT EXISTS `object_status` (
   `user` int(11) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `student` (`object`),
   KEY `date` (`date`),
   KEY `user` (`user`),
-  KEY `time` (`time`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `object_status_permission` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `object_status` int(11) NOT NULL,
-  `user` int(11) NOT NULL,
-  `read` tinyint(1) NOT NULL DEFAULT '0',
-  `write` tinyint(1) NOT NULL DEFAULT '0',
-  `grant` tinyint(1) NOT NULL DEFAULT '0',
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `object_status-user` (`object_status`,`user`),
-  KEY `user` (`user`)
+  KEY `time` (`time`),
+  KEY `object` (`object`),
+  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_tag` (
@@ -214,19 +172,6 @@ CREATE TABLE IF NOT EXISTS `object_tag` (
   KEY `user` (`user`),
   KEY `time` (`time`),
   KEY `tag_taxonomy` (`tag_taxonomy`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `object_tag_permission` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `object_tag` int(11) NOT NULL,
-  `user` int(11) NOT NULL,
-  `read` tinyint(1) NOT NULL DEFAULT '0',
-  `write` tinyint(1) NOT NULL DEFAULT '0',
-  `grant` tinyint(1) NOT NULL DEFAULT '0',
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `object_tag-user` (`object_tag`,`user`),
-  KEY `user` (`user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `sessions` (
@@ -244,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `tag` (
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `tag_taxonomy` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -256,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `tag_taxonomy` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `tag-taxonomy` (`tag`,`taxonomy`),
   KEY `taxonomy` (`taxonomy`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int(11) NOT NULL,
@@ -282,7 +227,7 @@ CREATE TABLE IF NOT EXISTS `user_config` (
   `value` longtext NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user-key` (`user`,`key`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO company (id, name, host, syscode, sysname) VALUE
 (1, '鲁班锁','sys.sh','LubanLock','鲁班锁');
@@ -308,11 +253,10 @@ ALTER TABLE `object_meta`
   ADD CONSTRAINT `object_meta_ibfk_2` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 ALTER TABLE `object_meta_permission`
-  ADD CONSTRAINT `object_meta_permission_ibfk_1` FOREIGN KEY (`object_meta`) REFERENCES `object_meta` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   ADD CONSTRAINT `object_meta_permission_ibfk_2` FOREIGN KEY (`user`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 ALTER TABLE `object_permission`
-  ADD CONSTRAINT `object_permission_ibfk_1` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `object_permission_ibfk_1` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `object_permission_ibfk_2` FOREIGN KEY (`user`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 ALTER TABLE `object_relationship`
@@ -324,30 +268,14 @@ ALTER TABLE `object_relationship_meta`
   ADD CONSTRAINT `object_relationship_meta_ibfk_1` FOREIGN KEY (`relationship`) REFERENCES `object_relationship` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `object_relationship_meta_ibfk_2` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
-ALTER TABLE `object_relationship_meta_permission`
-  ADD CONSTRAINT `object_relationship_meta_permission_ibfk_1` FOREIGN KEY (`object_relationship_meta`) REFERENCES `object_relationship_meta` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  ADD CONSTRAINT `object_relationship_meta_permission_ibfk_2` FOREIGN KEY (`user`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-
-ALTER TABLE `object_relationship_permission`
-  ADD CONSTRAINT `object_relationship_permission_ibfk_1` FOREIGN KEY (`object_relationship`) REFERENCES `object_relationship` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  ADD CONSTRAINT `object_relationship_permission_ibfk_2` FOREIGN KEY (`user`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-
 ALTER TABLE `object_status`
   ADD CONSTRAINT `object_status_ibfk_1` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `object_status_ibfk_2` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-
-ALTER TABLE `object_status_permission`
-  ADD CONSTRAINT `object_status_permission_ibfk_1` FOREIGN KEY (`object_status`) REFERENCES `object_status` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  ADD CONSTRAINT `object_status_permission_ibfk_2` FOREIGN KEY (`user`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 ALTER TABLE `object_tag`
   ADD CONSTRAINT `object_tag_ibfk_1` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `object_tag_ibfk_2` FOREIGN KEY (`tag_taxonomy`) REFERENCES `tag_taxonomy` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   ADD CONSTRAINT `object_tag_ibfk_3` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-
-ALTER TABLE `object_tag_permission`
-  ADD CONSTRAINT `object_tag_permission_ibfk_1` FOREIGN KEY (`object_tag`) REFERENCES `object_tag` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  ADD CONSTRAINT `object_tag_permission_ibfk_2` FOREIGN KEY (`user`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 ALTER TABLE `tag_taxonomy`
   ADD CONSTRAINT `tag_taxonomy_ibfk_1` FOREIGN KEY (`tag`) REFERENCES `tag` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
