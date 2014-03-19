@@ -1,5 +1,5 @@
 <?php
-class Message_model extends Object_model{
+class Message_model extends CI_Model{
 	
 	function __construct(){
 		parent::__construct();

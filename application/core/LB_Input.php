@@ -84,13 +84,5 @@ class LB_input extends CI_Input{
 		return false;
 	}
 	
-	function _clean_input_keys($str){   
-		$config = &get_config('config');   
-		if( ! preg_match("/^[".$config['permitted_uri_chars']."]+$/i", rawurlencode($str))){   
-		   exit('Disallowed Key Characters.');   
-		}   
-		return $str;   
-	}
-	
 }
 ?>

@@ -64,7 +64,7 @@ class User_model extends Object_model{
 		$this->config->user=$this->config();
 	}
 	
-	function fetch($id=null, $args = array(), $permission_check = true){
+	function fetch($id=null, array $args = array(), $permission_check = true){
 		$this->db->join('user','user.id = object.id','inner');
 		return parent::fetch($id, $args, $permission_check);
 	}
