@@ -795,7 +795,12 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			return $this;
 		}
 
-		if ( ! is_array($values))
+		//work around with empty input. uicestone 2013/5/24
+		if(is_null($values) || $values === array())
+		{
+			$values = array(NULL);
+		}
+		elseif ( ! is_array($values))
 		{
 			$values = array($values);
 		}
