@@ -65,8 +65,9 @@ class User_model extends Object_model{
 	}
 	
 	function fetch($id=null, array $args = array(), $permission_check = true){
-		$this->db->join('user','user.id = object.id','inner');
-		return parent::fetch($id, $args, $permission_check);
+		$object = parent::fetch($id, $args, $permission_check);
+		$user = $this->db->from('user')->where('id', $id)->get()->row_array();
+		return array_merge($object, $user);
 	}
 	
 	function getList(array $args=array()){
