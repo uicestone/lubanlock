@@ -164,7 +164,7 @@ class Object_model extends CI_Model{
 		
 		$result = $this->db->from('object_permission')->where('object',$this->id)->where_in('user',$users)->get()->row();
 		
-		if($result === array() || (bool)$result->$permission === true){
+		if(is_null($result) || (bool)$result->$permission === true){
 			return true;
 		}
 		
@@ -230,7 +230,7 @@ class Object_model extends CI_Model{
 		
 		$result = $this->db->from('object_meta_permission')->where('object', $this->id)->where('key', $key)->where_in('user', $users)->get()->row();
 		
-		if($result === array() || (bool)$result->$permission === true){
+		if(is_null($result) || (bool)$result->$permission === true){
 			return true;
 		}
 		
@@ -432,7 +432,7 @@ class Object_model extends CI_Model{
 			$permission_condition .= ' OR `object`.`id` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( '.implode(', ',$this->user->group_ids).' ) )';
 		}
 		
-		$this->db->where('( '.$permission_condition.' )');
+		$this->db->where('( '.$permission_condition.' )', null, false);
 		
 		if(!array_key_exists('order_by', $args)){
 			$args['order_by'] = 'object.time desc';
