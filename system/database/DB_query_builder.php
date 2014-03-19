@@ -67,6 +67,14 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @var	bool
 	 */
 	protected $qb_distinct			= FALSE;
+	
+	/**
+	 * QB FOUND_ROWS flag
+	 * For MySQLi driver only
+	 *
+	 * @var	bool
+	 */
+	protected $qb_found_rows		= FALSE;
 
 	/**
 	 * QB FROM data
@@ -431,6 +439,23 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	public function distinct($val = TRUE)
 	{
 		$this->qb_distinct = is_bool($val) ? $val : TRUE;
+		return $this;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * FOUND_ROWS
+	 *
+	 * Sets a flag which tells the query string compiler to add SQL_CALC_FOUND_ROWS
+	 * For MySQLi driver only
+	 * 
+	 * @param	bool
+	 * @return	object
+	 */
+	public function found_rows($val = TRUE)
+	{
+		$this->qb_found_rows = (is_bool($val)) ? $val : TRUE;
 		return $this;
 	}
 
@@ -2224,7 +2249,17 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		}
 		else
 		{
-			$sql = ( ! $this->qb_distinct) ? 'SELECT ' : 'SELECT DISTINCT ';
+			//Add support fot FOUND_ROWS, only for MySQLi driver. uicestone 2013/10/27
+			$sql = 'SELECT ';
+
+			if($this->qb_distinct){
+				$sql.='DISTINCT ';
+			}
+
+			if($this->qb_found_rows){
+				$sql.='SQL_CALC_FOUND_ROWS ';
+			}
+			//$sql = ( ! $this->ar_distinct) ? 'SELECT ' : 'SELECT DISTINCT ';
 
 			if (count($this->qb_select) === 0)
 			{
