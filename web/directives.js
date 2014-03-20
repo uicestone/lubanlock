@@ -143,8 +143,7 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 
 					default:
 						scope.object[scope.prop] = scope.value;
-						scope.object.$update();
-						
+						scope.object.$update({with_status:{as_rows:true}});
 				}
 			}
 			

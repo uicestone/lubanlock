@@ -88,13 +88,15 @@
 							<a class="icon-trash pointer-cursur pull-right" ng-click="removeMeta(key)"></a>
 						</div>
 					</div>
+					
+					<form class="meta-add" ng-show="addingMeta" ng-submit="submitMeta($event)">
+						<input type="text" placeholder="属性名称" class="profile-info-name" ng-model="newMetaKey" />
+						<input type="text" placeholder="属性值" class="profile-info-value" ng-model="newMetaValue" />
+						<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
+						<button type="button" class="btn btn-primary btn-xs icon-chevron-left" ng-click="closeMetaAddForm()"></button>
+					</form>
 				</div>
 
-				<form class="form-inline" ng-show="addingMeta" ng-submit="submitMeta()">
-					<input type="text" placeholder="属性名称" ng-model="newMetaKey" />
-					<input type="text" placeholder="属性值" ng-model="newMetaValue" />
-					<button class="btn btn-primary btn-xs icon-save"></button>
-				</form>
 				<button class="btn btn-info btn-xs icon-plus" ng-click="addMeta()" ng-hide="addingMeta"></button>
 				
 				<hr>

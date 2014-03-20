@@ -43,7 +43,13 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 			$scope.addingMeta = true;
 		}
 		
-		$scope.submitMeta = function(){
+		$scope.closeMetaAddForm = function(){
+			$scope.newMetaKey = undefined;
+			$scope.newMetaValue = undefined;
+			$scope.addingMeta = false;
+		}
+		
+		$scope.submitMeta = function($event){
 			
 			if($scope.object.meta[$scope.newMetaKey] === undefined){
 				$scope.object.meta[$scope.newMetaKey] = [];
@@ -51,7 +57,10 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 			
 			$scope.object.meta[$scope.newMetaKey].push($scope.newMetaValue);
 			
-			ObjectMeta.save({object: $scope.object.id, key: $scope.newMetaKey}, $scope.newMetaValue);
+			ObjectMeta.save({object: $scope.object.id, key: $scope.newMetaKey}, $scope.newMetaValue, function(){
+				$scope.newMetaValue = undefined;
+				angular.element($event.target).children('.profile-info-name').trigger('select');
+			});
 			
 		}
 		
