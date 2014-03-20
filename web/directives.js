@@ -52,22 +52,22 @@ lubanlockDirectives.directive('lubanDropzone', ['Object', function(Object){
 
 lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$location', function(Object, ObjectMeta, $location){
 	return {
-		restrict: 'A', //此指令通过HTML属性方式调用
+		restrict: 'A',				//此指令通过HTML属性方式调用
 		templateUrl: 'partials/editable.html',
-		transclude: true, //支持将HTML标签内部的内容追加到可编辑内容之后
+		transclude: true,			//支持将HTML标签内部的内容追加到可编辑内容之后
 		scope:{
 			object: '=',				//正在编辑的对象
 			value: '=lubanEditable',	//可编辑字段的值
+			name: '@lubanEditable',	//字段的值表达式，用以正则匹配获取属性类型或属性键名
+			type: '@',				//input的类型，可选text, radio, select
 			options: '=',				//input:radio和select的可用选项
 			placeholder: '@',		//input:text的placeholder
-			key:'=',					//在模版中手动指定的meta key
-			type: '@',				//input的类型，可选text, radio, select
-			name: '@lubanEditable'		//字段的值表达式，用以正则匹配获取属性类型或属性键名
+			key:'='					//在模版中手动指定的meta key TODO
 		},
-		link: function(scope, element, attr){
+		link: function(scope, element){
 			
 			//从值表达式中获得属性类型，为.之后[之前的字符串
-			scope.prop = attr.lubanEditable.match(/\.([^.^\[]*)/)[1];
+			scope.prop = scope.name.match(/\.([^.^\[]*)/)[1];
 			
 			//如果整个object都是undefined，说明没get过，则需要在首次更改时创建对象
 			scope.inAddMode = scope.object === undefined;
@@ -99,11 +99,9 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 				scope.isEditing = false;
 				
 				//首次添加时，失焦为首次保存的时间点
-				if(scope.inAddMode){
-
-					var data = {}; data[scope.prop] = scope.value;
-
-					Object.save(data, function(value){
+				if(scope.inAddMode && scope.object.name && scope.object.type){
+					
+					Object.save(scope.object, function(value){
 						//保存后跳转到对象编辑页
 						$location.url('detail/' + value.id);
 					});
@@ -127,7 +125,7 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 				switch(scope.prop){
 					case 'meta':
 						//接受手动传入的键名，没有的话再去键值表达式中匹配
-						var key = scope.key === undefined ? attr.lubanEditable.match(/\['(.*?)'\]/)[1] : scope.key;
+						var key = scope.key === undefined ? scope.name.match(/\['(.*?)'\]/)[1] : scope.key;
 						ObjectMeta.update({object: scope.object.id, key: key}, scope.value);
 						break;
 
