@@ -52,8 +52,8 @@ class Company_model extends Object_model{
 	 *	set: the insert or update query
 	 */
 	function config($key,$value=NULL){
-		
-		$row=$this->db->select('id,value')->from('company_config')->where('company',$this->id)->where('key',$key)
+		$db = $this->load->database('', true);
+		$row=$db->select('id,value')->from('company_config')->where('company',$this->id)->where('key',$key)
 			->get()->row();
 		
 		if(is_null($value)){
@@ -74,7 +74,7 @@ class Company_model extends Object_model{
 				$value=json_encode($value);
 			}
 			
-			return $this->db->upsert('company_config', array('value'=>$value, 'id'=>$row->id));
+			return $db->upsert('company_config', array('value'=>$value, 'id'=>$row->id));
 		}
 	}
 }

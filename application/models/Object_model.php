@@ -466,15 +466,15 @@ class Object_model extends CI_Model{
 		//使用两种方式来对列表分页
 		if(array_key_exists('page', $args)){
 			if(!array_key_exists('per_page', $args)){
-				$args['per_page'] = $this->config->user_item('per_page');
+				$args['per_page'] = $this->company->config('per_page');
 			}
 			//页码-每页数量方式，转换为sql limit
-			$args['limit']=array($args['per_page'],($args['page']-1)*$args['page']);
+			$args['limit'] = array($args['per_page'],($args['page']-1)*$args['page']);
 		}
 		
 		if(!array_key_exists('limit', $args)){
 			//默认limit
-			$args['limit']=25;//$this->config->user_item('per_page');
+			$args['limit'] = $this->company->config('per_page');
 		}
 		
 		if(is_array($args['limit'])){
