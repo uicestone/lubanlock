@@ -71,6 +71,12 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 			$location.url('detail/' + id);
 		}
 		
+		$scope.remove = function(){
+			$scope.object.$remove({}, function(){
+				history.back();
+			});
+		}
+		
 	}
 ]);
 
