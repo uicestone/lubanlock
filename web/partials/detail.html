@@ -89,7 +89,7 @@
 						</div>
 					</div>
 					
-					<form class="meta-add" ng-show="addingMeta" ng-submit="submitMeta($event)">
+					<form class="meta-add" ng-show="addingMeta" ng-submit="addMeta($event)">
 						<input type="text" placeholder="属性名称" class="profile-info-name" ng-model="newMetaKey" />
 						<input type="text" placeholder="属性值" class="profile-info-value" ng-model="newMetaValue" />
 						<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
@@ -97,7 +97,7 @@
 					</form>
 				</div>
 
-				<button class="btn btn-info btn-xs icon-plus" ng-click="addMeta()" ng-hide="addingMeta"></button>
+				<button class="btn btn-info btn-xs icon-plus" ng-click="openMetaAddForm()" ng-hide="addingMeta"></button>
 				
 				<hr>
 

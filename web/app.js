@@ -11,8 +11,8 @@ var lubanlockApp = angular.module('lubanlockApp', [
 	'ui.bootstrap'
 ]);
 
-lubanlockApp.config(['$routeProvider',
-	function($routeProvider) {
+lubanlockApp.config(['$routeProvider', '$httpProvider',
+	function($routeProvider, $httpProvider) {
 		$routeProvider
 			.when('/jobs/:favorite?', {
 				templateUrl: 'partials/list_job.html',
@@ -45,5 +45,9 @@ lubanlockApp.config(['$routeProvider',
 			.otherwise({
 				redirectTo: '/jobs'
 			});
+			
+		$httpProvider.interceptors.push('HttpInterceptor');
+
 	}
+	
 ]);

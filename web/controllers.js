@@ -4,6 +4,23 @@
 
 var lubanlockControllers = angular.module('lubanlockControllers', []);
 
+lubanlockControllers.controller('AlertCtrl', ['$scope', 'Alert',
+	function($scope, Alert){
+		
+		$scope.alerts = Alert.getAlerts();
+		
+		$scope.$watch('alerts.length', function(length){
+			
+			if(length === 0){
+				return;
+			}
+			
+			$scope.alert = $scope.alerts[$scope.alerts.length - 1];
+		});
+		
+	}
+]);
+
 lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object', '$location',
 	function($scope, $routeParams, Object, $location) {
 		
@@ -39,7 +56,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 		
 		$scope.addingMeta = false;
 		
-		$scope.addMeta = function(){
+		$scope.openMetaAddForm = function(){
 			$scope.addingMeta = true;
 		}
 		
@@ -49,15 +66,16 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 			$scope.addingMeta = false;
 		}
 		
-		$scope.submitMeta = function($event){
-			
-			if($scope.object.meta[$scope.newMetaKey] === undefined){
-				$scope.object.meta[$scope.newMetaKey] = [];
-			}
-			
-			$scope.object.meta[$scope.newMetaKey].push($scope.newMetaValue);
+		$scope.addMeta = function($event){
 			
 			ObjectMeta.save({object: $scope.object.id, key: $scope.newMetaKey}, $scope.newMetaValue, function(){
+				
+				if($scope.object.meta[$scope.newMetaKey] === undefined){
+					$scope.object.meta[$scope.newMetaKey] = [];
+				}
+
+				$scope.object.meta[$scope.newMetaKey].push($scope.newMetaValue);
+			
 				$scope.newMetaValue = undefined;
 				angular.element($event.target).children('.profile-info-name').trigger('select');
 			});

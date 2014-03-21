@@ -20,6 +20,20 @@
 	cursor: pointer;
 }
 
+.alert-container {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	text-align: center;
+	z-index: 2000;
+}
+
+.alert-container .alert{
+	display: inline-block;
+	min-width: 6%;
+	padding: 7px 15px;
+}
+
 /*form*/
 .form-horizontal .radio-inline, .form-horizontal .checkbox-inline{
 	padding-top: 3px;
