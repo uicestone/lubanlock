@@ -154,25 +154,21 @@ class Object extends LB_Controller{
 		}
 	}
 	
-	function tag($object_id){
+	function tag($object_id, $taxonomy = null){
 		
 		$this->object->id=$object_id;
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output($this->object->getTag());
 				break;
 			
-			case 'PUT':
 			case 'POST':
-				$tag_id=$this->object->addTag($this->input->data());
-				$this->output->set_output($this->object->getTag(array('id'=>$tag_id)));
+				$this->object->setTag($this->input->data(), $taxonomy, $this->input->get('append') ? $this->input->get('append') : false);
 				break;
 			
-			case 'DELETE':
-				$this->object->removeTag($this->input->get());
-				break;
 		}
+		
+		$this->output->set_output($this->object->getTag());
 	}
 	
 }

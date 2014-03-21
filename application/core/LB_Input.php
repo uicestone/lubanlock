@@ -24,7 +24,8 @@ class LB_input extends CI_Input{
 			parse_str($data,$data);
 		}
 		//parse as json
-		elseif((array_key_exists('Content-type', $headers) && $headers['Content-type']==='application/json') || json_decode($data)){
+		elseif((array_key_exists('Content-type', $headers) && $headers['Content-type']==='application/json') || !is_null(json_decode($data))){
+			
 			$data=json_decode($data,JSON_OBJECT_AS_ARRAY);
 		}
 

@@ -2,11 +2,6 @@
 class Object_model extends CI_Model{
 	
 	var $id;
-	var $data;//具体对象数据
-	var $meta;//具体对象的元数据
-	var $relative;
-	var $status;
-	var $tag;//具体对象的标签
 	
 	static $fields=array(
 		'name'=>NULL,
@@ -17,13 +12,6 @@ class Object_model extends CI_Model{
 		'time'=>NULL
 	);
 	
-	static $fields_tag=array(
-		'object'=>NULL,
-		'tag_taxonomy'=>NULL,
-		'user'=>NULL,
-		'time'=>NULL
-	);
-
 	function __construct() {
 		parent::__construct();
 	}
@@ -850,7 +838,7 @@ class Object_model extends CI_Model{
 	}
 	
 	/**
-	 * 获得一个对象的所有标签
+	 * 获得一个对象的所有分类标签
 	 */
 	function getTag(array $args = array()){
 		
@@ -858,16 +846,62 @@ class Object_model extends CI_Model{
 			->join('tag_taxonomy','tag_taxonomy.id = object_tag.tag_taxonomy','inner')
 			->join('tag','tag.id = tag_taxonomy.tag','inner')
 			->where('object_tag.object', $this->id)
-			->select('tag.name, tag_taxonomy.taxonomy');
+			->select('object_tag.*, tag.id tag, tag.name term, tag_taxonomy.taxonomy, tag_taxonomy.description, tag_taxonomy.parent, tag_taxonomy.count');
 		
-		$result = $this->db->get()->result_array();
+		if(array_key_exists('taxonomy', $args)){
+			$this->db->where('tag_taxonomy.taxonomy', $args['taxonomy']);
+		}
 		
-		$tags = array_column($result, 'name', 'taxonomy');
+		$result = $this->db->get()->result();
+		
+		if(array_key_exists('as_rows', $args)){
+			return $result;
+		}
+		
+		$tags = array();
+		
+		foreach($result as $row){
+			$tags[$row->taxonomy][] = $row->term;
+		}
 		
 		return $tags;
 	}
 	
+	/**
+	 * 为一个对象设置分类标签
+	 * @param array|string $tags 一个或多个分类值(tag.name)或分类值id(tag.id)
+	 * @param string $taxonomy 分类
+	 * @param bool $append 是否追加，false将用$tags重写此分类的值，否则保留原值
+	 */
 	function setTag($tags, $taxonomy, $append = false){
+		
+		if(!$tags){
+			$tags = [];
+		}
+		
+		if(!is_array($tags)){
+			$tags = array($tags);
+		}
+		
+		//如果并非追加，那么先删除此分类下不在此次添加之列的值
+		if(!$append){
+			
+			$tags_origin = $this->getTag(array('as_rows'=>true, 'taxonomy'=>$taxonomy));
+			
+			if($tags_origin){
+				foreach($tags_origin as $tag_origin){
+					if(!in_array($tag_origin->term, $tags)/* && !in_array($tag_origin->tag, $tags)*/){
+						$this->db->delete('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_origin->tag_taxonomy));
+					}
+				}
+			}
+		}
+		
+		foreach($tags as $tag){
+			$tag_taxonomy_id = /*is_integer($tag) ? $tag : */$this->tag->get($tag, $taxonomy);
+			$query = $this->db->insert_string('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_taxonomy_id, 'user'=>$this->user->id));
+			$this->db->query(str_replace('INSERT', 'INSERT IGNORE', $query));
+		}
 		
 	}
 	
