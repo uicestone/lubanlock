@@ -35,7 +35,12 @@ class Object extends LB_Controller{
 		
 		$args=$this->input->get();
 		
-		$this->output->set_output($this->object->fetch($id,$args));
+		$object = $this->object->fetch($id,$args);
+		
+		//meta在后台使用array，在前端使用Object表示，因此输出时要转化
+		array_key_exists('meta', $object) && $object['meta'] = (object)$object['meta'];
+		
+		$this->output->set_output($object);
 	}
 	
 	function getList(){
@@ -70,28 +75,30 @@ class Object extends LB_Controller{
 		$this->object->remove();
 	}
 	
-	function meta($object_id){
+	function meta($object_id, $key = null){
 		
 		$this->object->id=$object_id;
+		
+		$key = urldecode($key);
 		
 		switch ($this->input->method) {
 			case 'GET':
 				break;
 			
 			case 'POST':
-				$this->object->addMeta($this->input->data(), null, $this->input->get('unique'));
+				$this->object->addMeta($key, $this->input->data(), $this->input->get('unique'));
 				break;
 			
 			case 'PUT':
-				$this->object->updateMeta($this->input->get('key'), $this->input->data(), $this->input->get('prev_value') ? $this->input->get('prev_value') : null);
+				$this->object->updateMeta($key, $this->input->data(), $this->input->get('prev_value') ? $this->input->get('prev_value') : null);
 				break;
 			
 			case 'DELETE':
-				$this->object->removeMeta($this->input->get('key'), $this->input->get('value') ? $this->input->get('value') : null);
+				$this->object->removeMeta($key, $this->input->get('value') ? $this->input->get('value') : null);
 				break;
 		}
 		
-		$this->output->set_output($this->object->getMeta());
+		$this->output->set_output((object)$this->object->getMeta());
 		
 	}
 	

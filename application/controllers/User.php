@@ -5,8 +5,66 @@ class User extends LB_Controller{
 		parent::__construct();
 	}
 	
+	function index($id=NULL){
+		
+		switch ($this->input->method) {
+			case 'GET':
+				if(is_null($id)){
+					$this->getList();
+				}
+				else{
+					$this->fetch($id);
+				}
+				break;
+			
+			case 'POST':
+				$this->add();
+				break;
+			
+			case 'PUT':
+				$this->update($id);
+				break;
+			
+			case 'DELETE':
+				$this->remove($id);
+				break;
+		}
+	}
+	
+	function fetch($id){
+		
+		$args=$this->input->get();
+		
+		$user = $this->user->fetch($id, $args);
+		
+		$this->output->set_output($user);
+	}
+	
+	function getList(){
+		
+		$args=$this->input->get();
+		
+		$result=$this->user->getList($args);
+
+		$this->output->set_output($result['data']);
+		$this->output->set_status_header(200, 'OK, '.$result['total'].' Users in Total');
+	}
+	
+	function add(){
+		$data = $this->input->data();
+		
+		$user_id = $this->user->add($data);
+		
+		$this->fetch($user_id);
+	}
+	
+	function remove($id){
+		$this->user->remove($id);
+	}
+	
 	function logout(){
 		$this->user->sessionLogout();
+		redirect();
 	}
 	
 	function login(){
@@ -39,6 +97,10 @@ class User extends LB_Controller{
 		$this->output->title='用户资料';
 		$this->load->view('user/profile');
 		$this->load->view('user/profile_sidebar',true,'sidebar');
+	}
+	
+	function updatePassword(){
+		
 	}
 	
 }

@@ -561,6 +561,7 @@ class Object_model extends CI_Model{
 	
 	/**
 	 * 给当前对象添加一个或多个元数据
+	 * @todo 添加多个元数据的功能考虑移除
 	 * 即使键已经存在，仍将添加，除非$unique为true，那样的话不执行任何写入
 	 * 支持通过单个数组参数的方式一次添加多个元数据
 	 * @param string|array $key
