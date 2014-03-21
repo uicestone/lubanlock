@@ -149,7 +149,6 @@ CREATE TABLE IF NOT EXISTS `object_status` (
   `object` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `date` datetime NOT NULL,
-  `content` text,
   `comment` text,
   `user` int(11) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

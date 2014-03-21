@@ -804,8 +804,8 @@ class Object_model extends CI_Model{
 		return $status;
 		
 	}
-
-	function addStatus($name, $date = null, $content = null, $comment = null){
+	
+	function _parse_date($date){
 		
 		if(empty($date)){
 			$date = date('Y-m-d H:i:s');
@@ -820,11 +820,15 @@ class Object_model extends CI_Model{
 			$date = date('Y-m-d H:i:s', $date);
 		}
 		
+		return $date;
+	}
+
+	function addStatus($name, $date = null, $comment = null){
+		
 		$this->db->insert('object_status',array(
 			'object'=>$this->id,
 			'name'=>$name,
-			'date'=>$date,
-			'content'=>$content,
+			'date'=>$this->_parse_date($date),
 			'comment'=>$comment,
 			'user'=>$this->user->id
 		));
@@ -832,9 +836,52 @@ class Object_model extends CI_Model{
 		return $this->db->insert_id();
 	}
 	
-	function removeStatus(array $args = array()){
+	/**
+	 * 更新对象状态
+	 * @param string $name 要更新的状态名
+	 * @param string|int $date 新的日期
+	 * @param string $comment 新的备注
+	 * @param string|int $prev_date 为null则更新日期最新一条名称为$name的状态，否则更新名称为$name且日期为$prev_date的状态
+	 */
+	function updateStatus($name, $date = null, $comment = null, $prev_date = null){
 		
-		return $this->db->delete('object_status',array('id'=>$args['id']));
+		$set = array();
+		
+		if(!is_null($date)){
+			$set['date'] = $this->_parse_date($date);
+		}
+		
+		if(!is_null($comment)){
+			$set['comment'] = $comment;
+		}
+		
+		$where = array(
+			'object'=>$this->id,
+			'name'=>$name
+		);
+		
+		if(!is_null($prev_date)){
+			$where['date'] = $this->_parse_date($prev_date);
+		}
+		else{
+			$this->db->order_by('date desc')->limit(1);
+		}
+		
+		$this->db->update('object_status', $set, $where);
+	}
+	
+	function removeStatus($name, $date = null){
+		
+		$where = array(
+			'object'=>$this->id,
+			'name'=>$name
+		);
+		
+		if(!is_null($date)){
+			$where['date'] = $this->_parse_date($date);
+		}
+		
+		return $this->db->delete('object_status', $where);
 	}
 	
 	/**

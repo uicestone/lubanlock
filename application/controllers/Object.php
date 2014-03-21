@@ -39,6 +39,7 @@ class Object extends LB_Controller{
 		
 		//meta在后台使用array，在前端使用Object表示，因此输出时要转化
 		array_key_exists('meta', $object) && $object['meta'] = (object)$object['meta'];
+		array_key_exists('tag', $object) && $object['tag'] = (object)$object['tag'];
 		
 		$this->output->set_output($object);
 	}
@@ -128,30 +129,47 @@ class Object extends LB_Controller{
 		}
 	}
 	
-	function status($object_id){
+	function status($object_id, $name = null){
 		
 		$this->object->id=$object_id;
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output($this->object->getStatus());
-				break;
-			
-			case 'PUT':
-			case 'POST' && $this->input->data('id') === false:
-				$status_id=$this->object->addStatus($this->input->data());
-				$this->output->set_output($this->object->getStatus(array('id'=>$status_id)));
 				break;
 			
 			case 'POST':
-				$this->object->updateStatus($this->input->data());
-				$this->output->set_output($this->object->getStatus(array('id'=>$this->input->data('id'))));
+				
+				$data = $this->input->data();
+				
+				if(!is_array($data)){
+					$date = $data;
+					$comment = null;
+				}
+				else{
+					$comment = array_key_exists('comment', $data) ? $data['comment'] : null;
+					$date = array_key_exists('date', $data) ? $data['date'] : null;
+				}
+				
+				$this->object->addStatus($name, $date, $comment);
+				
+				break;
+			
+			case 'PUT':
+				
+				$this->object->updateStatus($name, 
+					$this->input->data('date') ? $this->input->data('date') : null, 
+					$this->input->data('comment') ? $this->input->data('comment') : null, 
+					$this->input->get('prev_date') ? $this->input->get('prev_date') : null
+				);
+				
 				break;
 			
 			case 'DELETE':
-				$this->object->removeStatus($this->input->get());
+				$this->object->removeStatus($name, $this->input->get('date') ? $this->input->get('date') : null);
 				break;
 		}
+		
+		$this->output->set_output($this->object->getStatus($this->input->get()));
 	}
 	
 	function tag($object_id, $taxonomy = null){
@@ -168,7 +186,7 @@ class Object extends LB_Controller{
 			
 		}
 		
-		$this->output->set_output($this->object->getTag());
+		$this->output->set_output((object)$this->object->getTag());
 	}
 	
 }
