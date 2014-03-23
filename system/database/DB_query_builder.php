@@ -2803,6 +2803,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 					'qb_aliased_tables'	=> array(),
 					'qb_no_escape'		=> array(),
 					'qb_distinct'		=> FALSE,
+					'qb_found_rows'	=>FALSE,
 					'qb_limit'		=> FALSE,
 					'qb_offset'		=> FALSE
 					)
