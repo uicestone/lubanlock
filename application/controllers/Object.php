@@ -103,30 +103,41 @@ class Object extends LB_Controller{
 		
 	}
 	
-	function relative($object_id){
+	function relative($object_id, $relation = null){
 		
 		$this->object->id=$object_id;
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output($this->object->getRelative());
-				break;
-			
-			case 'PUT':
-			case 'POST' && $this->input->data('id') === false:
-				$relative_id=$this->object->addRelative($this->input->data());
-				$this->output->set_output($this->object->getRelative(array('id'=>$relative_id)));
 				break;
 			
 			case 'POST':
-				$this->object->updateRelative($this->input->data());
-				$this->output->set_output($this->object->getRelative(array('id'=>$this->input->data('id'))));
+				
+				$data = $this->input->data();
+				
+				$num = '';
+				$meta = array();
+				$is_on = true;
+				
+				if(!is_array($data)){
+					$relative = $data;
+				}
+				else{
+					array_key_exists('relative', $data) && $relative = $data['relative'];
+					array_key_exists('num', $data) && $num = $data['num'];
+					array_key_exists('meta', $data) && $meta = $data['meta'];
+					array_key_exists('is_on', $data) && $is_on = $data['is_on'];
+				}
+				
+				$this->object->setRelative($relation, $relative, $num, $meta, $is_on, $this->input->get());
 				break;
 			
 			case 'DELETE':
-				$this->object->removeRelative($this->input->get());
+				$this->object->removeRelative($relation, $relative);
 				break;
 		}
+		
+		$this->output->set_output($this->object->getRelative($this->input->get()));
 	}
 	
 	function status($object_id, $name = null){

@@ -678,6 +678,15 @@ class Object_model extends CI_Model{
 		return $this->db->delete('object_meta', $condition);
 	}
 	
+	/**
+	 * 
+	 * @param array $args
+	 *	as_rows
+	 *	id_only
+	 *	include_disabled
+	 *	with_meta default:true
+	 * @return array
+	 */
 	function getRelative(array $args = array()){
 		
 		$this->db
@@ -688,21 +697,35 @@ class Object_model extends CI_Model{
 			$this->db->where('object_relationship.relation',$args['relation']);
 		}
 		
-		if(array_key_exists('id', $args)){
-			$this->db->where('object_relationship.id',$args['id']);
-			return $this->db->get()->row_array();
+		if(!array_key_exists('include_disabled', $args) || !$args['include_disabled']){
+			$this->db->where('object_relationship.is_on', true);
 		}
 		
 		$result = $this->db->get()->result_array();
 		
-		if(array_key_exists('as_rows', $args)){
+		if(array_key_exists('as_rows', $args) && $args['as_rows']){
 			return $result;
 		}
 		
 		$relatives = array();
 		
-		foreach($result as $row){
-			$relatives[$row['relation']][] = $this->fetch($row['relative'], array('with_meta'=>false, 'with_relative'=>false, 'with_status'=>false, 'with_tag'=>false, 'set_id'=>false));
+		foreach($result as $relationship){
+			
+			if(array_key_exists('id_only', $args) && $args['id_only']){
+				$relatives[$relationship['relation']][] = $relationship['relative'];
+			}
+			else{
+				$relative = $this->fetch($relationship['relative'], array('with_meta'=>false, 'with_relative'=>false, 'with_status'=>false, 'with_tag'=>false, 'set_id'=>false));
+				$relative['relationship_id'] = $relationship['id'];
+				$relative['relationship_num'] = $relationship['num'];
+				$relative['is_on'] = (bool)$relationship['is_on'];
+				
+				if(!array_key_exists('with_meta', $args) || $args['with_meta']){
+					$relative['meta'] = $this->getRelativeMeta($relationship['id']);
+				}
+				
+				$relatives[$relationship['relation']][] = $relative;
+			}
 		}
 		
 		return $relatives;
@@ -714,58 +737,77 @@ class Object_model extends CI_Model{
 	 * @param string $relation 关系
 	 * @param string $relative 关联对象id
 	 * @param string $num optional, 关系的编号
+	 * @param bool $is_on 是否启用关系，若为false，此关系虽然被保存，但默认情况不会被获取
+	 * @param array $args
+	 *	replace_meta
 	 * @return int|array new meta id(s)
 	 * @throws Exception
 	 */
-	function addRelative($relation, $relative, $num = ''){
+	function setRelative($relation, $relative, $num = '', array $meta = array(), $is_on = true, array $args = array()){
 		
-		if(is_array($relation)){
-			
-			$meta_ids = array();
-			
-			foreach($relation as $key => $value){
-				if(is_integer($key)){
-					if(!array_key_exists('relation', $value) || !array_key_exists('relative', $value)){
-						throw new Exception('argument_error', 400);
-					}
-					$meta_ids[] = $this->addRelative($value['relation'], $value);
-				}
-				elseif(is_array($value)){
-					$meta_ids[] = $this->addRelative($key, $value['relative'], array_key_exists('num', $value) ? $value['num'] : '');
-				}
-				else{
-					$meta_ids[] = $this->addRelative($key, $value);
-				}
-			}
-			
-			return $meta_ids;
+		try{
+			$this->fetch($relative, array('set_id'=>false));
+		}catch(Exception $e){
+			throw new Exception('invalid_relative', 400);
 		}
 		
-		$this->db->insert('object_relationship', array(
+		$return = $this->db->upsert('object_relationship', array(
 			'object'=>$this->id,
 			'relative'=>$relative,
 			'relation'=>$relation,
 			'num'=>$num,
+			'is_on'=>$is_on,
 			'user'=>$this->user->id
 		));
 		
-		return $this->db->insert_id();
+		//根据参数，先删除不在此次添加之列的键值对
+		if(array_key_exists('replace_meta', $args) && $args['replace_meta']){
+			
+			$meta_origin = $this->getRelativeMeta($relation, $relative);
+			
+			foreach($meta_origin as $key => $value){
+				if(!array_key_exists($key, $meta)){
+					$this->removeRelativeMeta($relation, $relative, $key);
+				}
+			}
+		}
+		
+		foreach($meta as $key => $value){
+			$this->setRelativeMeta($relation, $relative, $key, $value);
+		}
+		
+		return $return;
 	}
 	
-	function updateRelative(array $data, array $args=array()){
-		
-		$this->db->update('object_relationship',array_merge(
-				array('user'=>$this->user->id),
-				array_intersect_key($data, self::$fields_relationship)
-			),$args?$args:array('id'=>$data['id']));
-		
-		return $this;
+	function removeRelative($relation, $relative){
+		return $this->db->delete('object_relationship', array('object'=>$this->id, 'relation'=>$relation, 'relative'=>$relative));
 	}
 	
-	function removeRelative(array $args = array()){
+	function _getRelationshipID($relation, $relative){
 		
-		$this->db->where('id',$args['id'])->delete('object_relationship');
-		return $this;
+		$relationship = $this->db->from('object_relationship')->where(array('object'=>$this->id, 'relative'=>$relative, 'relation'=>$relation, 'is_on'=>true))->get()->row();
+		
+		if(!$relationship){
+			throw new Exception('relationship_not_exist', 500);
+		}
+		
+		return $relationship->id;
+	}
+	
+	function getRelativeMeta($relation, $relative = null){
+		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
+		$result = $this->db->from('object_relationship_meta')->where('relationship', $relationship_id)->get()->result_array();
+		return array_column($result, 'value', 'key');
+	}
+	
+	function setRelativeMeta($relation, $relative, $key, $value){
+		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
+		return $this->db->upsert('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key, 'value'=>$value, 'user'=>$this->user->id));
+	}
+	
+	function removeRelativeMeta($relation, $relative, $key){
+		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
+		return $this->db->delete('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key));
 	}
 	
 	/**
