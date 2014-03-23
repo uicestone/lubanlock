@@ -200,6 +200,20 @@ class Object extends LB_Controller{
 		$this->output->set_output((object)$this->object->getTag());
 	}
 	
+	function permission($object_id, $type = 'authorize', $name = 'read'){
+		$this->object->id = $object_id;
+		
+		switch ($this->input->method){
+			case 'GET':
+				break;
+			
+			case 'POST':
+				$this->object->authorize(array($name=>$type === 'authorize'), $this->input->data());
+		}
+		
+		$this->output->set_output($this->object->getPermission($this->input->get()));
+	}
+	
 }
 
 ?>

@@ -92,6 +92,8 @@ $route['object/(:num)/status']='object/status/$1';
 $route['object/(:num)/status/(:any)']='object/status/$1/$2';
 $route['object/(:num)/tag']='object/tag/$1';
 $route['object/(:num)/tag/(:any)']='object/tag/$1/$2';
+$route['object/(:num)/permission']='object/permission/$1';
+$route['object/(:num)/(authorize|prohibit)/(read|write|grant)']='object/permission/$1/$2/$3';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
