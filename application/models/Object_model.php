@@ -46,7 +46,7 @@ class Object_model extends CI_Model{
 			throw new Exception(lang('object').' '.$id.' '.lang('not_found'), 404);
 		}
 		
-		foreach(array('meta','relative','status','tag') as $field){
+		foreach(array('meta','relative','status','tag','permission') as $field){
 			if(!array_key_exists('with_'.$field,$args) || $args['with_'.$field]){
 				$property_args = array_key_exists('with_'.$field,$args) && is_array($args['with_'.$field]) ? $args['with_'.$field] : array();
 				$object[$field]=call_user_func(array($this,'get'.$field), $property_args);
@@ -483,7 +483,7 @@ class Object_model extends CI_Model{
 		$result['total'] = $this->db->query('SELECT FOUND_ROWS() rows')->row()->rows;
 		
 		//获得四属性的参数，决定是否为对象列表获取属性
-		foreach(array('meta','relative','status','tag') as $property){
+		foreach(array('meta','relative','status','tag','permission') as $property){
 			if(array_key_exists('with_'.$property, $args) && $args['with_'.$property]){
 				array_walk($result_array,function(&$row, $index, $userdata){
 					$this->id = $row['id'];
@@ -512,6 +512,24 @@ class Object_model extends CI_Model{
 		}else{
 			return array();
 		}
+	}
+	
+	function getPermission(array $args = array()){
+		if(!$this->allow()){
+			throw new Exception('no_permission', 403);
+		}
+		
+		$result = $this->db->from('object_permission')->where('object', $this->id)->get()->result();
+		
+		$permission = array('read'=>array(), 'write'=>array(), 'grant'=>array());
+		
+		foreach($result as $row){
+			foreach(array('read', 'write', 'grant') as $type){
+				$row->$type && $permission[$type][] = $row->user;
+			}
+		}
+		
+		return $permission;
 	}
 	
 	/**
