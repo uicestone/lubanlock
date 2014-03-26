@@ -7,7 +7,7 @@ class Nav_model extends CI_Model{
 		parent::__construct();
 		
 		self::$fields=array(
-			'user' => $this->user->id,
+			'user' => $this->user->session_id,
 			'name' => '',
 			'params' => '',
 			'parent' => NULL,

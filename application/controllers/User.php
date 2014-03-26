@@ -5,7 +5,7 @@ class User extends LB_Controller{
 		parent::__construct();
 	}
 	
-	function index($id=NULL){
+	function index($id = NULL){
 		
 		switch ($this->input->method) {
 			case 'GET':
@@ -44,22 +44,26 @@ class User extends LB_Controller{
 		
 		$args=$this->input->get();
 		
-		$result=$this->user->getList($args);
+		$result = $this->user->getList($args);
 
 		$this->output->set_output($result['data']);
 		$this->output->set_status_header(200, 'OK, '.$result['total'].' Users in Total');
 	}
 	
 	function add(){
-		$data = $this->input->data();
-		
-		$user_id = $this->user->add($data);
-		
+		$user_id = $this->user->add($this->input->data(), $this->input->get());
 		$this->fetch($user_id);
 	}
 	
+	function update($id){
+		$this->user->id = $id;
+		$this->user->update($this->input->data());
+		$this->fetch($id);
+	}
+	
 	function remove($id){
-		$this->user->remove($id);
+		$this->user->id = $id;
+		$this->user->remove();
 	}
 	
 	function logout(){
@@ -69,12 +73,9 @@ class User extends LB_Controller{
 	
 	function login(){
 		
-		if($this->input->get_post('username')){
-			
+		if($this->input->post_get('username') && $this->input->post_get('password')){
 			$user = $this->user->verify($this->input->get_post('username'), $this->input->get_post('password'));
-
-			$this->session->set_userdata('user_id', intval($user['id']));
-			$this->user->updateLoginTime();
+			$this->user->sessionLogin($user['id']);
 			redirect();
 		}
 		
@@ -90,8 +91,8 @@ class User extends LB_Controller{
 	
 	function profile(){
 		
-		$people=array_merge_recursive($this->people->fetch($this->user->id),$this->input->sessionPost('people'));
-		$people_meta=array_merge_recursive(array_column($this->people->getMeta($this->user->id),'content','name'),$this->input->sessionPost('people'));
+		$people=array_merge_recursive($this->people->fetch($this->user->session_id),$this->input->sessionPost('people'));
+		$people_meta=array_merge_recursive(array_column($this->people->getMeta($this->user->session_id),'content','name'),$this->input->sessionPost('people'));
 		$this->load->addViewArrayData(compact('people','people_meta'));
 		
 		$this->output->title='用户资料';

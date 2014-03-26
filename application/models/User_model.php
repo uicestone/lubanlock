@@ -1,6 +1,7 @@
 <?php
 class User_model extends Object_model{
 	
+	var $session_id;
 	var $name = '';
 	var $roles = array();
 	var $groups = array();
@@ -9,8 +10,7 @@ class User_model extends Object_model{
 	static $fields=array(
 		'name'=>'',
 		'email'=>'',
-		'alias'=>NULL,//别名
-		'password'=>'',//密码
+		'password'=>'',
 		'roles'=>''
 	);
 	
@@ -19,20 +19,20 @@ class User_model extends Object_model{
 	}
 	
 	function initialize($id=NULL){
-		isset($id) && $this->id=$id;
+		isset($id) && $this->session_id=$id;
 		
-		if(is_null($this->id) && $this->session->userdata('user_id')){
-			$this->id=intval($this->session->userdata('user_id'));
+		if(is_null($this->session_id) && $this->session->userdata('user_id')){
+			$this->session_id=intval($this->session->userdata('user_id'));
 		}
 		
-		if(!$this->id){
+		if(!$this->session_id){
 			return;
 		}
 		
-		$user=$this->fetch($this->id, array(), false);
+		$user=$this->fetch($this->session_id, array(), false);
 		$this->name=$user['name'];
 		$user['roles'] && $this->roles=explode(',',$user['roles']);
-		array_push($this->group_ids, $this->id);
+		array_push($this->group_ids, $this->session_id);
 		
 		function get_parent_group($children = array(), &$object){
 			
@@ -52,7 +52,7 @@ class User_model extends Object_model{
 			get_parent_group($parent_group_ids, $object);
 		}
 		
-		get_parent_group(array($this->id), $this);
+		get_parent_group(array($this->session_id), $this);
 		
 		$groups = $this->groups;
 		$this->groups = array();
@@ -66,22 +66,35 @@ class User_model extends Object_model{
 	
 	function fetch($id=null, array $args = array(), $permission_check = true){
 		$object = parent::fetch($id, $args, $permission_check);
-		$user = $this->db->from('user')->where('id', $id)->get()->row_array();
+		$user = $this->db->select('user.id, user.name, user.email, user.roles, user.last_ip, user.last_login')->from('user')->where('id', $id)->get()->row_array();
 		return array_merge($object, $user);
 	}
 	
 	function getList(array $args=array()){
 		
-		$this->db->join('user','user.id = object.id','inner');
+		$this->db->join('user','user.id = object.id','inner')->select('user.name, user.email, user.roles, user.last_ip, user.last_login');
 		
 		return parent::getList($args);
 	}
 	
-	function add(array $data){
+	/**
+	 * 
+	 * @param array $data
+	 * @param array $args
+	 *	object 要添加为用户的对象ID，如果不指定，将新建一个对象
+	 * @return int
+	 * @todo 添加的用户是重复的，且没有指定对象时，会先成功创建对象，然后插入user表时失败，这样会在产生一个冗余对象
+	 */
+	function add(array $data, array $args = array()){
 		
 		$data['type'] = 'user';
 		
-		$insert_id=parent::add($data);
+		if(array_key_exists('object', $args)){
+			$insert_id = $args['object'];
+		}
+		else{
+			$insert_id = parent::add($data);
+		}
 
 		$data=array_merge(self::$fields,array_intersect_key($data,self::$fields));
 		
@@ -91,6 +104,16 @@ class User_model extends Object_model{
 		$this->db->insert('user',$data);
 		
 		return $insert_id;
+	}
+	
+	function update(array $data){
+		parent::update($data);
+		return $this->db->update('user', array_intersect_key($data, self::$fields), array('id'=>$this->id));
+	}
+	
+	function remove(){
+		$this->db->delete('user', array('id'=>$this->id));
+		parent::remove();
 	}
 	
 	function verify($username,$password){
@@ -112,26 +135,6 @@ class User_model extends Object_model{
 		return $user;
 	}
 	
-	function updateLoginTime(){
-		$this->db->update('user',
-			array(
-				'last_ip'=>$this->session->userdata('ip_address'),
-				'last_login'=>date()
-			),
-			array('id'=>$this->id)
-		);
-	}
-	
-	function updatePassword($user_id,$new_password){
-		
-		return $this->db->update('user',array('password'=>$new_password),array('id'=>$user_id));
-		
-	}
-	
-	function updateUsername($user_id,$new_username){
-		return $this->db->update('user',array('name'=>$new_username),array('id'=>$user_id));
-	}
-	
 	/**
 	 * 根据uid直接为其设置登录状态
 	 */
@@ -145,6 +148,10 @@ class User_model extends Object_model{
 		if($user){
 			$this->initialize($user['id']);
 			$this->session->set_userdata('user_id', $user['id']);
+			$this->update(array(
+				'last_ip'=>$this->session->userdata('ip_address'),
+				'last_login'=>date('Y-m-d H:i:s')
+			));
 			return true;
 		}
 		
@@ -164,7 +171,7 @@ class User_model extends Object_model{
 	 */
 	function isLogged($group=NULL){
 		if(is_null($group)){
-			if(empty($this->id)){
+			if(empty($this->session_id)){
 				return false;
 			}
 		}elseif(empty($this->roles) || !in_array($group,$this->roles)){
@@ -185,7 +192,7 @@ class User_model extends Object_model{
 		
 		if(is_null($key)){
 			
-			$this->db->from('user_config')->where('user',$this->id);
+			$this->db->from('user_config')->where('user',$this->session_id);
 
 			$config=array_column($this->db->get()->result_array(),'value','key');
 
@@ -206,7 +213,7 @@ class User_model extends Object_model{
 			
 			$row=$this->db->select('id,value')
 				->from('user_config')
-				->where('user',$this->id)
+				->where('user',$this->session_id)
 				->where('key',$key)
 				->get()->row();
 
@@ -230,7 +237,7 @@ class User_model extends Object_model{
 				$value=json_encode($value);
 			}
 			
-			return $this->db->upsert('user_config', array('user'=>$this->id,'key'=>$key,'value'=>$value));
+			return $this->db->upsert('user_config', array('user'=>$this->session_id,'key'=>$key,'value'=>$value));
 		}
 	}
 

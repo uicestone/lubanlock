@@ -2,11 +2,6 @@
 class Object_model extends CI_Model{
 	
 	var $id;
-	var $data;//具体对象数据
-	var $meta;//具体对象的元数据
-	var $relative;
-	var $status;
-	var $tag;//具体对象的标签
 	
 	static $fields=array(
 		'name'=>NULL,
@@ -14,16 +9,10 @@ class Object_model extends CI_Model{
 		'num'=>'',
 		'company'=>NULL,
 		'user'=>NULL,
-		'time'=>NULL
+		'time'=>NULL,
+		'time_insert'=>NULL
 	);
 	
-	static $fields_tag=array(
-		'object'=>NULL,
-		'tag_taxonomy'=>NULL,
-		'user'=>NULL,
-		'time'=>NULL
-	);
-
 	function __construct() {
 		parent::__construct();
 	}
@@ -58,7 +47,7 @@ class Object_model extends CI_Model{
 			throw new Exception(lang('object').' '.$id.' '.lang('not_found'), 404);
 		}
 		
-		foreach(array('meta','relative','status','tag') as $field){
+		foreach(array('meta','relative','status','tag','permission') as $field){
 			if(!array_key_exists('with_'.$field,$args) || $args['with_'.$field]){
 				$property_args = array_key_exists('with_'.$field,$args) && is_array($args['with_'.$field]) ? $args['with_'.$field] : array();
 				$object[$field]=call_user_func(array($this,'get'.$field), $property_args);
@@ -81,7 +70,7 @@ class Object_model extends CI_Model{
 	function add(array $data){
 		
 		$data['company']=$this->company->id;
-		$data['user']=$this->user->id;
+		$data['user']=$this->user->session_id;
 		$data['time_insert']=date('Y-m-d H:i:s');
 		
 		$this->db->insert('object', array_merge(self::$fields, array_intersect_key($data, self::$fields)));
@@ -94,7 +83,7 @@ class Object_model extends CI_Model{
 			}
 		}
 		
-		$this->authorize(array('read'=>true,'write'=>true,'grant'=>true), $this->user->id, false);
+		$this->authorize(array('read'=>true,'write'=>true,'grant'=>true), $this->user->session_id, false);
 		
 		foreach(array('meta', 'relative', 'status', 'tag') as $property){
 			if(array_key_exists($property, $data)){
@@ -105,39 +94,25 @@ class Object_model extends CI_Model{
 		return $this->id;
 	}
 	
-	function update(array $data, $condition=NULL){
+	function update(array $data){
 
 		$data=array_intersect_key($data, self::$fields);
 		
 		if(empty($data)){
-			throw new Exception('argument_error', 400);
+			return;
 		}
 		
 		if(!$this->allow('write')){
 			throw new Exception('no_permission', 403);
 		}
 		
-		if(isset($condition)){
-			$this->db->where($condition);
-		}else{
-			$this->db->where('id',$this->id);
-		}
-		
-		$this->db->set($data)->update('object');
+		$this->db->set($data)->where('id', $this->id)->update('object');
 		
 		return $this->db->affected_rows();
 	}
 	
-	function remove($condition=NULL){
-
-		if(isset($condition)){
-			$this->db->where($condition);
-		}else{
-			$this->db->where('id',$this->id);
-		}
-		
-		return $this->db->delete('object');
-		
+	function remove(){
+		return $this->db->where('id', $this->id)->delete('object');
 	}
 	
 	/**
@@ -189,7 +164,7 @@ class Object_model extends CI_Model{
 	/**
 	 * 对某用户或组赋予/取消赋予一个对象某种权限
 	 * @param array|string $permission	可选健包括array('read'=>true,'write'=>true,'grant'=>true)，为string时自动转换成array(string=>true)
-	 * @param array|int $users	默认为$this->user->id，即当前用户
+	 * @param array|int $users	默认为$this->user->session_id，即当前用户
 	 * @param boolean $permission_check 授权时是否检查当前用户的grant权限
 	 * @throws Exception no_permission_to_grant
 	 */
@@ -202,7 +177,7 @@ class Object_model extends CI_Model{
 		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
 		
 		if(is_null($users)){
-			$users = array($this->user->id);
+			$users = array($this->user->session_id);
 		}
 		
 		if(!is_array($users)){
@@ -257,7 +232,7 @@ class Object_model extends CI_Model{
 	 * 就当前对象的某一元数据，授予某些用户或组某些权限
 	 * @param string $key 键名
 	 * @param array $permission 权限值 array(read|write|grant => true|false)
-	 * @param array|int $users 要授权的用户或组，默认为$this->user->id，即当前用户
+	 * @param array|int $users 要授权的用户或组，默认为$this->user->session_id，即当前用户
 	 */
 	function authorize_meta($key, array $permission = array(), $users = null, $permission_check = true){
 		
@@ -268,7 +243,7 @@ class Object_model extends CI_Model{
 		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
 		
 		if(is_null($users)){
-			$users = array($this->user->id);
+			$users = array($this->user->session_id);
 		}
 		
 		if(!is_array($users)){
@@ -433,9 +408,7 @@ class Object_model extends CI_Model{
 	 */
 	function getList(array $args=array()){
 
-		$this->db->found_rows();
-		
-		$this->db->from('object');
+		$this->db->from('object')->found_rows()->select('object.*');
 		
 		$this->db->where('object.company', $this->company->id);
 		
@@ -495,7 +468,7 @@ class Object_model extends CI_Model{
 		$result['total'] = $this->db->query('SELECT FOUND_ROWS() rows')->row()->rows;
 		
 		//获得四属性的参数，决定是否为对象列表获取属性
-		foreach(array('meta','relative','status','tag') as $property){
+		foreach(array('meta','relative','status','tag','permission') as $property){
 			if(array_key_exists('with_'.$property, $args) && $args['with_'.$property]){
 				array_walk($result_array,function(&$row, $index, $userdata){
 					$this->id = $row['id'];
@@ -524,6 +497,24 @@ class Object_model extends CI_Model{
 		}else{
 			return array();
 		}
+	}
+	
+	function getPermission(array $args = array()){
+		if(!$this->allow()){
+			throw new Exception('no_permission', 403);
+		}
+		
+		$result = $this->db->from('object_permission')->where('object', $this->id)->get()->result();
+		
+		$permission = array('read'=>array(), 'write'=>array(), 'grant'=>array());
+		
+		foreach($result as $row){
+			foreach(array('read', 'write', 'grant') as $type){
+				$row->$type && $permission[$type][] = $row->user;
+			}
+		}
+		
+		return $permission;
 	}
 	
 	/**
@@ -619,7 +610,7 @@ class Object_model extends CI_Model{
 			'object'=>$this->id,
 			'key'=>$key,
 			'value'=>$value,
-			'user'=>$this->user->id
+			'user'=>$this->user->session_id
 		));
 		
 		$meta_id = $this->db->insert_id();
@@ -690,6 +681,15 @@ class Object_model extends CI_Model{
 		return $this->db->delete('object_meta', $condition);
 	}
 	
+	/**
+	 * 
+	 * @param array $args
+	 *	as_rows
+	 *	id_only
+	 *	include_disabled
+	 *	with_meta default:true
+	 * @return array
+	 */
 	function getRelative(array $args = array()){
 		
 		$this->db
@@ -700,21 +700,35 @@ class Object_model extends CI_Model{
 			$this->db->where('object_relationship.relation',$args['relation']);
 		}
 		
-		if(array_key_exists('id', $args)){
-			$this->db->where('object_relationship.id',$args['id']);
-			return $this->db->get()->row_array();
+		if(!array_key_exists('include_disabled', $args) || !$args['include_disabled']){
+			$this->db->where('object_relationship.is_on', true);
 		}
 		
 		$result = $this->db->get()->result_array();
 		
-		if(array_key_exists('as_rows', $args)){
+		if(array_key_exists('as_rows', $args) && $args['as_rows']){
 			return $result;
 		}
 		
 		$relatives = array();
 		
-		foreach($result as $row){
-			$relatives[$row['relation']][] = $this->fetch($row['relative'], array('with_meta'=>false, 'with_relative'=>false, 'with_status'=>false, 'with_tag'=>false, 'set_id'=>false));
+		foreach($result as $relationship){
+			
+			if(array_key_exists('id_only', $args) && $args['id_only']){
+				$relatives[$relationship['relation']][] = $relationship['relative'];
+			}
+			else{
+				$relative = $this->fetch($relationship['relative'], array('with_meta'=>false, 'with_relative'=>false, 'with_status'=>false, 'with_tag'=>false, 'set_id'=>false));
+				$relative['relationship_id'] = $relationship['id'];
+				$relative['relationship_num'] = $relationship['num'];
+				$relative['is_on'] = (bool)$relationship['is_on'];
+				
+				if(!array_key_exists('with_meta', $args) || $args['with_meta']){
+					$relative['meta'] = $this->getRelativeMeta($relationship['id']);
+				}
+				
+				$relatives[$relationship['relation']][] = $relative;
+			}
 		}
 		
 		return $relatives;
@@ -726,58 +740,77 @@ class Object_model extends CI_Model{
 	 * @param string $relation 关系
 	 * @param string $relative 关联对象id
 	 * @param string $num optional, 关系的编号
+	 * @param bool $is_on 是否启用关系，若为false，此关系虽然被保存，但默认情况不会被获取
+	 * @param array $args
+	 *	replace_meta
 	 * @return int|array new meta id(s)
 	 * @throws Exception
 	 */
-	function addRelative($relation, $relative, $num = ''){
+	function setRelative($relation, $relative, $num = '', array $meta = array(), $is_on = true, array $args = array()){
 		
-		if(is_array($relation)){
-			
-			$meta_ids = array();
-			
-			foreach($relation as $key => $value){
-				if(is_integer($key)){
-					if(!array_key_exists('relation', $value) || !array_key_exists('relative', $value)){
-						throw new Exception('argument_error', 400);
-					}
-					$meta_ids[] = $this->addRelative($value['relation'], $value);
-				}
-				elseif(is_array($value)){
-					$meta_ids[] = $this->addRelative($key, $value['relative'], array_key_exists('num', $value) ? $value['num'] : '');
-				}
-				else{
-					$meta_ids[] = $this->addRelative($key, $value);
-				}
-			}
-			
-			return $meta_ids;
+		try{
+			$this->fetch($relative, array('set_id'=>false));
+		}catch(Exception $e){
+			throw new Exception('invalid_relative', 400);
 		}
 		
-		$this->db->insert('object_relationship', array(
+		$return = $this->db->upsert('object_relationship', array(
 			'object'=>$this->id,
 			'relative'=>$relative,
 			'relation'=>$relation,
 			'num'=>$num,
-			'user'=>$this->user->id
+			'is_on'=>$is_on,
+			'user'=>$this->user->session_id
 		));
 		
-		return $this->db->insert_id();
+		//根据参数，先删除不在此次添加之列的键值对
+		if(array_key_exists('replace_meta', $args) && $args['replace_meta']){
+			
+			$meta_origin = $this->getRelativeMeta($relation, $relative);
+			
+			foreach($meta_origin as $key => $value){
+				if(!array_key_exists($key, $meta)){
+					$this->removeRelativeMeta($relation, $relative, $key);
+				}
+			}
+		}
+		
+		foreach($meta as $key => $value){
+			$this->setRelativeMeta($relation, $relative, $key, $value);
+		}
+		
+		return $return;
 	}
 	
-	function updateRelative(array $data, array $args=array()){
-		
-		$this->db->update('object_relationship',array_merge(
-				array('user'=>$this->user->id),
-				array_intersect_key($data, self::$fields_relationship)
-			),$args?$args:array('id'=>$data['id']));
-		
-		return $this;
+	function removeRelative($relation, $relative){
+		return $this->db->delete('object_relationship', array('object'=>$this->id, 'relation'=>$relation, 'relative'=>$relative));
 	}
 	
-	function removeRelative(array $args = array()){
+	function _getRelationshipID($relation, $relative){
 		
-		$this->db->where('id',$args['id'])->delete('object_relationship');
-		return $this;
+		$relationship = $this->db->from('object_relationship')->where(array('object'=>$this->id, 'relative'=>$relative, 'relation'=>$relation, 'is_on'=>true))->get()->row();
+		
+		if(!$relationship){
+			throw new Exception('relationship_not_exist', 500);
+		}
+		
+		return $relationship->id;
+	}
+	
+	function getRelativeMeta($relation, $relative = null){
+		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
+		$result = $this->db->from('object_relationship_meta')->where('relationship', $relationship_id)->get()->result_array();
+		return array_column($result, 'value', 'key');
+	}
+	
+	function setRelativeMeta($relation, $relative, $key, $value){
+		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
+		return $this->db->upsert('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key, 'value'=>$value, 'user'=>$this->user->session_id));
+	}
+	
+	function removeRelativeMeta($relation, $relative, $key){
+		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
+		return $this->db->delete('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key));
 	}
 	
 	/**
@@ -816,8 +849,8 @@ class Object_model extends CI_Model{
 		return $status;
 		
 	}
-
-	function addStatus($name, $date = null, $content = null, $comment = null){
+	
+	function _parse_date($date){
 		
 		if(empty($date)){
 			$date = date('Y-m-d H:i:s');
@@ -832,25 +865,72 @@ class Object_model extends CI_Model{
 			$date = date('Y-m-d H:i:s', $date);
 		}
 		
+		return $date;
+	}
+
+	function addStatus($name, $date = null, $comment = null){
+		
 		$this->db->insert('object_status',array(
 			'object'=>$this->id,
 			'name'=>$name,
-			'date'=>$date,
-			'content'=>$content,
+			'date'=>$this->_parse_date($date),
 			'comment'=>$comment,
-			'user'=>$this->user->id
+			'user'=>$this->user->session_id
 		));
 		
 		return $this->db->insert_id();
 	}
 	
-	function removeStatus(array $args = array()){
+	/**
+	 * 更新对象状态
+	 * @param string $name 要更新的状态名
+	 * @param string|int $date 新的日期
+	 * @param string $comment 新的备注
+	 * @param string|int $prev_date 为null则更新日期最新一条名称为$name的状态，否则更新名称为$name且日期为$prev_date的状态
+	 */
+	function updateStatus($name, $date = null, $comment = null, $prev_date = null){
 		
-		return $this->db->delete('object_status',array('id'=>$args['id']));
+		$set = array();
+		
+		if(!is_null($date)){
+			$set['date'] = $this->_parse_date($date);
+		}
+		
+		if(!is_null($comment)){
+			$set['comment'] = $comment;
+		}
+		
+		$where = array(
+			'object'=>$this->id,
+			'name'=>$name
+		);
+		
+		if(!is_null($prev_date)){
+			$where['date'] = $this->_parse_date($prev_date);
+		}
+		else{
+			$this->db->order_by('date desc')->limit(1);
+		}
+		
+		$this->db->update('object_status', $set, $where);
+	}
+	
+	function removeStatus($name, $date = null){
+		
+		$where = array(
+			'object'=>$this->id,
+			'name'=>$name
+		);
+		
+		if(!is_null($date)){
+			$where['date'] = $this->_parse_date($date);
+		}
+		
+		return $this->db->delete('object_status', $where);
 	}
 	
 	/**
-	 * 获得一个对象的所有标签
+	 * 获得一个对象的所有分类标签
 	 */
 	function getTag(array $args = array()){
 		
@@ -858,16 +938,62 @@ class Object_model extends CI_Model{
 			->join('tag_taxonomy','tag_taxonomy.id = object_tag.tag_taxonomy','inner')
 			->join('tag','tag.id = tag_taxonomy.tag','inner')
 			->where('object_tag.object', $this->id)
-			->select('tag.name, tag_taxonomy.taxonomy');
+			->select('object_tag.*, tag.id tag, tag.name term, tag_taxonomy.taxonomy, tag_taxonomy.description, tag_taxonomy.parent, tag_taxonomy.count');
 		
-		$result = $this->db->get()->result_array();
+		if(array_key_exists('taxonomy', $args)){
+			$this->db->where('tag_taxonomy.taxonomy', $args['taxonomy']);
+		}
 		
-		$tags = array_column($result, 'name', 'taxonomy');
+		$result = $this->db->get()->result();
+		
+		if(array_key_exists('as_rows', $args)){
+			return $result;
+		}
+		
+		$tags = array();
+		
+		foreach($result as $row){
+			$tags[$row->taxonomy][] = $row->term;
+		}
 		
 		return $tags;
 	}
 	
+	/**
+	 * 为一个对象设置分类标签
+	 * @param array|string $tags 一个或多个分类值(tag.name)或分类值id(tag.id)
+	 * @param string $taxonomy 分类
+	 * @param bool $append 是否追加，false将用$tags重写此分类的值，否则保留原值
+	 */
 	function setTag($tags, $taxonomy, $append = false){
+		
+		if(!$tags){
+			$tags = [];
+		}
+		
+		if(!is_array($tags)){
+			$tags = array($tags);
+		}
+		
+		//如果并非追加，那么先删除此分类下不在此次添加之列的值
+		if(!$append){
+			
+			$tags_origin = $this->getTag(array('as_rows'=>true, 'taxonomy'=>$taxonomy));
+			
+			if($tags_origin){
+				foreach($tags_origin as $tag_origin){
+					if(!in_array($tag_origin->term, $tags)/* && !in_array($tag_origin->tag, $tags)*/){
+						$this->db->delete('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_origin->tag_taxonomy));
+					}
+				}
+			}
+		}
+		
+		foreach($tags as $tag){
+			$tag_taxonomy_id = /*is_integer($tag) ? $tag : */$this->tag->get($tag, $taxonomy);
+			$query = $this->db->insert_string('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_taxonomy_id, 'user'=>$this->user->session_id));
+			$this->db->query(str_replace('INSERT', 'INSERT IGNORE', $query));
+		}
 		
 	}
 	

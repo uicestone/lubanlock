@@ -157,7 +157,7 @@ $config['subclass_prefix'] = 'LB_';
 | DO NOT CHANGE THIS UNLESS YOU FULLY UNDERSTAND THE REPERCUSSIONS!!
 |
 */
-$config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
+$config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-\x{4e00}-\x{9fa5}';
 
 
 /*

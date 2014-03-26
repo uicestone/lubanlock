@@ -39,6 +39,7 @@ class Object extends LB_Controller{
 		
 		//meta在后台使用array，在前端使用Object表示，因此输出时要转化
 		array_key_exists('meta', $object) && $object['meta'] = (object)$object['meta'];
+		array_key_exists('tag', $object) && $object['tag'] = (object)$object['tag'];
 		
 		$this->output->set_output($object);
 	}
@@ -102,77 +103,115 @@ class Object extends LB_Controller{
 		
 	}
 	
-	function relative($object_id){
+	function relative($object_id, $relation = null){
 		
 		$this->object->id=$object_id;
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output($this->object->getRelative());
-				break;
-			
-			case 'PUT':
-			case 'POST' && $this->input->data('id') === false:
-				$relative_id=$this->object->addRelative($this->input->data());
-				$this->output->set_output($this->object->getRelative(array('id'=>$relative_id)));
 				break;
 			
 			case 'POST':
-				$this->object->updateRelative($this->input->data());
-				$this->output->set_output($this->object->getRelative(array('id'=>$this->input->data('id'))));
+				
+				$data = $this->input->data();
+				
+				$num = '';
+				$meta = array();
+				$is_on = true;
+				
+				if(!is_array($data)){
+					$relative = $data;
+				}
+				else{
+					array_key_exists('relative', $data) && $relative = $data['relative'];
+					array_key_exists('num', $data) && $num = $data['num'];
+					array_key_exists('meta', $data) && $meta = $data['meta'];
+					array_key_exists('is_on', $data) && $is_on = $data['is_on'];
+				}
+				
+				$this->object->setRelative($relation, $relative, $num, $meta, $is_on, $this->input->get());
 				break;
 			
 			case 'DELETE':
-				$this->object->removeRelative($this->input->get());
+				$this->object->removeRelative($relation, $relative);
 				break;
 		}
+		
+		$this->output->set_output($this->object->getRelative($this->input->get()));
 	}
 	
-	function status($object_id){
+	function status($object_id, $name = null){
 		
 		$this->object->id=$object_id;
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output($this->object->getStatus());
-				break;
-			
-			case 'PUT':
-			case 'POST' && $this->input->data('id') === false:
-				$status_id=$this->object->addStatus($this->input->data());
-				$this->output->set_output($this->object->getStatus(array('id'=>$status_id)));
 				break;
 			
 			case 'POST':
-				$this->object->updateStatus($this->input->data());
-				$this->output->set_output($this->object->getStatus(array('id'=>$this->input->data('id'))));
+				
+				$data = $this->input->data();
+				
+				if(!is_array($data)){
+					$date = $data;
+					$comment = null;
+				}
+				else{
+					$comment = array_key_exists('comment', $data) ? $data['comment'] : null;
+					$date = array_key_exists('date', $data) ? $data['date'] : null;
+				}
+				
+				$this->object->addStatus($name, $date, $comment);
+				
+				break;
+			
+			case 'PUT':
+				
+				$this->object->updateStatus($name, 
+					$this->input->data('date') ? $this->input->data('date') : null, 
+					$this->input->data('comment') ? $this->input->data('comment') : null, 
+					$this->input->get('prev_date') ? $this->input->get('prev_date') : null
+				);
+				
 				break;
 			
 			case 'DELETE':
-				$this->object->removeStatus($this->input->get());
+				$this->object->removeStatus($name, $this->input->get('date') ? $this->input->get('date') : null);
 				break;
 		}
+		
+		$this->output->set_output($this->object->getStatus($this->input->get()));
 	}
 	
-	function tag($object_id){
+	function tag($object_id, $taxonomy = null){
 		
 		$this->object->id=$object_id;
 		
 		switch ($this->input->method) {
 			case 'GET':
-				$this->output->set_output($this->object->getTag());
 				break;
 			
-			case 'PUT':
 			case 'POST':
-				$tag_id=$this->object->addTag($this->input->data());
-				$this->output->set_output($this->object->getTag(array('id'=>$tag_id)));
+				$this->object->setTag($this->input->data(), $taxonomy, $this->input->get('append') ? $this->input->get('append') : false);
 				break;
 			
-			case 'DELETE':
-				$this->object->removeTag($this->input->get());
-				break;
 		}
+		
+		$this->output->set_output((object)$this->object->getTag());
+	}
+	
+	function permission($object_id, $type = 'authorize', $name = 'read'){
+		$this->object->id = $object_id;
+		
+		switch ($this->input->method){
+			case 'GET':
+				break;
+			
+			case 'POST':
+				$this->object->authorize(array($name=>$type === 'authorize'), $this->input->data());
+		}
+		
+		$this->output->set_output($this->object->getPermission($this->input->get()));
 	}
 	
 }

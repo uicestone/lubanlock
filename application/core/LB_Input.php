@@ -2,34 +2,38 @@
 class LB_input extends CI_Input{
 	
 	var $method;
+	var $data;
 	
 	function __construct(){
 		parent::__construct();
 		$this->method=$this->server('REQUEST_METHOD');
+		$this->data = file_get_contents('php://input');
 	}
 	
 	/**
 	 * return the parsed request body, or a key value of it
 	 */
 	function data($index = NULL){
-		$data=file_get_contents('php://input');
+		
+		$data = $this->data;
 		
 		$headers=$this->request_headers();
 
 		//parse as form data
-		if(array_key_exists('Content-type', $headers) && (
-			strpos($headers['Content-type'],'application/x-www-form-urlencoded')===0
-			|| strpos($headers['Content-type'],'multipart/form-data')===0)
+		if(array_key_exists('Content-Type', $headers) && (
+			strpos($headers['Content-Type'],'application/x-www-form-urlencoded') === 0
+			|| strpos($headers['Content-Type'],'multipart/form-data') === 0)
 		){
 			parse_str($data,$data);
 		}
 		//parse as json
-		elseif((array_key_exists('Content-type', $headers) && $headers['Content-type']==='application/json') || json_decode($data)){
+		elseif((array_key_exists('Content-Type', $headers) && $headers['Content-Type']==='application/json') || !is_null(json_decode($data))){
+			
 			$data=json_decode($data,JSON_OBJECT_AS_ARRAY);
 		}
 
 		if(!is_null($index)){
-			
+
 			if(array_key_exists($index, $data)){
 				return $data[$index];
 			}
