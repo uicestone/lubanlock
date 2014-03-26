@@ -82,6 +82,7 @@ $route['login']='user/login';
 $route['logout']='user/logout';
 $route['profile']='user/profile';
 $route['signup']='user/signup';
+$route['user/(:num)']='user/index/$1';
 
 $route['object/(:num)']='object/index/$1';
 $route['object/(:num)/meta']='object/meta/$1';

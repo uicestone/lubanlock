@@ -206,7 +206,6 @@ CREATE TABLE IF NOT EXISTS `user` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `alias` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `roles` varchar(255) NOT NULL DEFAULT '',
   `last_ip` char(15) NOT NULL DEFAULT '',

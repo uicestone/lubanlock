@@ -11,6 +11,7 @@ class Test extends LB_Controller{
 	
 	function session(){
 		print_r($this->session->all_userdata());
+		print_r($this->user);
 	}
 }
 ?>

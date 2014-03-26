@@ -9,7 +9,8 @@ class Object_model extends CI_Model{
 		'num'=>'',
 		'company'=>NULL,
 		'user'=>NULL,
-		'time'=>NULL
+		'time'=>NULL,
+		'time_insert'=>NULL
 	);
 	
 	function __construct() {
@@ -69,7 +70,7 @@ class Object_model extends CI_Model{
 	function add(array $data){
 		
 		$data['company']=$this->company->id;
-		$data['user']=$this->user->id;
+		$data['user']=$this->user->session_id;
 		$data['time_insert']=date('Y-m-d H:i:s');
 		
 		$this->db->insert('object', array_merge(self::$fields, array_intersect_key($data, self::$fields)));
@@ -82,7 +83,7 @@ class Object_model extends CI_Model{
 			}
 		}
 		
-		$this->authorize(array('read'=>true,'write'=>true,'grant'=>true), $this->user->id, false);
+		$this->authorize(array('read'=>true,'write'=>true,'grant'=>true), $this->user->session_id, false);
 		
 		foreach(array('meta', 'relative', 'status', 'tag') as $property){
 			if(array_key_exists($property, $data)){
@@ -93,39 +94,25 @@ class Object_model extends CI_Model{
 		return $this->id;
 	}
 	
-	function update(array $data, $condition=NULL){
+	function update(array $data){
 
 		$data=array_intersect_key($data, self::$fields);
 		
 		if(empty($data)){
-			throw new Exception('argument_error', 400);
+			return;
 		}
 		
 		if(!$this->allow('write')){
 			throw new Exception('no_permission', 403);
 		}
 		
-		if(isset($condition)){
-			$this->db->where($condition);
-		}else{
-			$this->db->where('id',$this->id);
-		}
-		
-		$this->db->set($data)->update('object');
+		$this->db->set($data)->where('id', $this->id)->update('object');
 		
 		return $this->db->affected_rows();
 	}
 	
-	function remove($condition=NULL){
-
-		if(isset($condition)){
-			$this->db->where($condition);
-		}else{
-			$this->db->where('id',$this->id);
-		}
-		
-		return $this->db->delete('object');
-		
+	function remove(){
+		return $this->db->where('id', $this->id)->delete('object');
 	}
 	
 	/**
@@ -177,7 +164,7 @@ class Object_model extends CI_Model{
 	/**
 	 * 对某用户或组赋予/取消赋予一个对象某种权限
 	 * @param array|string $permission	可选健包括array('read'=>true,'write'=>true,'grant'=>true)，为string时自动转换成array(string=>true)
-	 * @param array|int $users	默认为$this->user->id，即当前用户
+	 * @param array|int $users	默认为$this->user->session_id，即当前用户
 	 * @param boolean $permission_check 授权时是否检查当前用户的grant权限
 	 * @throws Exception no_permission_to_grant
 	 */
@@ -190,7 +177,7 @@ class Object_model extends CI_Model{
 		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
 		
 		if(is_null($users)){
-			$users = array($this->user->id);
+			$users = array($this->user->session_id);
 		}
 		
 		if(!is_array($users)){
@@ -245,7 +232,7 @@ class Object_model extends CI_Model{
 	 * 就当前对象的某一元数据，授予某些用户或组某些权限
 	 * @param string $key 键名
 	 * @param array $permission 权限值 array(read|write|grant => true|false)
-	 * @param array|int $users 要授权的用户或组，默认为$this->user->id，即当前用户
+	 * @param array|int $users 要授权的用户或组，默认为$this->user->session_id，即当前用户
 	 */
 	function authorize_meta($key, array $permission = array(), $users = null, $permission_check = true){
 		
@@ -256,7 +243,7 @@ class Object_model extends CI_Model{
 		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
 		
 		if(is_null($users)){
-			$users = array($this->user->id);
+			$users = array($this->user->session_id);
 		}
 		
 		if(!is_array($users)){
@@ -421,9 +408,7 @@ class Object_model extends CI_Model{
 	 */
 	function getList(array $args=array()){
 
-		$this->db->found_rows();
-		
-		$this->db->from('object');
+		$this->db->from('object')->found_rows()->select('object.*');
 		
 		$this->db->where('object.company', $this->company->id);
 		
@@ -625,7 +610,7 @@ class Object_model extends CI_Model{
 			'object'=>$this->id,
 			'key'=>$key,
 			'value'=>$value,
-			'user'=>$this->user->id
+			'user'=>$this->user->session_id
 		));
 		
 		$meta_id = $this->db->insert_id();
@@ -775,7 +760,7 @@ class Object_model extends CI_Model{
 			'relation'=>$relation,
 			'num'=>$num,
 			'is_on'=>$is_on,
-			'user'=>$this->user->id
+			'user'=>$this->user->session_id
 		));
 		
 		//根据参数，先删除不在此次添加之列的键值对
@@ -820,7 +805,7 @@ class Object_model extends CI_Model{
 	
 	function setRelativeMeta($relation, $relative, $key, $value){
 		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
-		return $this->db->upsert('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key, 'value'=>$value, 'user'=>$this->user->id));
+		return $this->db->upsert('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key, 'value'=>$value, 'user'=>$this->user->session_id));
 	}
 	
 	function removeRelativeMeta($relation, $relative, $key){
@@ -890,7 +875,7 @@ class Object_model extends CI_Model{
 			'name'=>$name,
 			'date'=>$this->_parse_date($date),
 			'comment'=>$comment,
-			'user'=>$this->user->id
+			'user'=>$this->user->session_id
 		));
 		
 		return $this->db->insert_id();
@@ -1006,7 +991,7 @@ class Object_model extends CI_Model{
 		
 		foreach($tags as $tag){
 			$tag_taxonomy_id = /*is_integer($tag) ? $tag : */$this->tag->get($tag, $taxonomy);
-			$query = $this->db->insert_string('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_taxonomy_id, 'user'=>$this->user->id));
+			$query = $this->db->insert_string('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_taxonomy_id, 'user'=>$this->user->session_id));
 			$this->db->query(str_replace('INSERT', 'INSERT IGNORE', $query));
 		}
 		
