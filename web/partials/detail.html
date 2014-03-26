@@ -52,8 +52,8 @@
 				</div>
 
 				<form class="prop-add" ng-show="adding.meta" ng-submit="addMeta($event)">
-					<input type="text" placeholder="属性名称" class="profile-info-name" ng-model="new.meta.key" />
-					<input type="text" placeholder="属性值" class="profile-info-value" ng-model="new.meta.value" />
+					<input type="text" placeholder="属性名称" ng-model="new.meta.key" />
+					<input type="text" placeholder="属性值" ng-model="new.meta.value" />
 					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('meta')"></button>
 				</form>
