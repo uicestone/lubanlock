@@ -47,36 +47,42 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object',
 	}
 ]);
 
-lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object', 'ObjectMeta', '$location',
-	function($scope, $routeParams, Object, ObjectMeta, $location) {
+lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object', 'ObjectMeta', 'ObjectRelative', 'ObjectStatus', 'ObjectTag', '$location',
+	function($scope, $routeParams, Object, ObjectMeta, ObjectRelative, ObjectStatus, ObjectTag, $location) {
 		
 		if($routeParams.id !== undefined){
 			$scope.object = Object.get({id: $routeParams.id, with_status: {as_rows: true, order_by:'date desc'}});
 		}
 		
-		$scope.addingMeta = false;
-		
-		$scope.openMetaAddForm = function(){
-			$scope.addingMeta = true;
+		$scope.adding = {
+			meta: false,
+			relative: false,
+			status: false,
+			tag: false
 		}
 		
-		$scope.closeMetaAddForm = function(){
-			$scope.newMetaKey = undefined;
-			$scope.newMetaValue = undefined;
-			$scope.addingMeta = false;
+		$scope.new = {};
+		
+		$scope.openPropAddForm = function(prop){
+			$scope.adding[prop] = true;
+		}
+		
+		$scope.closePropAddForm = function(prop){
+			$scope.new[prop] = {};
+			$scope.adding[prop] = false;
 		}
 		
 		$scope.addMeta = function($event){
 			
-			ObjectMeta.save({object: $scope.object.id, key: $scope.newMetaKey}, $scope.newMetaValue, function(){
+			ObjectMeta.save({object: $scope.object.id, key: $scope.new.meta.key}, $scope.new.meta.value, function(){
 				
-				if($scope.object.meta[$scope.newMetaKey] === undefined){
-					$scope.object.meta[$scope.newMetaKey] = [];
+				if($scope.object.meta[$scope.new.meta.key] === undefined){
+					$scope.object.meta[$scope.new.meta.key] = [];
 				}
 
-				$scope.object.meta[$scope.newMetaKey].push($scope.newMetaValue);
+				$scope.object.meta[$scope.new.meta.key].push($scope.new.meta.value);
 			
-				$scope.newMetaValue = undefined;
+				$scope.new.meta.value = undefined;
 				angular.element($event.target).children('.profile-info-name').trigger('select');
 			});
 			
@@ -85,6 +91,27 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 		$scope.removeMeta = function(key, value){
 			ObjectMeta.remove({object: $scope.object.id, key: key, value: value}, function(meta){
 				$scope.object.meta = meta;
+			});
+		}
+		
+		$scope.addStatus = function(){
+			
+			ObjectStatus.save({object: $scope.object.id, name: $scope.new.status.name, as_rows: true, order_by: 'date desc'}, $scope.new.status.date, function(status){
+				$scope.object.status = status;
+				$scope.new.status = {};
+			});
+			
+		}
+		
+		$scope.removeStatus = function(name, date){
+			ObjectStatus.remove({object: $scope.object.id, name: name, date: date, as_rows: true, order_by: 'date desc'}, function(status){
+				$scope.object.status = status;
+			});
+		}
+		
+		$scope.addTag = function(){
+			ObjectTag.save({object: $scope.object.id, taxonomy: $scope.new.tag.taxonomy}, $scope.new.tag.term, function(tag){
+				$scope.object.tag = tag;
 			});
 		}
 		

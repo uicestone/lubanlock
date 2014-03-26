@@ -1,6 +1,6 @@
 /*common*/
 .btn{
-	padding: 2px 12px;
+	padding: 3px 15px 4px;
 }
 
 .pointer-cursur{
@@ -64,17 +64,14 @@ textarea, input[type="text"], input[type="password"], input[type="datetime"], in
 }
 
 /*detail*/
-form.meta-add{
+form.prop-add{
 	position: relative;
 }
-form.meta-add .profile-info-name{
-	padding: 6px 10px 6px 0;
+
+form.prop-add .profile-info-name{
+	text-align: left;
 }
-form.meta-add .profile-info-value{
-	padding: 6px 0 6px 10px;
-}
-form.meta-add .btn{
-	padding: 4px 12px 5px;
+
+form.prop-add .btn{
 	vertical-align: bottom;
-	margin-left: 6px;
 }

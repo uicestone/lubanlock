@@ -12,69 +12,29 @@
 	<div class="col-xs-12">
 
 		<div id="user-profile-1" class="user-profile row">
-			<div class="col-xs-12 col-sm-3 center">
+			<div class="col-xs-12 col-sm-3">
 
 				<div class="profile-contact-info">
 					<div class="profile-contact-links align-left">
 						<a class="btn btn-link" ng-repeat="(taxonomy, tag) in object.tag">
 							<i class="light-blue">{{taxonomy}}</i>
-							<span class="bigger-120 ">{{tag}}</span>
+							<span class="bigger-120 ">{{tag | plain}}</span>
 						</a>
 					</div>
-
+					
 				</div>
 
+				<form class="prop-add" ng-show="adding.tag" ng-submit="addTag($event)">
+					<input class="col-sm-3" type="text" placeholder="分类方式" ng-model="new.tag.taxonomy" />
+					<input class="col-sm-5" type="text" placeholder="分类" ng-model="new.tag.term" />
+					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
+					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('tag')"></button>
+				</form>
+				
+				<button class="btn btn-info btn-xs icon-chevron-right" ng-click="openPropAddForm('tag')" ng-hide="adding.tag"></button>
+				
 				<div class="hr hr16 dotted"></div>
 				
-<!--					<div class="profile-users clearfix">
-					<div class="itemdiv memberdiv">
-						<div class="inline position-relative">
-							<div class="user">
-								<a href="#">
-									<img src="img/avatar-example.png" alt="Bob Doe's avatar">
-								</a>
-							</div>
-
-							<div class="body">
-								<div class="name">
-									<a href="#">
-										<span class="user-status status-online"></span>
-										Bob Doe
-									</a>
-								</div>
-							</div>
-
-						<div class="popover">
-								<div class="arrow"></div>
-
-								<div class="popover-content">
-									<div class="bolder">Content Editor</div>
-
-									<div class="time">
-										<i class="icon-time middle bigger-120 orange"></i>
-										<span class="green"> 20 mins ago </span>
-									</div>
-
-									<div class="hr dotted hr-8"></div>
-
-									<div class="tools action-buttons">
-										<a href="#">
-											<i class="icon-facebook-sign blue bigger-150"></i>
-										</a>
-
-										<a href="#">
-											<i class="icon-twitter-sign light-blue bigger-150"></i>
-										</a>
-
-										<a href="#">
-											<i class="icon-google-plus-sign red bigger-150"></i>
-										</a>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>-->
 			</div>
 
 			<div class="col-xs-12 col-sm-9">
@@ -89,15 +49,16 @@
 						</div>
 					</div>
 					
-					<form class="meta-add" ng-show="addingMeta" ng-submit="addMeta($event)">
-						<input type="text" placeholder="属性名称" class="profile-info-name" ng-model="newMetaKey" />
-						<input type="text" placeholder="属性值" class="profile-info-value" ng-model="newMetaValue" />
-						<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
-						<button type="button" class="btn btn-primary btn-xs icon-chevron-left" ng-click="closeMetaAddForm()"></button>
-					</form>
 				</div>
 
-				<button class="btn btn-info btn-xs icon-plus" ng-click="openMetaAddForm()" ng-hide="addingMeta"></button>
+				<form class="prop-add" ng-show="adding.meta" ng-submit="addMeta($event)">
+					<input type="text" placeholder="属性名称" class="profile-info-name" ng-model="new.meta.key" />
+					<input type="text" placeholder="属性值" class="profile-info-value" ng-model="new.meta.value" />
+					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
+					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('meta')"></button>
+				</form>
+				
+				<button class="btn btn-info btn-xs icon-chevron-right" ng-click="openPropAddForm('meta')" ng-hide="adding.meta"></button>
 				
 				<hr>
 
@@ -106,10 +67,21 @@
 						<div class="profile-info-name"> {{relation}} </div>
 
 						<div class="profile-info-value">
-							<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)" ng-repeat="relative in relatives">{{relative.name}}</a>
+							<span ng-repeat="relative in relatives">
+								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{relative.name}}</a>
+							</span>
 						</div>
 					</div>
 				</div>
+				
+				<form class="prop-add" ng-show="adding.relative" ng-submit="addRelative($event)">
+					<input type="text" placeholder="关系" ng-model="new.relationship.relation" />
+					<input type="text" placeholder="关联对象" ng-model="new.relationship.relative" />
+					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
+					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('relative')"></button>
+				</form>
+
+				<button class="btn btn-info btn-xs icon-chevron-right" ng-click="openPropAddForm('relative')" ng-hide="adding.relative"></button>
 				
 				<hr>
 
@@ -133,12 +105,24 @@
 											</div>
 										</div>
 									</div>
+									
+									<a class="icon-trash pointer-cursur pull-right" ng-click="removeStatus(status.name, status.date)"></a>
 								</div>
 
 							</div><!-- /.timeline-items -->
 						</div><!-- /.timeline-container -->
 					</div>
 				</div>
+				
+				<form class="prop-add" ng-show="adding.status" ng-submit="addStatus($event)">
+					<input type="text" placeholder="状态名称" ng-model="new.status.name" />
+					<input type="text" placeholder="日期时间" ng-model="new.status.date" datepicker-popup />
+					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
+					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('status')"></button>
+				</form>
+
+				<button class="btn btn-info btn-xs icon-chevron-right" ng-click="openPropAddForm('status')" ng-hide="adding.status"></button>
+				
 			</div>
 		</div>
 	</div><!-- /.col -->

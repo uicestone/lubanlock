@@ -31,14 +31,16 @@ lubanlockServices.factory('ObjectRelative', ['$resource',
 lubanlockServices.factory('ObjectStatus', ['$resource',
 	function($resource){
 		return $resource('object/:object/status/:name', {object: '@object'}, {
-			update: {method: 'PUT'}
+			save: {method: 'POST', isArray: true},
+			update: {method: 'PUT', isArray: true},
+			remove: {method: 'DELETE', isArray: true}
 		});
 	}
 ]);
 
 lubanlockServices.factory('ObjectTag', ['$resource',
 	function($resource){
-		return $resource('object/:object/tag', {object: '@object'}, {
+		return $resource('object/:object/tag/:taxonomy', {object: '@object'}, {
 			update: {method: 'PUT'}
 		});
 	}
