@@ -98,7 +98,7 @@ lubanlockServices.factory('HttpInterceptor', ['$q', '$window', 'Alert', function
 //			if (canRecover(rejection)) {
 //				return responseOrNewPromise
 //			}
-			Alert.addAlert(rejection.headers()['status-text']);
+			Alert.addAlert(eval(rejection.headers()['status-text']));
 			
 			return $q.reject(rejection);
 		}
