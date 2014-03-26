@@ -112,7 +112,13 @@ class Object_model extends CI_Model{
 	}
 	
 	function remove(){
-		return $this->db->where('id', $this->id)->delete('object');
+		$result = $this->db->where('id', $this->id)->delete('object');
+		
+		if($this->db->error() && strpos($this->db->error()['message'], 'Cannot delete or update a parent row: a foreign key constraint fails') === 0){
+			throw new Exception('存在关联数据，无法删除', 500);
+		}
+		
+		return $result;
 	}
 	
 	/**
