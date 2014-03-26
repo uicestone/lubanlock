@@ -11,7 +11,9 @@ class User_model extends Object_model{
 		'name'=>'',
 		'email'=>'',
 		'password'=>'',
-		'roles'=>''
+		'roles'=>'',
+		'last_ip'=>'',
+		'last_login'=>NULL
 	);
 	
 	function __construct(){
