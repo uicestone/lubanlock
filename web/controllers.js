@@ -24,8 +24,14 @@ lubanlockControllers.controller('AlertCtrl', ['$scope', 'Alert',
 lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object', '$location',
 	function($scope, $routeParams, Object, $location) {
 		
-		$scope.objects = Object.query(angular.extend({with_status: {as_rows: true}, with_tag: true}, $routeParams));
 		$scope.currentPage = $location.search().page || 1;
+		
+		$scope.objects = Object.query(angular.extend({with_status: {as_rows: true}, with_tag: true}, $routeParams), function(value, responseHeaders){
+			var statusText = eval(responseHeaders()['status-text']);
+			$scope.totalObjects = Number(statusText.match(/(\d+) Objects in Total/)[1]);
+			$scope.objectListStart = Number(statusText.match(/(\d+) \-/)[1]);
+			$scope.objectListEnd = Number(statusText.match(/\- (\d+)/)[1]);
+		});
 		
 		$scope.showDetail = function(id, type){
 			
