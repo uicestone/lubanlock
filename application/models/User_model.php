@@ -31,30 +31,14 @@ class User_model extends Object_model{
 			return;
 		}
 		
-		$user=$this->fetch($this->session_id, array(), false);
+		$user=$this->fetch($this->session_id);
 		$this->name=$user['name'];
-		$user['roles'] && $this->roles=explode(',',$user['roles']);
+		
+		$this->roles = $this->_parse_roles($user['roles']);
+		
 		array_push($this->group_ids, $this->session_id);
 		
-		function get_parent_group($children = array(), &$object){
-			
-			$parents = $object->getList(array(
-				'type'=>'group',
-				'has_relative_like'=>array($children)
-			));
-			
-			$object->groups = array_merge($object->groups, $parents['data']);
-			$parent_group_ids = array_column($parents['data'], 'id');
-			$object->group_ids = array_merge($object->group_ids, $parent_group_ids);
-			
-			if(empty($parent_group_ids)){
-				return;
-			}
-		
-			get_parent_group($parent_group_ids, $object);
-		}
-		
-		get_parent_group(array($this->session_id), $this);
+		$this->_get_parent_group(array($this->session_id));
 		
 		$groups = $this->groups;
 		$this->groups = array();
@@ -63,9 +47,47 @@ class User_model extends Object_model{
 			$this->groups[$value['id']] = $value;
 		}
 		
-		$this->config->user=$this->config();
 	}
 	
+	function _parse_roles($roles){
+		
+		$roles_decoded = json_decode($roles);
+		
+		if(is_array($roles_decoded)){
+			return $roles_decoded;
+		}
+		elseif($roles){
+			return explode(',', $roles);
+		}
+		else{
+			return array();
+		}
+	}
+	
+	function _get_parent_group($children = array()){
+
+		$parents = $this->getList(array(
+			'type'=>'group',
+			'has_relative_like'=>array($children)
+		));
+		
+		$this->groups = array_merge($this->groups, $parents['data']);
+		$parent_group_ids = array_column($parents['data'], 'id');
+		$this->group_ids = array_merge($this->group_ids, $parent_group_ids);
+		
+		$this->roles = array_merge($this->roles, array_reduce(
+			array_map(array($this, '_parse_roles'), array_column($parents['data'], 'roles')),
+			function($result, $item){
+				return array_merge($result, $item);
+			}, array()
+		));
+			
+		if($parent_group_ids){
+			$this->_get_parent_group($parent_group_ids);
+		}
+		
+	}
+
 	function fetch($id=null, array $args = array(), $permission_check = true){
 		$object = parent::fetch($id, $args, $permission_check);
 		$user = $this->db->select('user.id, user.name, user.email, user.roles, user.last_ip, user.last_login')->from('user')->where('id', $id)->get()->row_array();
