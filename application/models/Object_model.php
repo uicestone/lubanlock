@@ -448,7 +448,7 @@ class Object_model extends CI_Model{
 				$args['per_page'] = $this->company->config('per_page');
 			}
 			//页码-每页数量方式，转换为sql limit
-			$args['limit'] = array($args['per_page'],($args['page']-1)*$args['page']);
+			$args['limit'] = array($args['per_page'],($args['page']-1)*$args['per_page']);
 		}
 		
 		if(!array_key_exists('limit', $args)){
@@ -470,8 +470,15 @@ class Object_model extends CI_Model{
 		
 		$result_array=$this->db->get()->result_array();
 		
-		$result = array();
-		$result['total'] = $this->db->query('SELECT FOUND_ROWS() rows')->row()->rows;
+		$result = array('data'=>array(), 'info'=>array(
+			'total'=>$this->db->query('SELECT FOUND_ROWS() rows')->row()->rows,
+			'from'=>is_array($args['limit']) ? $args['limit'][1] + 1 : 1,
+			'to'=>is_array($args['limit']) ? $args['limit'][0] + $args['limit'][1] : $args['limit']
+		));
+		
+		if($result['info']['to'] > $result['info']['total']){
+			$result['info']['to'] = $result['info']['total'];
+		}
 		
 		//获得四属性的参数，决定是否为对象列表获取属性
 		foreach(array('meta','relative','status','tag','permission') as $property){
