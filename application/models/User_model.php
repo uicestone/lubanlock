@@ -120,14 +120,12 @@ class User_model extends Object_model{
 	
 	function verify($username,$password){
 		
-		$username=$this->db->escape($username);
-		
 		$this->db
 			->from('user')
-			->where('company',$this->company->id)
-			->where("(name = $username OR alias = $username)",NULL,false)
-			->where('password',$password);
-				
+			->where('name', $username)
+			->where('company', $this->company->id)
+			->where('password', $password);
+		
 		$user=$this->db->get()->row_array();
 		
 		if(!$user){
