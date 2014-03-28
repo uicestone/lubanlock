@@ -115,8 +115,8 @@
 				</div>
 				
 				<form class="prop-add" ng-show="adding.status" ng-submit="addStatus($event)">
-					<input type="text" placeholder="状态名称" ng-model="new.status.name" />
 					<input type="text" placeholder="日期时间" ng-model="new.status.date" datepicker-popup />
+					<input type="text" placeholder="状态名称" ng-model="new.status.name" />
 					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('status')"></button>
 				</form>
