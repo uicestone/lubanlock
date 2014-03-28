@@ -112,7 +112,13 @@ class Object_model extends CI_Model{
 	}
 	
 	function remove(){
-		return $this->db->where('id', $this->id)->delete('object');
+		$result = $this->db->where('id', $this->id)->delete('object');
+		
+		if($this->db->error() && strpos($this->db->error()['message'], 'Cannot delete or update a parent row: a foreign key constraint fails') === 0){
+			throw new Exception('存在关联数据，无法删除', 500);
+		}
+		
+		return $result;
 	}
 	
 	/**
@@ -414,10 +420,14 @@ class Object_model extends CI_Model{
 		
 		$this->db->where($this->_parse_criteria($args), null, false);
 		
-		$permission_condition = '`object`.`id` NOT IN ( SELECT `object` FROM `object_permission` )';
+		$permission_condition = "\n".'`object`.`id` NOT IN ( SELECT `object` FROM `object_permission` )';
+		
+		if($this->user->roles){
+			$permission_condition .= "\nOR `object`.`type` IN ('".implode("', '", $this->user->roles)."')";
+		}
 		
 		if(is_array($this->user->group_ids) && !empty($this->user->group_ids)){
-			$permission_condition .= ' OR `object`.`id` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( '.implode(', ',$this->user->group_ids).' ) )';
+			$permission_condition .= "\n".'OR `object`.`id` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( '.implode(', ',$this->user->group_ids).' ) )';
 		}
 		
 		$this->db->where('( '.$permission_condition.' )', null, false);
@@ -442,7 +452,7 @@ class Object_model extends CI_Model{
 				$args['per_page'] = $this->company->config('per_page');
 			}
 			//页码-每页数量方式，转换为sql limit
-			$args['limit'] = array($args['per_page'],($args['page']-1)*$args['page']);
+			$args['limit'] = array($args['per_page'],($args['page']-1)*$args['per_page']);
 		}
 		
 		if(!array_key_exists('limit', $args)){
@@ -464,8 +474,15 @@ class Object_model extends CI_Model{
 		
 		$result_array=$this->db->get()->result_array();
 		
-		$result = array();
-		$result['total'] = $this->db->query('SELECT FOUND_ROWS() rows')->row()->rows;
+		$result = array('data'=>array(), 'info'=>array(
+			'total'=>$this->db->query('SELECT FOUND_ROWS() rows')->row()->rows,
+			'from'=>is_array($args['limit']) ? $args['limit'][1] + 1 : 1,
+			'to'=>is_array($args['limit']) ? $args['limit'][0] + $args['limit'][1] : $args['limit']
+		));
+		
+		if($result['info']['to'] > $result['info']['total']){
+			$result['info']['to'] = $result['info']['total'];
+		}
 		
 		//获得四属性的参数，决定是否为对象列表获取属性
 		foreach(array('meta','relative','status','tag','permission') as $property){
@@ -863,6 +880,14 @@ class Object_model extends CI_Model{
 			}
 			
 			$date = date('Y-m-d H:i:s', $date);
+		}
+		
+		elseif(strtotime($date)){
+			return date('Y-m-d H:i:s', strtotime($date));
+		}
+		
+		else{
+			throw new Exception('invalid_date_input', 400);
 		}
 		
 		return $date;
