@@ -882,6 +882,14 @@ class Object_model extends CI_Model{
 			$date = date('Y-m-d H:i:s', $date);
 		}
 		
+		elseif(strtotime($date)){
+			return date('Y-m-d H:i:s', strtotime($date));
+		}
+		
+		else{
+			throw new Exception('invalid_date_input', 400);
+		}
+		
 		return $date;
 	}
 
