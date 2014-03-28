@@ -420,10 +420,14 @@ class Object_model extends CI_Model{
 		
 		$this->db->where($this->_parse_criteria($args), null, false);
 		
-		$permission_condition = '`object`.`id` NOT IN ( SELECT `object` FROM `object_permission` )';
+		$permission_condition = "\n".'`object`.`id` NOT IN ( SELECT `object` FROM `object_permission` )';
+		
+		if($this->user->roles){
+			$permission_condition .= "\nOR `object`.`type` IN ('".implode("', '", $this->user->roles)."')";
+		}
 		
 		if(is_array($this->user->group_ids) && !empty($this->user->group_ids)){
-			$permission_condition .= ' OR `object`.`id` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( '.implode(', ',$this->user->group_ids).' ) )';
+			$permission_condition .= "\n".'OR `object`.`id` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( '.implode(', ',$this->user->group_ids).' ) )';
 		}
 		
 		$this->db->where('( '.$permission_condition.' )', null, false);
