@@ -67,28 +67,28 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 			tag: false
 		}
 		
-		$scope.new = {};
+		$scope['new'] = {};
 		
 		$scope.openPropAddForm = function(prop){
 			$scope.adding[prop] = true;
 		}
 		
 		$scope.closePropAddForm = function(prop){
-			$scope.new[prop] = {};
+			$scope['new'][prop] = {};
 			$scope.adding[prop] = false;
 		}
 		
 		$scope.addMeta = function($event){
 			
-			ObjectMeta.save({object: $scope.object.id, key: $scope.new.meta.key}, $scope.new.meta.value, function(){
+			ObjectMeta.save({object: $scope.object.id, key: $scope['new'].meta.key}, $scope['new'].meta.value, function(){
 				
-				if($scope.object.meta[$scope.new.meta.key] === undefined){
-					$scope.object.meta[$scope.new.meta.key] = [];
+				if($scope.object.meta[$scope['new'].meta.key] === undefined){
+					$scope.object.meta[$scope['new'].meta.key] = [];
 				}
 
-				$scope.object.meta[$scope.new.meta.key].push($scope.new.meta.value);
+				$scope.object.meta[$scope['new'].meta.key].push($scope['new'].meta.value);
 			
-				$scope.new.meta.value = undefined;
+				$scope['new'].meta.value = undefined;
 				angular.element($event.target).children(':input:first').trigger('select');
 			});
 			
@@ -102,9 +102,9 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 		
 		$scope.addStatus = function(){
 			
-			ObjectStatus.save({object: $scope.object.id, name: $scope.new.status.name, as_rows: true, order_by: 'date desc'}, $scope.new.status.date, function(status){
+			ObjectStatus.save({object: $scope.object.id, name: $scope['new'].status.name, as_rows: true, order_by: 'date desc'}, $scope['new'].status.date, function(status){
 				$scope.object.status = status;
-				$scope.new.status = {};
+				$scope['new'].status = {};
 			});
 			
 		}
@@ -116,7 +116,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 		}
 		
 		$scope.addTag = function(){
-			ObjectTag.save({object: $scope.object.id, taxonomy: $scope.new.tag.taxonomy}, $scope.new.tag.term, function(tag){
+			ObjectTag.save({object: $scope.object.id, taxonomy: $scope['new'].tag.taxonomy}, $scope['new'].tag.term, function(tag){
 				$scope.object.tag = tag;
 			});
 		}
