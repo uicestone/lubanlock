@@ -26,11 +26,6 @@
 		<script type="text/javascript" src="filters.js"></script>
 		<script type="text/javascript" src="services.js"></script>
 
-		<!--[if lt IE 9]>
-		<script src="js/html5shiv.js"></script>
-		<script src="js/respond.min.js"></script>
-		<![endif]-->
-
 		<link rel="stylesheet" href="css/font-awesome.min.css" />
 		
 		<!--[if IE 7]>
@@ -49,6 +44,11 @@
 
 		<link rel="stylesheet" href="css/style.css" />
 		
+		<!--[if lt IE 9]>
+		<script src="js/html5shiv.js"></script>
+		<script src="js/respond.min.js"></script>
+		<![endif]-->
+
 		<script type="text/javascript">
 			var company = <?=json_encode($this->company)?>;
 			var user = <?=json_encode($this->user)?>;
