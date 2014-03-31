@@ -607,6 +607,10 @@ class Object_model extends CI_Model{
 			return $meta_ids;
 		}
 		
+		if(is_null($value)){
+			return;
+		}
+		
 		if(!$this->allow('write') || !$this->allow_meta($key, 'write')){
 			throw new Exception('no_permission', 403);
 		}
