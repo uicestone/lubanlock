@@ -89,7 +89,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object
 				$scope.object.meta[$scope.new.meta.key].push($scope.new.meta.value);
 			
 				$scope.new.meta.value = undefined;
-				angular.element($event.target).children('.profile-info-name').trigger('select');
+				angular.element($event.target).children(':input:first').trigger('select');
 			});
 			
 		}
