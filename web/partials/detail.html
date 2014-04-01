@@ -4,7 +4,7 @@
 			<i class="icon-double-angle-right"></i>
 			<span luban-editable="object.type" object="object" placeholder="对象类型"></span>
 		</small>
-		<button class="btn btn-danger pull-right" ng-click="remove()">删除</button>
+		<button class="btn btn-danger pull-right" ng-if="object.$resolved" ng-click="remove()">删除</button>
 	</h1>
 </div><!-- /.page-header -->
 

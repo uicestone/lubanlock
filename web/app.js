@@ -43,7 +43,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider',
 				controller: 'DetailCtrl'
 			})
 			.otherwise({
-				redirectTo: '/jobs'
+				redirectTo: '/list'
 			});
 			
 		$httpProvider.interceptors.push('HttpInterceptor');

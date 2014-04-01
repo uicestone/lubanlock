@@ -70,7 +70,11 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 			scope.prop = scope.name.match(/\.([^.^\[]*)/)[1];
 			
 			//如果整个object都是undefined，说明没get过，则需要在首次更改时创建对象
-			scope.inAddMode = scope.object === undefined;
+			if(scope.object === undefined){
+				scope.inAddMode = true;
+				scope.object = {};
+			}
+			
 			scope.isEditing = scope.inAddMode;
 			
 			//监控对象资源的请求状态
@@ -92,7 +96,8 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 			scope.editCompleted = function(){
 				
 				//失焦时值仍然为undefined，说明未曾编辑，则不保存
-				if(scope.value === undefined){
+				//name和type由于不推荐为空值，因此为空也视为未曾编辑
+				if(scope.value === undefined || ((scope.prop === 'name' || scope.prop === 'type') && scope.value === '')){
 					return;
 				}
 				
@@ -103,7 +108,7 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 					
 					Object.save(scope.object, function(value){
 						//保存后跳转到对象编辑页
-						$location.url('detail/' + value.id);
+						$location.replace().url('detail/' + value.id);
 					});
 				}
 				
