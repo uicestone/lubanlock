@@ -119,34 +119,10 @@
 				<div class="sidebar sidebar-fixed" id="sidebar">
 
 					<ul class="nav nav-list">
-						<li class="dropdown">
-							<a class="dropdown-toggle">
-								<i class="icon-list"></i>
-								<span class="menu-text"> 职位信息 </span>
-
-								<b class="arrow icon-angle-down"></b>
-							</a>
-
-							<ul class="submenu" dropdown-menu>
-								<li>
-									<a href="#/jobs">
-										<i class="icon-double-angle-right"></i>
-										所有职位
-									</a>
-								</li>
-								<li>
-									<a href="#/list?type=%E8%81%8C%E4%BD%8D%E7%94%B3%E8%AF%B7">
-										<i class="icon-double-angle-right"></i>
-										已投递的职位
-									</a>
-								</li>
-							</ul>
-						</li>
-
 						<li>
-							<a href="#/my-resume">
-								<i class="icon-edit"></i>
-								<span class="menu-text"> 我的简历 </span>
+							<a href="#/list">
+								<i class="icon-cloud"></i>
+								<span class="menu-text"> 所有数据 </span>
 							</a>
 						</li>
 						
@@ -154,13 +130,6 @@
 							<a href="#/user">
 								<i class="icon-user"></i>
 								<span class="menu-text"> 用户管理 </span>
-							</a>
-						</li>
-						
-						<li>
-							<a href="#/list">
-								<i class="icon-cloud"></i>
-								<span class="menu-text"> 所有数据 </span>
 							</a>
 						</li>
 						

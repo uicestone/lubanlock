@@ -14,18 +14,6 @@ var lubanlockApp = angular.module('lubanlockApp', [
 lubanlockApp.config(['$routeProvider', '$httpProvider',
 	function($routeProvider, $httpProvider) {
 		$routeProvider
-			.when('/jobs/:favorite?', {
-				templateUrl: 'partials/list_job.html',
-				controller: 'JobsCtrl'
-			})
-			.when('/job/:id', {
-				templateUrl: 'partials/detail_job.html',
-				controller: 'JobDetailCtrl'
-			})
-			.when('/my-resume', {
-				templateUrl: 'partials/my_resume.html',
-				controller: 'MyResumeCtrl'
-			})
 			.when('/user', {
 				templateUrl: 'partials/list_user.html',
 				controller: 'UsersCtrl'
