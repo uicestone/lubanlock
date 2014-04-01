@@ -100,5 +100,20 @@ class User extends LB_Controller{
 		$this->load->view('user/profile_sidebar',true,'sidebar');
 	}
 	
+	function config($item = null){
+		
+		switch($this->input->method){
+			case 'GET':
+				break;
+			
+			case 'POST':
+				$this->user->config($item, $this->input->data());
+				break;
+		}
+		
+		$this->output->set_output($this->user->config($item));
+		
+	}
+	
 }
 ?>
