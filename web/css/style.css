@@ -20,6 +20,10 @@
 	cursor: pointer;
 }
 
+.navbar {
+	height: 45px;
+}
+
 .alert-container {
 	position: fixed;
 	top: 0;

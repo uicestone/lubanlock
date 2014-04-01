@@ -26,20 +26,16 @@
 		<script type="text/javascript" src="filters.js"></script>
 		<script type="text/javascript" src="services.js"></script>
 
-		<link rel="stylesheet" href="css/font-awesome.min.css" />
+		<link rel="stylesheet" href="css/font-awesome.css" />
 		
-		<!--[if IE 7]>
-		<link rel="stylesheet" href="css/font-awesome-ie7.min.css" />
-		<![endif]-->
-		
-		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/bootstrap.css" />
 		<link rel="stylesheet" href="css/dropzone.css" />
 
 		<link rel="stylesheet" href="css/ace-fonts.css" />
-		<link rel="stylesheet" href="css/ace.min.css" />
+		<link rel="stylesheet" href="css/ace.css" />
 		
 		<!--[if lte IE 8]>
-		<link rel="stylesheet" href="css/ace-ie.min.css" />
+		<link rel="stylesheet" href="css/ace-ie.css" />
 		<![endif]-->
 
 		<link rel="stylesheet" href="css/style.css" />

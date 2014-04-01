@@ -13,33 +13,22 @@
 		<script type="text/javascript" src="js/jquery/jquery-1.11.0.js"></script>
 		<![endif]-->
 					
-		<script src="js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="css/font-awesome.css" />
+		<link rel="stylesheet" href="css/bootstrap.css" />
+		<link rel="stylesheet" href="css/ace-fonts.css" />
+		<link rel="stylesheet" href="css/ace.css" />
+		
+		<!--[if lte IE 8]>
+		<link rel="stylesheet" href="css/ace-ie.css" />
+		<![endif]-->
 
-		<script src="js/ace.min.js"></script>
-		<script src="js/ace-elements.min.js"></script>
-		<script src="js/ace-extra.min.js"></script>
-
+		<link rel="stylesheet" href="css/style.css" />
+		
 		<!--[if lt IE 9]>
 		<script src="js/html5shiv.js"></script>
 		<script src="js/respond.min.js"></script>
 		<![endif]-->
 
-		<link rel="stylesheet" href="css/font-awesome.min.css" />
-		
-		<!--[if IE 7]>
-		<link rel="stylesheet" href="css/font-awesome-ie7.min.css" />
-		<![endif]-->
-		
-		<link rel="stylesheet" href="css/bootstrap.min.css" />
-
-		<link rel="stylesheet" href="css/ace-fonts.css" />
-		<link rel="stylesheet" href="css/ace.min.css" />
-		
-		<!--[if lte IE 8]>
-		<link rel="stylesheet" href="css/ace-ie.min.css" />
-		<![endif]-->
-
-		<link rel="stylesheet" href="css/style.css" />
 	</head>
 
 	<body class="login-layout">
