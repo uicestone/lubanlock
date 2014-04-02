@@ -56,7 +56,7 @@ lubanlockServices.factory('User', ['$resource',
 
 lubanlockServices.factory('UserConfig', ['$resource',
 	function($resource){
-		return $resource('user/:user/config/:item', {user: '@user', item: '@item'});
+		return $resource('user/config/:item', {item: '@item'});
 	}
 ]);
 

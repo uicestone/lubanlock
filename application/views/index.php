@@ -116,7 +116,7 @@
 					<span class="menu-text"></span>
 				</a>
 
-				<div class="sidebar sidebar-fixed" id="sidebar">
+				<div class="sidebar sidebar-fixed" id="sidebar" ng-controller="NavCtrl" ng-class="{'menu-min':config.nav_minimized}">
 
 					<ul class="nav nav-list">
 						<li>
@@ -136,7 +136,7 @@
 					</ul><!-- /.nav-list -->
 
 					<div class="sidebar-collapse" id="sidebar-collapse">
-						<i class="icon-double-angle-left" data-icon1="icon-double-angle-left" data-icon2="icon-double-angle-right"></i>
+						<i data-icon1="icon-double-angle-left" data-icon2="icon-double-angle-right" ng-class="{'icon-double-angle-left': !config.nav_minimized, 'icon-double-angle-right': config.nav_minimized}" ng-click="toggleMinimize()"></i>
 					</div>
 
 				</div>
