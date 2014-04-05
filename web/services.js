@@ -120,3 +120,23 @@ lubanlockServices.factory('Alert', [function(){
         }
 	};
 }]);
+
+lubanlockServices.factory('Nav', ['$resource',
+	function($resource){
+		
+		var Resource = $resource('nav', {}, {save: {method: 'POST', isArray: true}});
+		
+		var items = Resource.query();
+		
+		return {
+			query: function(){
+				return items;
+			},
+			
+			save: function(item, callback){
+				items.push(item);
+				Resource.save(item, callback);
+			}
+		}
+	}
+]);

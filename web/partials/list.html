@@ -1,4 +1,10 @@
-<a href="#/detail" class="btn btn-primary">添加</a>
+<a href="#/detail" class="btn btn-primary icon-plus"></a>
+<form class="form-inline" ng-show="showNavSaveForm" ng-submit="addNavItem()" style="display: inline;">
+	<input type="text" placeholder="名称" ng-model="newNavItemName">
+	<input type="text" placeholder="模板" ng-model="newNavItemTemplate">
+	<button type="submit" class="btn btn-xs btn-primary">保存</button>
+</form>
+<a class="btn" ng-if="!inNav" ng-click="toggleNavSaveForm()" ng-class="{'icon-bookmark': !showNavSaveForm, 'icon-chevron-left': showNavSaveForm}"></a>
 <span id="paginator" class="pull-right">
 	<span class="dataTables_info">{{objectListStart}} - {{objectListEnd}}, {{totalObjects}}</span>
 	<button class="btn icon-chevron-left" ng-click="previousPage()" ng-disabled="!currentPage || currentPage === 1"></button>

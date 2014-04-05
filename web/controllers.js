@@ -21,8 +21,10 @@ lubanlockControllers.controller('AlertCtrl', ['$scope', 'Alert',
 	}
 ]);
 
-lubanlockControllers.controller('NavCtrl', 
-	function($scope, UserConfig){
+lubanlockControllers.controller('NavCtrl', ['$scope', 'Nav', 'UserConfig', '$location',
+	function($scope, Nav, UserConfig, $location){
+		
+		$scope.items = Nav.query();
 		
 		//TODO 不是很舒服， 考虑改成全局config，但需要解决promise的问题
 		$scope.config = UserConfig.get({item: 'nav_minimized'});
@@ -31,21 +33,36 @@ lubanlockControllers.controller('NavCtrl',
 			$scope.config.nav_minimized = !$scope.config.nav_minimized;
 			$scope.config.$save();
 		}
-	}
-);
-
-lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object', '$location',
-	function($scope, $routeParams, Object, $location) {
 		
+		$scope.navigateTo = function(item){
+			$location.path(item.template || 'list').search(item.params);
+		}
+	}
+]);
+
+lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object', '$location', 'Nav',
+	function($scope, $routeParams, Object, $location, Nav) {
+		
+		//列表分页
 		$scope.currentPage = $location.search().page || 1;
 		
 		$scope.objects = Object.query(angular.extend({with_status: {as_rows: true}, with_tag: true}, $routeParams), function(value, responseHeaders){
+			//从responseHeaders中获得status-text，用正则匹配出分页参数
 			var statusText = eval(responseHeaders()['status-text']);
 			$scope.totalObjects = Number(statusText.match(/(\d+) Objects in Total/)[1]);
 			$scope.objectListStart = Number(statusText.match(/(\d+) \-/)[1]);
 			$scope.objectListEnd = Number(statusText.match(/\- (\d+)/)[1]);
 		});
 		
+		$scope.nextPage = function(){
+			$location.search('page', ++$scope.currentPage);
+		}
+		
+		$scope.previousPage = function(){
+			$location.search('page', --$scope.currentPage);
+		}
+		
+		//详情页，TODO，待完善
 		$scope.showDetail = function(id, type){
 			
 			if(type === 'file'){
@@ -56,13 +73,20 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object',
 			$location.url('detail/' + id);
 		}
 		
-		$scope.nextPage = function(){
-			$location.search('page', ++$scope.currentPage);
+		//保存为菜单，TODO，需要抽象以便快速应用于其他列表页
+		$scope.showNavSaveForm = false;
+		
+		$scope.toggleNavSaveForm = function(){
+			$scope.showNavSaveForm = !$scope.showNavSaveForm;
 		}
 		
-		$scope.previousPage = function(){
-			$location.search('page', --$scope.currentPage);
+		$scope.addNavItem = function(){
+			Nav.save({name: $scope.newNavItemName, template:$scope.newNavItemTemplate, params: $location.search()}, function(){
+				$scope.showNavSaveForm = false;
+				$scope.newNavItemName = $scope.newNavItemTemplate = null;
+			});
 		}
+		
 	}
 ]);
 

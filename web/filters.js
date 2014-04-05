@@ -4,6 +4,9 @@
 
 var lubanlockFilters = angular.module('lubanlockFilters', []);
 
+/**
+ * 将对象或数组转化为逗号分隔字符串显示
+ */
 lubanlockFilters.filter('plain', function(){
 	return function(input){
 		
@@ -21,6 +24,9 @@ lubanlockFilters.filter('plain', function(){
 	}
 });
 
+/**
+ * 一个数组的对象中取一个属性成为一个一维数组
+ */
 lubanlockFilters.filter('select', function(){
 	return function(input, select){
 		
