@@ -9,6 +9,7 @@ class Nav_model extends CI_Model{
 		self::$fields=array(
 			'user' => $this->user->session_id,
 			'name' => '',
+			'template'=>'',
 			'params' => '',
 			'parent' => NULL,
 			'order' => 0
@@ -16,11 +17,10 @@ class Nav_model extends CI_Model{
 		
 	}
 	
-	
 	function add(array $data){
 		
-		if(array_key_exists('param', $data)){
-			$data['param'] = json_encode($data['param']);
+		if(array_key_exists('params', $data)){
+			$data['params'] = json_encode($data['params']);
 		}
 		
 		$this->db->upsert('nav',
@@ -45,7 +45,7 @@ class Nav_model extends CI_Model{
 	function get(){
 		
 		$result = $this->db->from('nav')
-			->where_in('user', $this->user->groups)
+			->where_in('user', $this->user->group_ids)
 			->get()->result_array();
 		
 		$nav_items=array();
@@ -64,6 +64,10 @@ class Nav_model extends CI_Model{
 		
 		return array_values($nav_items);
 		
+	}
+	
+	function remove($id){
+		return $this->db->delete('nav', array('id'=>$id));
 	}
 	
 }

@@ -37,13 +37,14 @@ CREATE TABLE IF NOT EXISTS `nav` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user` int(11) DEFAULT NULL,
   `name` varchar(16) NOT NULL,
+  `template` varchar(16) NOT NULL DEFAULT '',
   `params` text,
   `parent` int(11) DEFAULT NULL,
   `order` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `parent` (`parent`),
   KEY `order` (`order`),
-  KEY `user` (`user`),
+  UNIQUE `user-name` (`user`, `name`),
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
