@@ -28,8 +28,11 @@ class LB_Controller extends CI_Controller{
 		if($this->input->accept('application/json')){
 			echo json_encode($output);
 		}
-		else{
+		elseif(is_string($output)){
 			echo $output;
+		}
+		else{
+			echo var_export($output);
 		}
 		
 	}

@@ -100,7 +100,28 @@ class User extends LB_Controller{
 		$this->load->view('user/profile_sidebar',true,'sidebar');
 	}
 	
-	function updatePassword(){
+	function config($item = null){
+		
+		switch($this->input->method){
+			case 'GET':
+				break;
+			
+			case 'POST':
+				$data = $this->input->data();
+				
+				if(is_array($data)){
+					foreach($data as $key => $value){
+						$this->user->config($key, $value);
+					}
+				}
+				else{
+					$this->user->config($item, $data);
+				}
+				
+				break;
+		}
+		
+		$this->output->set_output(is_null($item) ? $this->user->config($item) : array($item=>$this->user->config($item)));
 		
 	}
 	

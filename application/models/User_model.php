@@ -220,11 +220,7 @@ class User_model extends Object_model{
 
 			return array_map(function($value){
 				
-				$decoded=json_decode($value,true);
-				
-				if(!is_null($decoded)){
-					$value=$decoded;
-				}
+				$value = json_decode($value,true);
 				
 				return $value;
 				
@@ -242,12 +238,7 @@ class User_model extends Object_model{
 			if($row){
 				$json_value=json_decode($row->value);
 				
-				if(is_null($json_value)){
-					return $row->value;
-				}
-				else{
-					return $json_value;
-				}
+				return $json_value;
 			}
 			else{
 				return false;
@@ -255,9 +246,7 @@ class User_model extends Object_model{
 		}
 		else{
 			
-			if(is_array($value)){
-				$value=json_encode($value);
-			}
+			$value=json_encode($value);
 			
 			return $this->db->upsert('user_config', array('user'=>$this->session_id,'key'=>$key,'value'=>$value));
 		}
