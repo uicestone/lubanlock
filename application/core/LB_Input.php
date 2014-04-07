@@ -48,17 +48,13 @@ class LB_input extends CI_Input{
 	 */
 	function get($index = NULL, $xss_clean = FALSE){
 		
-		$get_temp = $_GET;
-		unset($_GET['query']);
 		$get = parent::get($index, $xss_clean);
-		
-		if($get === FALSE && isset($get_temp['query'])){
-			$_GET = json_decode($get_temp['query'],JSON_OBJECT_AS_ARRAY);
-			$get = parent::get($index, $xss_clean);
-		}
 		
 		if(is_array($get)){
 			array_walk($get, function(&$value){
+				if(!is_string($value)){
+					throw new Exception('URI params should be string, JSON is supported.', 400);
+				}
 				$decoded = json_decode($value, JSON_OBJECT_AS_ARRAY);
 				!is_null($decoded) && $value = $decoded;
 			});
@@ -67,8 +63,6 @@ class LB_input extends CI_Input{
 			$decoded = json_decode($get, JSON_OBJECT_AS_ARRAY);
 			!is_null($decoded) && $get = $decoded;
 		}
-		
-		$_GET = $get_temp;
 		
 		if(is_null($index) && $get===false){
 			$get=array();
