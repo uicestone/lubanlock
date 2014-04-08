@@ -1,28 +1,44 @@
 <form class="form-horizontal" ng-submit="updateConfig()">
 	<tabset>
 
-		<tab heading="个人设置" id="edit-settings">
-			
-		</tab>
-
-		<tab heading="修改密码" id="edit-password">
+		<tab heading="用户信息" id="edit-password">
 			<div class="space-10"></div>
 
 			<div class="form-group">
-				<label class="col-sm-3 control-label no-padding-right" for="form-field-pass1" ng-model="newPassword">新密码</label>
+				<label class="col-sm-3 control-label no-padding-right" for="username">用户名</label>
 
 				<div class="col-sm-9">
-					<input type="password" id="form-field-pass1">
+					<input id="username" type="text" ng-model="$parent.user.name">
 				</div>
 			</div>
 
 			<div class="space-4"></div>
 
 			<div class="form-group">
-				<label class="col-sm-3 control-label no-padding-right" for="form-field-pass2" ng-model="newPasswordConfirm">重复新密码</label>
+				<label class="col-sm-3 control-label no-padding-right" for="email">电子邮件</label>
 
 				<div class="col-sm-9">
-					<input type="password" id="form-field-pass2">
+					<input id="email" type="text" ng-model="$parent.user.email">
+				</div>
+			</div>
+
+			<div class="space-4"></div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label no-padding-right" for="new-password">新密码</label>
+
+				<div class="col-sm-9">
+					<input id="new-password" type="password" ng-model="$parent.newPassword">
+				</div>
+			</div>
+
+			<div class="space-4"></div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label no-padding-right" for="new-password-confirm">重复新密码</label>
+
+				<div class="col-sm-9">
+					<input id="new-password-confirm" type="password" ng-model="$parent.newPasswordConfirm">
 				</div>
 			</div>
 		</tab>
@@ -30,13 +46,13 @@
 	
 	<div class="clearfix form-actions">
 		<div class="col-md-offset-3 col-md-9">
-			<button class="btn btn-info" type="submit">
+			<button type="submit" class="btn btn-info">
 				<i class="icon-ok bigger-110"></i>
 				保存
 			</button>
 
 			&nbsp; &nbsp;
-			<button class="btn" type="reset">
+			<button type="reset" class="btn">
 				<i class="icon-undo bigger-110"></i>
 				重置
 			</button>

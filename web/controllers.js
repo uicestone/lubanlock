@@ -201,12 +201,16 @@ lubanlockControllers.controller('UsersCtrl', ['$scope', '$routeParams', 'User', 
 
 lubanlockControllers.controller('UserDetailCtrl', ['$scope', '$routeParams', 'User', 'UserConfig',
 	function($scope, $routeParams, User, UserConfig) {
+		
 		$scope.user = User.get({id: $routeParams.id});
+		
+		$scope.config = UserConfig.get();
+		
 		$scope.updateConfig = function(){
-			if($scope.newPassword && $scope.newPasswordConfirm){
+			if($scope.newPassword && $scope.newPassword === $scope.newPasswordConfirm){
 				$scope.user.password = $scope.newPassword;
-				$scope.user.update();
 			}
+			$scope.user.$update();
 		}
 	}
 ]);

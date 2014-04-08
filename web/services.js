@@ -56,7 +56,7 @@ lubanlockServices.factory('ObjectTag', ['$resource',
 lubanlockServices.factory('User', ['$resource',
 	function($resource){
 		return $resource('user/:id', {id: '@id'}, {
-			updatePassword: {method: 'PUT'},
+			update: {method: 'PUT'},
 		});
 	}
 ]);
