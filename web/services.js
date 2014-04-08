@@ -7,6 +7,13 @@ var lubanlockServices = angular.module('lubanlockServices', ['ngResource']);
 lubanlockServices.factory('Object', ['$resource',
 	function($resource){
 		return $resource('object/:id', {id: '@id'}, {
+			//通过改变Resource请求成功时的返回值来达到获得header的目的 TODO 这样做改变了Resource的行为，可能会有未知问题
+			get: {method: 'GET', interceptor: {response: function(response){
+				return response;
+			}}},
+			query: {method: 'GET', isArray: true, interceptor: {response: function(response){
+				return response;
+			}}},
 			update: {method: 'PUT'},
 		});
 	}
@@ -105,8 +112,19 @@ lubanlockServices.factory('HttpInterceptor', ['$q', '$window', 'Alert', function
 	};
 }]);
 
-lubanlockServices.factory('Alert', [function(){
+lubanlockServices.factory('Alert', ['$rootScope', function($rootScope){
+	
 	var alerts = [];
+	
+	//监控路由导航状态并给予提示信息 TODO 应该分离到消息服务之外
+	$rootScope.$on('$routeChangeStart', function(){
+		alerts.push({message: '正在加载...'});
+	});
+	
+	$rootScope.$on('$routeChangeSuccess', function(){
+		//TODO 消息应该可以根据ID删除，这也就意味着消息插入的时候要有ID
+		alerts.pop();
+	});
 	
 	return {
 		getAlerts: function(){

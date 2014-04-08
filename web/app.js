@@ -24,11 +24,23 @@ lubanlockApp.config(['$routeProvider', '$httpProvider',
 			})
 			.when('/list', {
 				templateUrl: 'partials/list.html',
-				controller: 'ListCtrl'
+				controller: 'ListCtrl',
+				resolve: {
+					objectsResponse: ['Object', '$route', function(Object, $route){
+						return Object.query(angular.extend({with_status: {as_rows: true}, with_tag: true}, $route.current.params)).$promise;
+					}]
+				}
 			})
 			.when('/detail/:id?', {
 				templateUrl: 'partials/detail.html',
-				controller: 'DetailCtrl'
+				controller: 'DetailCtrl',
+				resolve: {
+					objectResponse: ['$route', 'Object', function($route, Object){
+						if($route.current.params.id){
+							return Object.get({id: $route.current.params.id, with_status: {as_rows: true, order_by:'date desc'}}).$promise;
+						}
+					}]
+				}
 			})
 			.otherwise({
 				redirectTo: '/list'

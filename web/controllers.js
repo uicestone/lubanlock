@@ -40,20 +40,20 @@ lubanlockControllers.controller('NavCtrl', ['$scope', 'Nav', 'UserConfig', '$loc
 	}
 ]);
 
-lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object', '$location', 'Nav',
-	function($scope, $routeParams, Object, $location, Nav) {
-		
+lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'objectsResponse',
+	function($scope, $location, Nav, objectsResponse) {
 		//列表分页
 		$scope.currentPage = $location.search().page || 1;
 		
-		$scope.objects = Object.query(angular.extend({with_status: {as_rows: true}, with_tag: true}, $routeParams), function(value, responseHeaders){
-			//从responseHeaders中获得status-text，用正则匹配出分页参数
-			var statusText = eval(responseHeaders()['status-text']);
-			$scope.totalObjects = Number(statusText.match(/(\d+) Objects in Total/)[1]);
-			$scope.objectListStart = Number(statusText.match(/(\d+) \-/)[1]);
-			$scope.objectListEnd = Number(statusText.match(/\- (\d+)/)[1]);
-		});
+		$scope.headers = objectsResponse.headers();
+		$scope.objects = objectsResponse.data;
 		
+		//从responseHeaders中获得status-text，用正则匹配出分页参数
+		var statusText = eval($scope.headers['status-text']);
+		$scope.totalObjects = Number(statusText.match(/(\d+) Objects in Total/)[1]);
+		$scope.objectListStart = Number(statusText.match(/(\d+) \-/)[1]);
+		$scope.objectListEnd = Number(statusText.match(/\- (\d+)/)[1]);
+
 		$scope.nextPage = function(){
 			$location.search('page', ++$scope.currentPage);
 		}
@@ -62,7 +62,7 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object',
 			$location.search('page', --$scope.currentPage);
 		}
 		
-		//详情页，TODO，待完善
+		//详情页，TODO，待完善，对于符合一定条件的对象，使用特定模板载入
 		$scope.showDetail = function(id, type){
 			
 			if(type === 'file'){
@@ -90,12 +90,11 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$routeParams', 'Object',
 	}
 ]);
 
-lubanlockControllers.controller('DetailCtrl', ['$scope', '$routeParams', 'Object', 'ObjectMeta', 'ObjectRelative', 'ObjectStatus', 'ObjectTag', '$location',
-	function($scope, $routeParams, Object, ObjectMeta, ObjectRelative, ObjectStatus, ObjectTag, $location) {
+lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'ObjectMeta', 'ObjectRelative', 'ObjectStatus', 'ObjectTag', '$location',
+	function($scope, objectResponse, ObjectMeta, ObjectRelative, ObjectStatus, ObjectTag, $location) {
 		
-		if($routeParams.id !== undefined){
-			$scope.object = Object.get({id: $routeParams.id, with_status: {as_rows: true, order_by:'date desc'}});
-		}
+		$scope.object = objectResponse.data;
+		$scope.headers = objectResponse.headers();
 		
 		$scope.adding = {
 			meta: false,
