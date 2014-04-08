@@ -27,7 +27,9 @@ class LB_input extends CI_Input{
 			parse_str($data,$data);
 		}
 		//parse as json
-		elseif((array_key_exists('Content-Type', $headers) && strpos($headers['Content-Type'], 'application/json') === 0) || !is_null(json_decode($data))){
+		//不根据request header来判断解码方式，而是直接尝试json_decode根据执行结果判断
+		//这是因为Angular将非数组/对象的postData未经json编码直接发送，并且请求头内带有Content-Type: application/json
+		elseif(!is_null(json_decode($data))){
 			$data=json_decode($data,JSON_OBJECT_AS_ARRAY);
 		}
 
