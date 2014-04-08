@@ -93,8 +93,10 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'obje
 lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'ObjectMeta', 'ObjectRelative', 'ObjectStatus', 'ObjectTag', '$location',
 	function($scope, objectResponse, ObjectMeta, ObjectRelative, ObjectStatus, ObjectTag, $location) {
 		
-		$scope.object = objectResponse.data;
-		$scope.headers = objectResponse.headers();
+		if(objectResponse){
+			$scope.object = objectResponse.data;
+			$scope.headers = objectResponse.headers();
+		}
 		
 		$scope.adding = {
 			meta: false,

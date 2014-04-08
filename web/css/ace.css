@@ -9442,8 +9442,8 @@ li.item-default {
   margin-left: -12px;
 }
 .profile-contact-links {
-  padding: 4px 2px 5px;
-  border: 1px solid #E0E2E5;
+  /*padding: 4px 2px 5px;*/
+  /*border: 1px solid #E0E2E5;*/
   background-color: #F8FAFC;
 }
 .profile-contact-info .btn-link:hover > [class*="icon-"],

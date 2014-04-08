@@ -21,7 +21,7 @@ lubanlockServices.factory('Object', ['$resource',
 
 lubanlockServices.factory('ObjectMeta', ['$resource',
 	function($resource){
-		return $resource('object/:object/meta/:key?', {object: '@object', key: '@key'}, {
+		return $resource('object/:object/meta/:key', {object: '@object', key: '@key'}, {
 			update: {method: 'PUT'}
 		});
 	}
@@ -112,17 +112,30 @@ lubanlockServices.factory('HttpInterceptor', ['$q', '$window', 'Alert', function
 	};
 }]);
 
-lubanlockServices.factory('Alert', ['$rootScope', function($rootScope){
+lubanlockServices.factory('Alert', ['$rootScope', '$timeout', function($rootScope, $timeout){
 	
 	var alerts = [];
 	
 	//监控路由导航状态并给予提示信息 TODO 应该分离到消息服务之外
+	
+	var fastRouteChangeTimeout;
+	var slowRouteChangeTimeout;
+	
 	$rootScope.$on('$routeChangeStart', function(){
-		alerts.push({message: '正在加载...'});
+		
+		fastRouteChangeTimeout = $timeout(function(){
+			alerts.push({message: '正在加载...'});
+		}, 200);
+		
+		slowRouteChangeTimeout = $timeout(function(){
+			alerts.push({message: '仍在继续...'});
+		}, 5000);
 	});
 	
 	$rootScope.$on('$routeChangeSuccess', function(){
 		//TODO 消息应该可以根据ID删除，这也就意味着消息插入的时候要有ID
+		$timeout.cancel(fastRouteChangeTimeout);
+		$timeout.cancel(slowRouteChangeTimeout);
 		alerts.pop();
 	});
 	

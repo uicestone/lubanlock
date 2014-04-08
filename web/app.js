@@ -34,6 +34,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider',
 			.when('/detail/:id?', {
 				templateUrl: 'partials/detail.html',
 				controller: 'DetailCtrl',
+				//TODO 模版也需要在路由执行前预加载
 				resolve: {
 					objectResponse: ['$route', 'Object', function($route, Object){
 						if($route.current.params.id){
