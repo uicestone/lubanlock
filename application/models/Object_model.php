@@ -450,6 +450,10 @@ class Object_model extends CI_Model{
 		if(array_key_exists('page', $args)){
 			if(!array_key_exists('per_page', $args)){
 				$args['per_page'] = $this->company->config('per_page');
+				
+				if(!$args['per_page']){
+					$args['per_page'] = 25;
+				}
 			}
 			//页码-每页数量方式，转换为sql limit
 			$args['limit'] = array($args['per_page'],($args['page']-1)*$args['per_page']);
