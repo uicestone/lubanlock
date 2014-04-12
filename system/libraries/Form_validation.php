@@ -49,7 +49,9 @@ class CI_Form_validation {
 	 *
 	 * @var array
 	 */
-	protected $_field_data		= array();
+	//TODO make this public for manually setting error message, there should be a better solution
+	//protected $_field_data		= array();
+	public $_field_data			= array();
 
 	/**
 	 * Validation rules for the current form
