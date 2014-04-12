@@ -270,4 +270,10 @@ function array_remove_value(array &$array,$remove,$like=false){
 		}
 	}
 }
+
+function array_is_numerical_index($array){
+	return array_reduce(array_keys($array), function($result, $item){
+		return $result && is_integer($item);
+	}, true);
+}
 ?>
