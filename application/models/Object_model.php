@@ -143,6 +143,7 @@ class Object_model extends CI_Model{
 	 * @param array|int $users	默认为$this->user->group_ids，即当前用户和递归所属组
 	 * @return boolean
 	 * @throws Exception	argument_error
+	 * @todo 重大问题，对于group_ids为NULL的用户会返回全部允许
 	 */
 	function allow($permission = 'read', $users = null){
 		
