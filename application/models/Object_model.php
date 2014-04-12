@@ -183,6 +183,11 @@ class Object_model extends CI_Model{
 		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
 		
 		if(is_null($users)){
+			
+			if(!$this->user->session_id){
+				return false;
+			}
+			
 			$users = array($this->user->session_id);
 		}
 		
@@ -220,7 +225,7 @@ class Object_model extends CI_Model{
 			$users = array($users);
 		}
 		
-		if(empty($users)){
+		if(empty($users) && $this->company->config('object_meta_permission_check')){
 			return false;
 		}
 		
@@ -249,6 +254,11 @@ class Object_model extends CI_Model{
 		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
 		
 		if(is_null($users)){
+			
+			if(!$this->user->session_id){
+				return false;
+			}
+			
 			$users = array($this->user->session_id);
 		}
 		
