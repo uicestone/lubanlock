@@ -596,15 +596,13 @@ class Object_model extends CI_Model{
 			
 			$meta_ids = array();
 			
-			foreach($key as $k => $v){
-				if(is_array($v)){
-					if(!array_key_exists('key', $v) || !array_key_exists('value', $v)){
-						throw new Exception('argument_error', 400);
-					}
-					$meta_ids[] = $this->addMeta($v['key'], $v['value'], array_key_exists('unique', $v) ? $v['unique'] : $unique);
+			foreach($key as $sub_key => $sub_func_args){
+				if(is_array($sub_func_args)){
+					extract($sub_func_args);
+					$meta_ids[] = $this->addMeta($key, $value, $unique);
 				}
 				else{
-					$meta_ids[] = $this->addMeta($k, $v, $unique);
+					$meta_ids[] = $this->addMeta($sub_key, $sub_func_args, $unique);
 				}
 			}
 			
@@ -777,6 +775,13 @@ class Object_model extends CI_Model{
 			$this->fetch($relative, array('set_id'=>false));
 		}catch(Exception $e){
 			throw new Exception('invalid_relative', 400);
+		}
+		
+		if(is_array($relation)){
+			foreach($relation as $sub_func_args){
+				extract($sub_func_args);
+				$this->setRelative($relation, $relative, $num, $meta, $is_on, $args);
+			}
 		}
 		
 		$return = $this->db->upsert('object_relationship', array(
