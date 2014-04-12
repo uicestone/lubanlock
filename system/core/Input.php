@@ -744,7 +744,7 @@ class CI_Input {
 	 */
 	protected function _clean_input_keys($str, $fatal = TRUE)
 	{
-		if ( ! preg_match('/^[a-z0-9:_\/|-]+$/i', $str))
+		if ( ! preg_match('/^[a-z0-9:_\/|\-\x{4e00}-\x{9fa5}]+$/iu', $str))
 		{
 			if ($fatal === TRUE)
 			{
