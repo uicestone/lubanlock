@@ -47,7 +47,7 @@ class User extends LB_Controller{
 		$result = $this->user->getList($args);
 
 		$this->output->set_output($result['data']);
-		$this->output->set_status_header(200, 'OK, '.$result['total'].' Users in Total');
+		$this->output->set_status_header(200, 'OK, '.$result['info']['total'].' Users in Total');
 	}
 	
 	function add(){
