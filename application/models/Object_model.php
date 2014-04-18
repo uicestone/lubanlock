@@ -526,8 +526,6 @@ class Object_model extends CI_Model{
 		$result=$this->getList($args);
 		if(isset($result['data'][0])){
 			return $result['data'][0];
-		}else{
-			return array();
 		}
 	}
 	
