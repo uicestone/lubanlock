@@ -31,7 +31,8 @@ class User_model extends Object_model{
 			return;
 		}
 		
-		$user=$this->fetch($this->session_id);
+		$user=$this->fetch($this->session_id, array('with_meta'=>false, 'with_status'=>false, 'with_relative'=>false, 'with_tag'=>false), false);
+		
 		$this->name=$user['name'];
 		
 		$this->roles = $this->_parse_roles($user['roles']);
