@@ -607,7 +607,15 @@ class Object_model extends CI_Model{
 			
 			foreach($key as $sub_key => $sub_func_args){
 				if(is_array($sub_func_args)){
+					
+					$sub_func_args = array_merge(array(
+						'key' => null,
+						'value' => null,
+						'unique' => false,
+					), $sub_func_args);
+					
 					extract($sub_func_args);
+					
 					$meta_ids[] = $this->addMeta($key, $value, $unique);
 				}
 				else{
@@ -778,7 +786,7 @@ class Object_model extends CI_Model{
 	 * @return int|array new meta id(s)
 	 * @throws Exception
 	 */
-	function setRelative($relation, $relative, $num = '', array $meta = array(), $is_on = true, array $args = array()){
+	function setRelative($relation, $relative = null, $num = '', array $meta = array(), $is_on = true, array $args = array()){
 		
 		try{
 			$this->fetch($relative, array('set_id'=>false));
@@ -787,10 +795,32 @@ class Object_model extends CI_Model{
 		}
 		
 		if(is_array($relation)){
-			foreach($relation as $sub_func_args){
-				extract($sub_func_args);
-				$this->setRelative($relation, $relative, $num, $meta, $is_on, $args);
+			
+			$relationship_ids = array();
+			
+			foreach($relation as $key => $sub_func_args){
+				if(is_array($sub_func_args)){
+					
+					$sub_func_args = array_merge(array(
+						'relation' => null,
+						'relative' => null,
+						'num' => '',
+						'meta' => array(),
+						'is_on' => true,
+						'args' => array(),
+					), $sub_func_args);
+					
+					extract($sub_func_args);
+					
+					$relationship_ids[] = $this->setRelative($relation, $relative, $num, $meta, $is_on, $args);
+				}
+				else{
+					$relationship_ids[] = $this->setRelative($key, $sub_func_args);
+				}
 			}
+			
+			return $relationship_ids;
+			
 		}
 		
 		$return = $this->db->upsert('object_relationship', array(
@@ -821,7 +851,7 @@ class Object_model extends CI_Model{
 		return $return;
 	}
 	
-	function addRelative($relation, $relative, $num = '', array $meta = array(), $is_on = true, array $args = array()){
+	function addRelative($relation, $relative = null, $num = '', array $meta = array(), $is_on = true, array $args = array()){
 		return $this->setRelative($relation, $relative, $num, $meta, $is_on, $args);
 	}
 	
