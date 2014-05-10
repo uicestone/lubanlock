@@ -31,7 +31,8 @@ class User_model extends Object_model{
 			return;
 		}
 		
-		$user=$this->fetch($this->session_id);
+		$user=$this->fetch($this->session_id, array('with_meta'=>false, 'with_status'=>false, 'with_relative'=>false, 'with_tag'=>false), false);
+		
 		$this->name=$user['name'];
 		
 		$this->roles = $this->_parse_roles($user['roles']);
@@ -89,8 +90,18 @@ class User_model extends Object_model{
 	}
 
 	function fetch($id=null, array $args = array(), $permission_check = true){
+		
+		if(is_null($id)){
+			$id=$this->id;
+		}
+		elseif(!array_key_exists('set_id', $args) || $args['set_id']){
+			$this->id=$id;
+		}
+		
 		$object = parent::fetch($id, $args, $permission_check);
+		
 		$user = $this->db->select('user.id, user.name, user.email, user.roles, user.last_ip, user.last_login')->from('user')->where('id', $id)->get()->row_array();
+		
 		return array_merge($object, $user);
 	}
 	

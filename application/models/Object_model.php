@@ -143,6 +143,7 @@ class Object_model extends CI_Model{
 	 * @param array|int $users	默认为$this->user->group_ids，即当前用户和递归所属组
 	 * @return boolean
 	 * @throws Exception	argument_error
+	 * @todo 重大问题，对于group_ids为NULL的用户会返回全部允许
 	 */
 	function allow($permission = 'read', $users = null){
 		
@@ -183,6 +184,11 @@ class Object_model extends CI_Model{
 		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
 		
 		if(is_null($users)){
+			
+			if(!$this->user->session_id){
+				return false;
+			}
+			
 			$users = array($this->user->session_id);
 		}
 		
@@ -220,7 +226,7 @@ class Object_model extends CI_Model{
 			$users = array($users);
 		}
 		
-		if(empty($users)){
+		if(empty($users) && $this->company->config('object_meta_permission_check')){
 			return false;
 		}
 		
@@ -249,6 +255,11 @@ class Object_model extends CI_Model{
 		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
 		
 		if(is_null($users)){
+			
+			if(!$this->user->session_id){
+				return false;
+			}
+			
 			$users = array($this->user->session_id);
 		}
 		
@@ -450,6 +461,10 @@ class Object_model extends CI_Model{
 		if(array_key_exists('page', $args)){
 			if(!array_key_exists('per_page', $args)){
 				$args['per_page'] = $this->company->config('per_page');
+				
+				if(!$args['per_page']){
+					$args['per_page'] = 25;
+				}
 			}
 			//页码-每页数量方式，转换为sql limit
 			$args['limit'] = array($args['per_page'],($args['page']-1)*$args['per_page']);
@@ -511,8 +526,6 @@ class Object_model extends CI_Model{
 		$result=$this->getList($args);
 		if(isset($result['data'][0])){
 			return $result['data'][0];
-		}else{
-			return array();
 		}
 	}
 	
@@ -592,15 +605,21 @@ class Object_model extends CI_Model{
 			
 			$meta_ids = array();
 			
-			foreach($key as $k => $v){
-				if(is_array($v)){
-					if(!array_key_exists('key', $v) || !array_key_exists('value', $v)){
-						throw new Exception('argument_error', 400);
-					}
-					$meta_ids[] = $this->addMeta($v['key'], $v['value'], array_key_exists('unique', $v) ? $v['unique'] : $unique);
+			foreach($key as $sub_key => $sub_func_args){
+				if(is_array($sub_func_args)){
+					
+					$sub_func_args = array_merge(array(
+						'key' => null,
+						'value' => null,
+						'unique' => false,
+					), $sub_func_args);
+					
+					extract($sub_func_args);
+					
+					$meta_ids[] = $this->addMeta($key, $value, $unique);
 				}
 				else{
-					$meta_ids[] = $this->addMeta($k, $v, $unique);
+					$meta_ids[] = $this->addMeta($sub_key, $sub_func_args, $unique);
 				}
 			}
 			
@@ -767,12 +786,41 @@ class Object_model extends CI_Model{
 	 * @return int|array new meta id(s)
 	 * @throws Exception
 	 */
-	function setRelative($relation, $relative, $num = '', array $meta = array(), $is_on = true, array $args = array()){
+	function setRelative($relation, $relative = null, $num = '', array $meta = array(), $is_on = true, array $args = array()){
 		
 		try{
 			$this->fetch($relative, array('set_id'=>false));
 		}catch(Exception $e){
 			throw new Exception('invalid_relative', 400);
+		}
+		
+		if(is_array($relation)){
+			
+			$relationship_ids = array();
+			
+			foreach($relation as $key => $sub_func_args){
+				if(is_array($sub_func_args)){
+					
+					$sub_func_args = array_merge(array(
+						'relation' => null,
+						'relative' => null,
+						'num' => '',
+						'meta' => array(),
+						'is_on' => true,
+						'args' => array(),
+					), $sub_func_args);
+					
+					extract($sub_func_args);
+					
+					$relationship_ids[] = $this->setRelative($relation, $relative, $num, $meta, $is_on, $args);
+				}
+				else{
+					$relationship_ids[] = $this->setRelative($key, $sub_func_args);
+				}
+			}
+			
+			return $relationship_ids;
+			
 		}
 		
 		$return = $this->db->upsert('object_relationship', array(
@@ -801,6 +849,10 @@ class Object_model extends CI_Model{
 		}
 		
 		return $return;
+	}
+	
+	function addRelative($relation, $relative = null, $num = '', array $meta = array(), $is_on = true, array $args = array()){
+		return $this->setRelative($relation, $relative, $num, $meta, $is_on, $args);
 	}
 	
 	function removeRelative($relation, $relative){
@@ -1026,5 +1078,8 @@ class Object_model extends CI_Model{
 		
 	}
 	
+	function addTag($tags, $taxonomy, $append = false){
+		return $this->setTag($tags, $taxonomy, $append);
+	}
 }
 ?>

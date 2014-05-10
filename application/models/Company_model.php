@@ -35,6 +35,10 @@ class Company_model extends Object_model{
 
 		$row=$this->db->get()->row();
 		
+		if(!$row){
+			throw new Exception('"'.$host_name.'" isn\'t leading you to any company.', 404);
+		}
+		
 		$this->id=intval($row->id);
 		$this->name=$row->name;
 		$this->type=$row->type;

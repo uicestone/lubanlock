@@ -46,12 +46,13 @@ class Nav_model extends CI_Model{
 		
 		$result = $this->db->from('nav')
 			->where_in('user', $this->user->group_ids)
+			->or_where('user', null)
 			->get()->result_array();
 		
 		$nav_items=array();
 		
 		foreach($result as $nav_item){
-			$nav_item['params'] = json_decode($nav_item['params']);
+			$nav_item['params'] = json_decode($nav_item['params'], JSON_OBJECT_AS_ARRAY);
 			$nav_items[$nav_item['id']] = $nav_item;
 		}
 		

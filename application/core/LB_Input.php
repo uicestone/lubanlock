@@ -27,7 +27,9 @@ class LB_input extends CI_Input{
 			parse_str($data,$data);
 		}
 		//parse as json
-		elseif((array_key_exists('Content-Type', $headers) && strpos($headers['Content-Type'], 'application/json') === 0) || !is_null(json_decode($data))){
+		//不根据request header来判断解码方式，而是直接尝试json_decode根据执行结果判断
+		//这是因为Angular将非数组/对象的postData未经json编码直接发送，并且请求头内带有Content-Type: application/json
+		elseif(!is_null(json_decode($data))){
 			$data=json_decode($data,JSON_OBJECT_AS_ARRAY);
 		}
 
@@ -48,17 +50,13 @@ class LB_input extends CI_Input{
 	 */
 	function get($index = NULL, $xss_clean = FALSE){
 		
-		$get_temp = $_GET;
-		unset($_GET['query']);
 		$get = parent::get($index, $xss_clean);
-		
-		if($get === FALSE && isset($get_temp['query'])){
-			$_GET = json_decode($get_temp['query'],JSON_OBJECT_AS_ARRAY);
-			$get = parent::get($index, $xss_clean);
-		}
 		
 		if(is_array($get)){
 			array_walk($get, function(&$value){
+				if(!is_string($value)){
+					throw new Exception('URI params should be string, JSON is supported.', 400);
+				}
 				$decoded = json_decode($value, JSON_OBJECT_AS_ARRAY);
 				!is_null($decoded) && $value = $decoded;
 			});
@@ -67,8 +65,6 @@ class LB_input extends CI_Input{
 			$decoded = json_decode($get, JSON_OBJECT_AS_ARRAY);
 			!is_null($decoded) && $get = $decoded;
 		}
-		
-		$_GET = $get_temp;
 		
 		if(is_null($index) && $get===false){
 			$get=array();
