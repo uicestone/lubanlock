@@ -13,7 +13,10 @@ var object = {
 	"meta":meta,
 	"relative":relative,
 	"status":status,
-	"tag":tag
+	"tag":tag,
+	"user":0,
+	"time":"1970-01-01 00:00:00",
+	"time_insert":"1970-01-01 00:00:00"
 };
 
 /*
@@ -50,7 +53,8 @@ var relative = {
 var status = [
 	{
 		"name":"",
-		"date":"1970-01-01 00:00:00"
+		"date":"1970-01-01 00:00:00",
+		"comment":""
 	}
 ];
 
@@ -58,7 +62,7 @@ var status = [
  * 一个对象的标签，用于搜索和分类
  */
 var tag = {
-	"{taxonomy}": ["{tag1}","{tag2}"]
+	"{taxonomy}": ["{term1}","{term2}"]
 };
 
 /**

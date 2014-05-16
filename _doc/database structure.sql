@@ -228,15 +228,6 @@ CREATE TABLE IF NOT EXISTS `user_config` (
   UNIQUE KEY `user-key` (`user`,`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO company (id, name, host, syscode, sysname) VALUE
-(1, '鲁班锁','sys.sh','LubanLock','鲁班锁');
-
-INSERT INTO object (id, name, company, user) VALUE
-(1, 'root', 1, 1);
-
-INSERT INTO user (id,name,company) VALUE
-(1,'root',1);
-
 ALTER TABLE `company_config`
   ADD CONSTRAINT `company_config_ibfk_1` FOREIGN KEY (`company`) REFERENCES `company` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
