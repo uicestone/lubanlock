@@ -41,7 +41,7 @@ class Tag_model extends CI_Model{
 		
 		$this->db->insert('tag_taxonomy',
 			array_merge(
-				array('tag'=>$tag_id, 'taxonomy'=>$taxonomy),
+				array('tag'=>$tag_id, 'taxonomy'=>$taxonomy, 'name'=>$taxonomy . ': ' . $tag_name),
 				array_intersect_key($args, array('description'=>'', 'parent'=>0))
 			)
 		);
@@ -92,6 +92,16 @@ class Tag_model extends CI_Model{
 		
 		return $tag->id;
 		
+	}
+	
+	function calibrateCount(){
+		
+		$this->db->query(
+			'UPDATE `tag_taxonomy` LEFT JOIN ('
+			. '	SELECT `tag_taxonomy`, COUNT(*) `count` FROM `object_tag` GROUP BY `tag_taxonomy`'
+			. ') `object_tag_grouped` ON `object_tag_grouped`.`tag_taxonomy` = `tag_taxonomy`.`id`'
+			. 'SET `tag_taxonomy`.`count` = `object_tag_grouped`.`count`'
+		);
 	}
 	
 }

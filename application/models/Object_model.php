@@ -1061,19 +1061,26 @@ class Object_model extends CI_Model{
 			
 			$tags_origin = $this->getTag(array('as_rows'=>true, 'taxonomy'=>$taxonomy));
 			
-			if($tags_origin){
-				foreach($tags_origin as $tag_origin){
-					if(!in_array($tag_origin->term, $tags)/* && !in_array($tag_origin->tag, $tags)*/){
-						$this->db->delete('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_origin->tag_taxonomy));
-					}
+			foreach($tags_origin as $tag_origin){
+				if(!in_array($tag_origin->term, $tags)){
+					$this->db->delete('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_origin->tag_taxonomy));
+					$this->db->where('id', $tag_origin->tag_taxonomy)->set('count', '`count` - 1', false)->update('tag_taxonomy');
 				}
 			}
 		}
 		
-		foreach($tags as $tag){
-			$tag_taxonomy_id = /*is_integer($tag) ? $tag : */$this->tag->get($tag, $taxonomy);
-			$query = $this->db->insert_string('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_taxonomy_id, 'user'=>$this->user->session_id));
+		foreach($tags as $index => $tag){
+			
+			if(!is_integer($index)){
+				$taxonomy = $index;
+			}
+			
+			$tag_taxonomy_id = $this->CI->tag->get($tag, $taxonomy);
+			$query = $this->db->insert_string('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_taxonomy_id, 'user'=>$this->CI->user->session_id));
 			$this->db->query(str_replace('INSERT', 'INSERT IGNORE', $query));
+			if($this->db->affected_rows() === 1){
+				$this->db->where('id', $tag_taxonomy_id)->set('count', '`count` + 1', false)->update('tag_taxonomy');
+			}
 		}
 		
 	}
