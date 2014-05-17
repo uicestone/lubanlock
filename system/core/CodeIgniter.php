@@ -404,7 +404,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	// Mark a start point so we can benchmark the controller
 	$BM->mark('controller_execution_time_( '.$class.' / '.$method.' )_start');
 
-	$CI = new $class();
+	try{
+		$CI = new $class();
+	}
+	catch(Exception $exception){
+		$OUT->set_status_header($exception->getCode(), lang($exception->getMessage()));
+		if(!$IN->accept('application/json')){
+			show_error(lang($exception->getMessage()), $exception->getCode());
+		}
+	}
 
 /*
  * ------------------------------------------------------
@@ -424,7 +432,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	catch(Exception $exception){
 		$OUT->set_status_header($exception->getCode(), lang($exception->getMessage()));
 		if(!$IN->accept('application/json')){
-			show_error(lang($exception->getMessage()), NULL);
+			show_error(lang($exception->getMessage()), $exception->getCode());
 		}
 	}
 
