@@ -14,7 +14,7 @@ class Welcome extends LB_Controller{
 	}
 	
 	function robots(){
-		$this->output->set_output($this->config->user_item('robots'));
+		$this->output->set_output($this->company->config('robots'));
 	}
 	
 	function favicon(){

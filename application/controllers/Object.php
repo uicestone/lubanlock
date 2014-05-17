@@ -5,7 +5,7 @@ class Object extends LB_Controller{
 		parent::__construct();
 	}
 	
-	function index($id=NULL){
+	function index($id = NULL){
 		
 		switch ($this->input->method) {
 			case 'GET':
@@ -33,9 +33,9 @@ class Object extends LB_Controller{
 	
 	function fetch($id){
 		
-		$args=$this->input->get();
+		$args = $this->input->get();
 		
-		$object = $this->object->fetch($id,$args);
+		$object = $this->object->fetch($id, $args);
 		
 		//meta在后台使用array，在前端使用Object表示，因此输出时要转化
 		array_key_exists('meta', $object) && $object['meta'] = (object)$object['meta'];
