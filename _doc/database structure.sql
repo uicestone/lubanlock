@@ -195,6 +195,7 @@ CREATE TABLE IF NOT EXISTS `tag_taxonomy` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tag` int(11) NOT NULL,
   `taxonomy` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
   `description` text,
   `parent` int(11) DEFAULT NULL,
   `count` int(11) NOT NULL,
