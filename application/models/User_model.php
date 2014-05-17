@@ -2,8 +2,7 @@
 class User_model extends Object_model{
 	
 	var $session_id;
-	var $name = '';
-	var $roles = array();
+	var $name = '', $email, $password, $roles = array();
 	var $groups = array();
 	var $group_ids = array();//当前用户所属组的object id，包含当前用户的user id
 	
@@ -16,11 +15,11 @@ class User_model extends Object_model{
 		'last_login'=>NULL
 	);
 	
-	function __construct(){
-		parent::__construct();
+	function __construct($data = null){
+		parent::__construct($data);
 	}
 	
-	function initialize($id=NULL){
+	function initialize($id = null){
 		isset($id) && $this->session_id=$id;
 		
 		if(is_null($this->session_id) && $this->session->userdata('user_id')){
@@ -122,19 +121,22 @@ class User_model extends Object_model{
 	 */
 	function add(array $data, array $args = array()){
 		
-		$data['type'] = 'user';
+		!array_key_exists('type', $data) && $data['type'] = 'user';
 		
 		if(array_key_exists('object', $args)){
 			$insert_id = $args['object'];
+		}
+		elseif($this->id){
+			$insert_id = $this->id;
 		}
 		else{
 			$insert_id = parent::add($data);
 		}
 
-		$data=array_merge(self::$fields,array_intersect_key($data,self::$fields));
+		$data = array_merge(self::$fields, array_intersect_key($data,self::$fields));
 		
-		$data['id']=$insert_id;
-		$data['company']=$this->company->id;
+		$data['id'] = $insert_id;
+		$data['company'] = $this->CI->company->id;
 
 		$this->db->insert('user',$data);
 		
@@ -156,7 +158,7 @@ class User_model extends Object_model{
 		$this->db
 			->from('user')
 			->where('name', $username)
-			->where('company', $this->company->id)
+			->where('company', $this->CI->company->id)
 			->where('password', $password);
 		
 		$user=$this->db->get()->row_array();
