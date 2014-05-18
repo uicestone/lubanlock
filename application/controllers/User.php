@@ -73,10 +73,24 @@ class User extends LB_Controller{
 	
 	function login(){
 		
-		if($this->input->post_get('username') && $this->input->post_get('password')){
+		if(!is_null($this->input->post_get('login'))){
 			$user = $this->user->verify($this->input->get_post('username'), $this->input->get_post('password'));
 			$this->user->sessionLogin($user['id']);
 			redirect();
+		}
+		
+		if(!is_null($this->input->post_get('signup'))){
+
+			$user_id=$this->user->add(array(
+				'name'=>$this->input->post('username'),
+				'password'=>$this->input->post('password'),
+				'email'=>$this->input->post('email')
+			));
+
+			$this->user->sessionLogin($user_id);
+
+			redirect(urldecode($this->input->post('forward')));
+
 		}
 		
 		$this->load->view('login', compact('alert'));
