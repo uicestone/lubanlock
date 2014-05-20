@@ -1,14 +1,28 @@
 /*common*/
-.btn{
-	padding: 3px 15px 4px;
+.btn {
+	padding: 2px 15px;
+}
+
+.btn-xs {
+	padding: 2px 13px;
 }
 
 .pointer-cursur{
 	cursor: pointer;
 }
 
+.row-compact {
+	margin-left: -2px;
+	margin-right: -2px;
+}
+
+.row-compact>.col-xs-1, .row-compact>.col-sm-1, .row-compact>.col-md-1, .row-compact>.col-lg-1, .row-compact>.col-xs-2, .row-compact>.col-sm-2, .row-compact>.col-md-2, .row-compact>.col-lg-2, .row-compact>.col-xs-3, .row-compact>.col-sm-3, .row-compact>.col-md-3, .row-compact>.col-lg-3, .row-compact>.col-xs-4, .row-compact>.col-sm-4, .row-compact>.col-md-4, .row-compact>.col-lg-4, .row-compact>.col-xs-5, .row-compact>.col-sm-5, .row-compact>.col-md-5, .row-compact>.col-lg-5, .row-compact>.col-xs-6, .row-compact>.col-sm-6, .row-compact>.col-md-6, .row-compact>.col-lg-6, .row-compact>.col-xs-7, .row-compact>.col-sm-7, .row-compact>.col-md-7, .row-compact>.col-lg-7, .row-compact>.col-xs-8, .row-compact>.col-sm-8, .row-compact>.col-md-8, .row-compact>.col-lg-8, .row-compact>.col-xs-9, .row-compact>.col-sm-9, .row-compact>.col-md-9, .row-compact>.col-lg-9, .row-compact>.col-xs-10, .row-compact>.col-sm-10, .row-compact>.col-md-10, .row-compact>.col-lg-10, .row-compact>.col-xs-11, .row-compact>.col-sm-11, .row-compact>.col-md-11, .row-compact>.col-lg-11, .row-compact>.col-xs-12, .row-compact>.col-sm-12, .row-compact>.col-md-12, .row-compact>.col-lg-12 {
+	padding-right: 2px;
+	padding-left: 2px;
+}
+
 /*page*/
-.page-content{
+.page-content {
 	padding-top: 16px;
 }
 
@@ -55,6 +69,14 @@
 
 textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"]{
 	line-height: 1.3;
+}
+
+.form-control-xs {
+	height: 28px;
+}
+
+.form-control-justify {
+	width: 100% !important;
 }
 
 .form-control-static{

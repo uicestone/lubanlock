@@ -24,14 +24,20 @@
 					
 				</div>
 
-				<form class="prop-add" ng-show="adding.tag" ng-submit="addTag($event)">
-					<input class="col-sm-3" type="text" placeholder="分类方式" ng-model="new.tag.taxonomy" />
-					<input class="col-sm-5" type="text" placeholder="分类" ng-model="new.tag.term" />
+				<div class="space-2"></div>
+				
+				<form class="form-inline row row-compact" ng-show="adding.tag" ng-submit="addTag($event)">
+					<div class="form-group col-sm-4">
+						<input class="form-control form-control-xs form-control-justify" type="text" class="form-control form-control-xs" placeholder="分类方式" ng-model="new.tag.taxonomy" />
+					</div>
+					<div class="form-group col-sm-4">
+						<input class="form-control form-control-xs form-control-justify" type="text" class="form-control form-control-xs" placeholder="分类" ng-model="new.tag.term" />
+					</div>
 					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('tag')"></button>
 				</form>
 				
-				<button class="btn btn-info btn-xs icon-chevron-right" ng-click="openPropAddForm('tag')" ng-hide="adding.tag"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个分类标签 " ng-click="openPropAddForm('tag')" ng-hide="adding.tag"></button>
 				
 				<div class="hr hr16 dotted"></div>
 				
@@ -44,21 +50,28 @@
 						<div class="profile-info-name"> {{key}} </div>
 
 						<div class="profile-info-value">
-							<span luban-editable="object.meta[key]" object="object" key="key"></span>
+							<span ng-repeat="(index, value) in values">
+								<span luban-editable="object.meta[key][index]" object="object" key="key" value="value"></span>
+								<a class="icon-trash pointer-cursur" ng-click="removeMeta(key, value)"></a>
+							</span>
 							<a class="icon-trash pointer-cursur pull-right" ng-click="removeMeta(key)"></a>
 						</div>
 					</div>
 					
 				</div>
 
-				<form class="prop-add" ng-show="adding.meta" ng-submit="addMeta($event)">
-					<input type="text" placeholder="属性名称" ng-model="new.meta.key" />
-					<input type="text" placeholder="属性值" ng-model="new.meta.value" />
+				<form class="form-inline" ng-show="adding.meta" ng-submit="addMeta($event)">
+					<div class="form-group">
+						<input type="text" class="form-control form-control-xs" placeholder="属性名称" ng-model="new.meta.key" />
+					</div>
+					<div class="form-group">
+						<input type="text" class="form-control form-control-xs" placeholder="属性值" ng-model="new.meta.value" />
+					</div>
 					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('meta')"></button>
 				</form>
 				
-				<button class="btn btn-info btn-xs icon-chevron-right" ng-click="openPropAddForm('meta')" ng-hide="adding.meta"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个元数据" ng-click="openPropAddForm('meta')" ng-hide="adding.meta"></button>
 				
 				<hr>
 
@@ -74,14 +87,18 @@
 					</div>
 				</div>
 				
-				<form class="prop-add" ng-show="adding.relative" ng-submit="addRelative($event)">
-					<input type="text" placeholder="关系" ng-model="new.relationship.relation" />
-					<input type="text" placeholder="关联对象" ng-model="new.relationship.relative" />
+				<form class="form-inline" ng-show="adding.relative" ng-submit="addRelative($event)">
+					<div class="form-group">
+						<input type="text" class="form-control form-control-xs" placeholder="关系" ng-model="new.relationship.relation" />
+					</div>
+					<div class="form-group">
+						<input type="text" class="form-control form-control-xs" placeholder="关联对象" ng-model="new.relationship.relative" />
+					</div>
 					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('relative')"></button>
 				</form>
 
-				<button class="btn btn-info btn-xs icon-chevron-right" ng-click="openPropAddForm('relative')" ng-hide="adding.relative"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个关联对象" ng-click="openPropAddForm('relative')" ng-hide="adding.relative"></button>
 				
 				<hr>
 
@@ -114,14 +131,18 @@
 					</div>
 				</div>
 				
-				<form class="prop-add" ng-show="adding.status" ng-submit="addStatus($event)">
-					<input type="text" placeholder="日期时间" ng-model="new.status.date" datepicker-popup />
-					<input type="text" placeholder="状态名称" ng-model="new.status.name" />
+				<form class="form-inline" ng-show="adding.status" ng-submit="addStatus($event)">
+					<div class="form-group">
+						<input type="text" class="form-control form-control-xs" placeholder="日期时间" ng-model="new.status.date" datepicker-popup />
+					</div>
+					<div class="form-group">
+						<input type="text" class="form-control form-control-xs" placeholder="状态名称" ng-model="new.status.name" />
+					</div>
 					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('status')"></button>
 				</form>
 
-				<button class="btn btn-info btn-xs icon-chevron-right" ng-click="openPropAddForm('status')" ng-hide="adding.status"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个状态" ng-click="openPropAddForm('status')" ng-hide="adding.status"></button>
 				
 			</div>
 		</div>
