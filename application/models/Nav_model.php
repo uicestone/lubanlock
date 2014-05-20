@@ -17,6 +17,13 @@ class Nav_model extends CI_Model{
 		
 	}
 	
+	function fetch($name){
+		return $this->db->from('nav')
+			->where('name', $name)
+			->where_in('user', $this->user->group_ids)
+			->get()->row();
+	}
+	
 	function add(array $data){
 		
 		if(array_key_exists('params', $data)){
@@ -33,13 +40,13 @@ class Nav_model extends CI_Model{
 		return $this->db->insert_id();
 	}
 	
-	function update(array $data, $id){
+	function update(array $data, $where){
 	
 		if(array_key_exists('params', $data)){
 			$data['params'] = json_encode($data['params']);
 		}
 		
-		return $this->db->update('nav', array_intersect_key($data, self::$fields), array('id'=>$id));
+		return $this->db->update('nav', array_intersect_key($data, self::$fields), is_array($where) ? $where : array('id'=>$where));
 	}
 	
 	function get(){
@@ -67,8 +74,8 @@ class Nav_model extends CI_Model{
 		
 	}
 	
-	function remove($id){
-		return $this->db->delete('nav', array('id'=>$id));
+	function remove($where){
+		return $this->db->delete('nav', is_array($where) ? $where : array('name'=>$where));
 	}
 	
 }

@@ -122,7 +122,8 @@
 						
 						<li ng-repeat="item in items">
 							<a ng-click="navigateTo(item)">
-								<i class="icon-{{item.icon}}"></i>
+								<i class="icon-trash" ng-if="removable[item.name]" ng-mouseleave="makeRemovable(item.name, false)" ng-click="remove(item, $event)"></i>
+								<i class="icon-{{item.icon}}" ng-hide="removable[item.name]" ng-mouseenter="makeRemovable(item.name)"></i>
 								<span class="menu-text"> {{item.name}} </span>
 							</a>
 						</li>

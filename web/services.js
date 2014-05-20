@@ -152,22 +152,36 @@ lubanlockServices.factory('Alert', ['$rootScope', '$timeout', function($rootScop
 	};
 }]);
 
-lubanlockServices.factory('Nav', ['$resource',
+lubanlockServices.service('Nav', ['$resource',
 	function($resource){
 		
-		var Resource = $resource('nav', {}, {save: {method: 'POST', isArray: true}});
-		
+		var Resource = $resource('nav/:name', {name:'@name'});
 		var items = Resource.query();
 		
 		return {
 			query: function(){
 				return items;
 			},
-			
-			save: function(item, callback){
+			save: function(data, success){
+				var item = new Resource(data);
 				items.push(item);
-				Resource.save(item, callback);
+				item.$save({}, function(){
+					success();
+				});
+			},
+			remove: function(item, success){
+				var index;
+				for(index in items){
+					if(items[index].name === item.name){
+						items.splice(index, 1);
+					}
+				}
+				
+				item.$remove({}, function(){
+					angular.isFunction(success) && success();
+				});
 			}
-		}
+		};
+		
 	}
 ]);

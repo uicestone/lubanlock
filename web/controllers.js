@@ -37,6 +37,18 @@ lubanlockControllers.controller('NavCtrl', ['$scope', 'Nav', 'UserConfig', '$loc
 		$scope.navigateTo = function(item){
 			$location.path(item.template || 'list').search(item.params);
 		}
+		
+		$scope.removable = {};
+		
+		$scope.makeRemovable = function(item, value){
+			value = value === undefined ? true : value;
+			$scope.removable[item] = value;
+		}
+		
+		$scope.remove = function(item, event){
+			event.stopPropagation();
+			Nav.remove(item);
+		}
 	}
 ]);
 
@@ -81,7 +93,7 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'obje
 		}
 		
 		$scope.addNavItem = function(){
-			Nav.save({name: $scope.newNavItemName, template:$scope.newNavItemTemplate, params: $location.search()}, function(){
+			Nav.save({name: $scope.newNavItemName, template: $scope.newNavItemTemplate, params: $location.search()}, function(){
 				$scope.showNavSaveForm = false;
 				$scope.newNavItemName = $scope.newNavItemTemplate = null;
 			});
@@ -94,7 +106,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'Obje
 	function($scope, objectResponse, ObjectMeta, ObjectRelative, ObjectStatus, ObjectTag, $location) {
 		
 		if(objectResponse){
-			$scope.object = objectResponse.data;
+			$scope.object = objectResponse.resource;
 			$scope.headers = objectResponse.headers();
 		}
 		
@@ -127,7 +139,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'Obje
 				$scope.object.meta[$scope['new'].meta.key].push($scope['new'].meta.value);
 			
 				$scope['new'].meta.value = undefined;
-				angular.element($event.target).children(':input:first').trigger('select');
+				angular.element($event.target).find(':input:first').trigger('select');
 			});
 			
 		}

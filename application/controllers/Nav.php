@@ -5,9 +5,10 @@ class Nav extends LB_Controller{
 		$this->load->model('nav_model','nav');
 	}
 	
-	function index($id = NULL){
+	function index($name = NULL){
 		switch($this->input->method){
 			case 'GET':
+				$this->get();
 				break;
 			
 			case 'POST':
@@ -15,31 +16,30 @@ class Nav extends LB_Controller{
 				break;
 				
 			case 'PUT':
-				$this->update($id);
+				$this->update($name);
 				break;
 				
 			case 'DELETE':
-				$this->remove($id);
+				$this->remove($name);
 				break;
 		}
 		
-		$this->get($id);
-
 	}
 	
-	function get(){
-		$this->output->set_output($this->nav->get());
+	function get($name = null){
+		$this->output->set_output(is_null($name) ? $this->nav->get() : $this->nav->fetch($name));
 	}
 	
 	function add(){
 		$this->nav->add($this->input->data());
+		$this->output->set_output($this->nav->fetch($this->input->data('name')));
 	}
 	
-	function update($id){
-		$this->nav->update($this->input->data, $id);
+	function update($name){
+		$this->nav->update($this->input->data, array('name'=>$name));
 	}
 	
-	function remove($id){
-		$this->nav->remove($id);
+	function remove($name){
+		$this->nav->remove(array('name'=>$name));
 	}
 }

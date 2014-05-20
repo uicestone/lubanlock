@@ -69,7 +69,7 @@ class Company_model extends Object_model{
 					return $json_value;
 				}
 			}else{
-				return false;
+				return;
 			}
 		}
 		else{

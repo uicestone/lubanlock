@@ -78,10 +78,7 @@ $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
-$route['login']='user/login';
-$route['logout']='user/logout';
-$route['profile']='user/profile';
-$route['signup']='user/signup';
+$route['(login|logout|profile|signup)']='user/$1';
 $route['user/(:num)']='user/index/$1';
 
 $route['object/(:num)']='object/index/$1';
@@ -95,6 +92,8 @@ $route['object/(:num)/tag']='object/tag/$1';
 $route['object/(:num)/tag/(:any)']='object/tag/$1/$2';
 $route['object/(:num)/permission']='object/permission/$1';
 $route['object/(:num)/(authorize|prohibit)/(read|write|grant)']='object/permission/$1/$2/$3';
+
+$route['nav/(:any)'] = 'nav/index/$1';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

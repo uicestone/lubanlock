@@ -3,8 +3,9 @@ class Object_model extends CI_Model{
 	
 	var $id,
 		$name, $type, $num, $company, $user, $time, $time_insert,
-		$meta, $relative, $status, $tag,
-		$CI;
+		$meta, $relative, $status, $tag;
+	
+	protected $CI;
 	
 	static $fields=array(
 		'name'=>NULL,
@@ -509,12 +510,16 @@ class Object_model extends CI_Model{
 				}
 			}
 			//页码-每页数量方式，转换为sql limit
-			$args['limit'] = array($args['per_page'],($args['page']-1)*$args['per_page']);
+			$args['limit'] = array($args['per_page'], ($args['page'] - 1) * $args['per_page']);
 		}
 		
 		if(!array_key_exists('limit', $args)){
 			//默认limit
 			$args['limit'] = $this->CI->company->config('per_page');
+			
+			if(is_null($args['limit'])){
+				$args['limit'] = 25;
+			}
 		}
 		
 		if(is_array($args['limit'])){
@@ -522,11 +527,11 @@ class Object_model extends CI_Model{
 			call_user_func_array(array($this->db,'limit'), $args['limit']);
 		}
 		elseif(count(preg_split('/,\s*/',$args['limit'])) === 2){
-			$args['limit'] = preg_split('/,\s*/',$args['limit']);
+			$args['limit'] = preg_split('/,\s*/', $args['limit']);
 			call_user_func_array(array($this->db,'limit'), $args['limit']);
 		}
 		else{
-			call_user_func(array($this->db,'limit'), $args['limit']);
+			call_user_func(array($this->db, 'limit'), $args['limit']);
 		}
 		
 		$result_array=$this->db->get()->result_array();
