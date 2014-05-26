@@ -243,7 +243,7 @@ class CI_Output {
 		}
 
 		$header = 'Content-Type: '.$mime_type
-			.(empty($charset) ? NULL : '; charset='.$charset);
+			.(empty($charset) ? '' : '; charset='.$charset);
 
 		$this->headers[] = array($header, TRUE);
 		return $this;
@@ -556,7 +556,7 @@ class CI_Output {
 
 		$cache_path .= md5($uri);
 
-		if ( ! $fp = @fopen($cache_path, FOPEN_WRITE_CREATE_DESTRUCTIVE))
+		if ( ! $fp = @fopen($cache_path, 'w+b'))
 		{
 			log_message('error', 'Unable to write cache file: '.$cache_path);
 			return;
@@ -607,7 +607,7 @@ class CI_Output {
 
 		if (is_int($result))
 		{
-			@chmod($cache_path, FILE_WRITE_MODE);
+			@chmod($cache_path, 0666);
 			log_message('debug', 'Cache file written: '.$cache_path);
 
 			// Send HTTP cache-control headers to browser to match file cache settings.
@@ -640,7 +640,7 @@ class CI_Output {
 		$uri =	$CFG->item('base_url').$CFG->item('index_page').$URI->uri_string;
 		$filepath = $cache_path.md5($uri);
 
-		if ( ! file_exists($filepath) OR ! $fp = @fopen($filepath, FOPEN_READ))
+		if ( ! file_exists($filepath) OR ! $fp = @fopen($filepath, 'rb'))
 		{
 			return FALSE;
 		}
