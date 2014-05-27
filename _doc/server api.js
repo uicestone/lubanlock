@@ -44,6 +44,8 @@ var relative = {
 			}
 		}
 	]
+} | {
+	"relation": ["{id}"]
 };
 
 /*
@@ -56,7 +58,9 @@ var status = [
 		"date":"1970-01-01 00:00:00",
 		"comment":""
 	}
-];
+] | {
+	"{name}":"{date}"
+};
 
 /*
  * 一个对象的标签，用于搜索和分类
@@ -75,13 +79,7 @@ var api = [
 		"request":{
 			"method":"GET",
 			"path":"/object/" + object.id,
-			"query":{
-				"with_meta":true | getMetaArgs,
-				"with_relative":true | getStatusArgs,
-				"with_status":true,
-				"with_tag":true,
-				"with":["meta","relative","status","tag"]
-			}
+			"query":args.getObjectProperty
 		},
 		"response":{
 			"contentType":"application/json",/*contentType默认都为application/json*/
@@ -114,7 +112,7 @@ var api = [
 		"name":"获取对象列表",
 		"request":{
 			"path":"/object",
-			"query":listArgs
+			"query":args.getList + args.objectField + args.algorithm + args.logical
 		},
 		"response":{
 			"headers":{
@@ -164,6 +162,7 @@ var api = [
 		}
 	},
 	{
+		// 暂未实现
 		"name":"推荐的meta.name",
 		"request":{
 			"method":"GET",
@@ -211,6 +210,7 @@ var api = [
 		}
 	},
 	{
+		// 暂未实现
 		"name":"推荐的status.name",
 		"request":{
 			"method":"GET",
@@ -248,6 +248,7 @@ var api = [
 		}
 	},
 	{
+		// 暂未实现
 		"name":"推荐的relative.relation",
 		"request":{
 			"method":"GET",
@@ -336,15 +337,12 @@ var api = [
 			"path":"/nav",
 		},
 		"response":{
-			"header":{
-				"contentType":"application/json"
-			},
 			"body":[
 				{
-					"id":1,
+					"id":"",
 					"name":"潜在客户",//菜单的显示名称
-					"params":{//由前端自行决定，json存数据库
-						"controller":"List",
+					"template":"",
+					"params":{
 						"type":"客户",
 						"tag":["潜在客户"]
 					},
@@ -356,7 +354,7 @@ var api = [
 	{
 		"name":"菜单存储",
 		"request":{
-			"method":"PUT/POST",
+			"method":"POST",
 			"path":"/nav",
 			"body":[
 				{
@@ -366,7 +364,7 @@ var api = [
 						"type":"客户",
 						"tag":["潜在客户"]
 					},
-					"parent":0
+					"parent":""
 				}
 			]
 		}
@@ -374,10 +372,10 @@ var api = [
 	{
 		"name":"菜单更新",
 		"request":{
-			"method":"POST",
+			"method":"PUT",
 			"path":"/nav",
 			"query":{
-				"id":1
+				"name":""
 			},
 			"body":[
 				{
@@ -387,7 +385,7 @@ var api = [
 						"type":"客户",
 						"tag":["潜在客户"]
 					},
-					"parent":0
+					"parent":""
 				}
 			]
 		}
@@ -398,36 +396,22 @@ var api = [
 			"method":"DELETE",
 			"path":"/nav",
 			"query":{
-				"id":1
+				"name":""
 			}
 		}
 	}
 ];
 
 /**
- * 对象列表搜索参数
+ * API中涉及的所有通用的参数
  */
-var listArgs = "{value}"/*直接匹配一个值，默认匹配的键为object.id*/ | ["{value}"]/*作为{in:[]}处理*/ | {
-	"search":"",//智能搜索
-	"id":0,//根据id获得对象
-	"name":listArgs,//usage: {"name":"Jason"}, {"name":["Jason","Mike","Marry"]}, {"name":{"in":["Jason","Mike","Marry"]}}
-	"type":listArgs,
-	"num":listArgs,
-	"time":listArgs,
-	"user":listArgs,
-	"meta":{"{key}": listArgs} | [listArgs],//前一种按键-值对搜索，后一种按键名
-	"status":{"{name}": listArgs} | [listArgs],//前一种按状态-时间对搜索，后一种按状态名
-	"tag":{"{taxonomy}": listArgs} | [listArgs],//前一种按分类方式-分类搜索，后一种按分类
-	"is_relative_of":{"{role}": listArgs} | [listArgs],//前一种按关系-关联对象搜索，后一种按关联对象
-	"has_relative_like":{"{role}": listArgs} | [listArgs],//前一种按关系-关联对象搜索，后一种按关联对象
-	"and, or":listArgs,//逻辑运算，如{"or":{"name":{"in":["A", "B"]}, "name":{"nin":["C","D"]}}。
-	"gt, gte, lt, lte, ne":"{value}",//算数运算
-	"in, nin":["{value}"],//in 或 not in
+var args = {};
 
-	"with_meta":false | getMetaArgs,
-	"with_relative":false | getRelativeArgs,
-	"with_status":false | getStatusArgs,
-	"with_tag":false | getTagArgs,
+/**
+ * 获得列表的基本参数，这些参数是不具有递归属性的
+ */
+args.getList = {
+	"search":"",//智能搜索
 
 	"order_by":[//支持2种格式
 		"id desc",
@@ -448,11 +432,73 @@ var listArgs = "{value}"/*直接匹配一个值，默认匹配的键为object.id
 	]
 };
 
-var getMetaArgs = {
+/**
+ * 获取单个对象或对象列表时，指定是否获取这些对象的扩展属性
+ * 对于获取单个对象，这些属性默认都是获取的，在对象列表中，默认都是不获取的
+ * 不仅可以指定true|false，还可以接受参数，来控制获得属性的行为，如返回属性的格式
+ */
+args.getObjectProperty = {
+	"with_meta":true | args.getMeta,
+	"with_relative":true | args.getRelative,
+	"with_status":true | args.getStatus,
+	"with_tag":true | args.getTag,
+	"with_permission":true | args.getPermission,
+	"with":["meta","relative","status","tag","permission"] | {
+		"meta": true | args.getMeta,
+		"relative": true | args.getRelative,
+		"status": true | args.getStatus,
+		"tag": true | args.getTag,
+		"permission": true | args.getPermission
+	}
+}
+
+/**
+ * 对象字段参数
+ */
+args.objectField = {
+	"id": args.algorithm + args.logical,
+	"name": args.algorithm + args.logical,//usage: {"name":"Jason"}, {"name":["Jason","Mike","Marry"]}, {"name":{"in":["Jason","Mike","Marry"]}}
+	"type": args.algorithm + args.logical,
+	"num": args.algorithm + args.logical,
+	"time": args.algorithm + args.logical,
+	"user": args.algorithm + args.logical,
+	"meta":{"{key}": args.algorithm + args.logical} | [args.algorithm],//前一种按键-值对搜索，后一种按键名
+	"status":{"{name}": args.algorithm + args.logical} | [args.algorithm],//前一种按状态-时间对搜索，后一种按状态名
+	"tag":{"{taxonomy}": args.algorithm + args.logical} | [args.algorithm],//前一种按分类方式-分类搜索，后一种按分类
+	"is_relative_of":{"{role}": args.objectField} | [args.objectField],//前一种按关系-关联对象搜索，后一种按关联对象
+	"has_relative_like":{"{role}": args.objectField} | [args.objectField]//前一种按关系-关联对象搜索，后一种按关联对象
+}
+
+/**
+ * 逻辑运算参数
+ */
+args.logical = {
+	"and": args.objectField,//逻辑运算，如{"or":{"name":{"in":["A", "B"]}, "name":{"nin":["C","D"]}}。
+	"or": args.objectField
+};
+
+/**
+ * 算数比较运算参数
+ */
+args.algorithm = "{value}"/*直接匹配一个值，默认匹配的键为object.id*/ | ["{value}"]/*作为{in:[]}处理*/ | {
+	"gt":"{value}",
+	"gte":"{value}",
+	"lt":"{value}",
+	"lte":"{value}",
+	"ne":"{value}",
+	"in":["{value}"],
+	"nin":["{value}"]
+};
+
+args.getMeta = {
 	as_rows: false
 }
 
-var getStatusArgs = {
+args.getStatus = {
+	as_rows: false
+}
+
+args.getRelative = {
 	as_rows: false,
 	id_only: false,
 	include_disabled: false,
