@@ -6,7 +6,7 @@
  *  对象数据结构
  */
 var object = {
-	"id":0,
+	"id":"",
 	"type":"",//类型，如"人员", "联系人", "案件", "事务"
 	"num":"",//编号，字符串
 	"name":"",//显示名称
@@ -14,7 +14,8 @@ var object = {
 	"relative":relative,
 	"status":status,
 	"tag":tag,
-	"user":0,
+	"permission":permission,
+	"user":"",
 	"time":"1970-01-01 00:00:00",
 	"time_insert":"1970-01-01 00:00:00"
 };
@@ -34,10 +35,10 @@ var meta = {
 var relative = {
 	"{relation}": [
 		{
-			"id": 0,
-			"type":"",//关联对象的object.type
-			"name": "",//关联对象的object.name
-			"num":"",//关联对象的object.num
+			"id": object.id,
+			"type":object.type,//关联对象的object.type
+			"name": object.name,//关联对象的object.name
+			"num":object.num,//关联对象的object.num
 			"relationship_num":"",//关系的编号
 			meta:{//关系的元数据
 				"{key}":"{value}"
@@ -45,7 +46,7 @@ var relative = {
 		}
 	]
 } | {
-	"relation": ["{id}"]
+	"relation": [object.id]
 };
 
 /*
@@ -69,13 +70,34 @@ var tag = {
 	"{taxonomy}": ["{term1}","{term2}"]
 };
 
+var permission = {
+	"read":[user.id],
+	"write":[user.id],
+	"grant":[user.id]
+}
+
+var user = {
+	"roles":[],
+	"email":""
+} + object;
+
+var navItem = {
+	"id":"",
+	"name":"",
+	"template":"",
+	"params":{
+		
+	},
+	"order":0,
+	"subnav":navItem
+}
+
 /**
  * server api
  */
-var api = [
+var api = {
 	/*整个对象的CURD*/
-	{
-		"name":"获取单个对象",
+	"获取单个对象":{
 		"request":{
 			"method":"GET",
 			"path":"/object/" + object.id,
@@ -86,8 +108,7 @@ var api = [
 			"body":object
 		}
 	},
-	{
-		"name":"创建单个对象",
+	"创建单个对象":{
 		"request":{
 			"method":"PUT/POST",
 			"path":"/object",
@@ -97,8 +118,7 @@ var api = [
 			"body":object
 		}
 	},
-	{
-		"name":"更新单个对象",
+	"更新单个对象":{
 		"request":{
 			"method":"PUT",
 			"path":"/object/" + object.id,
@@ -108,8 +128,7 @@ var api = [
 			"body":object
 		}
 	},
-	{
-		"name":"获取对象列表",
+	"获取对象列表":{
 		"request":{
 			"path":"/object",
 			"query":args.getList + args.objectField + args.algorithm + args.logical
@@ -131,8 +150,7 @@ var api = [
 	/*
 	 * meta
 	 */
-	{
-		"name":"为一个对象添加一个元数据",
+	"为一个对象添加一个元数据":{
 		"request":{
 			"method":"POST",
 			"path":"/object/" + object.id + "/meta/" + meta.key,
@@ -143,8 +161,7 @@ var api = [
 			"body":meta//all meta key-values of the object
 		}
 	},
-	{
-		"name":"更新对象的一个元数据",
+	"更新对象的一个元数据":{
 		"request":{
 			"method":"PUT",
 			"path":"/object/" + object.id + "/meta/" + meta.key,
@@ -152,8 +169,7 @@ var api = [
 			"body":value
 		}
 	},
-	{
-		"name":"删除一个对象的一个元数据",
+	"删除一个对象的一个元数据":{
 		"request":{
 			"method":" DELETE",
 			"path":"/object/" + object.id + "/meta/" + meta.key,
@@ -161,9 +177,8 @@ var api = [
 			"query":meta//with "id" or some attributes for resource locating
 		}
 	},
-	{
+	"推荐的meta.name":{
 		// 暂未实现
-		"name":"推荐的meta.name",
 		"request":{
 			"method":"GET",
 			"path":"meta/name",
@@ -180,8 +195,7 @@ var api = [
 	/*
 	 * status
 	 */
-	{
-		"name":"为一个对象添加一个状态",
+	"为一个对象添加一个状态":{
 		"request":{
 			"method":"POST",
 			"path":"/object/" + object.id + "/status/" + status.name,
@@ -192,8 +206,7 @@ var api = [
 			"body":status
 		}
 	},
-	{
-		"name":"更新对象的一个状态",
+	"更新对象的一个状态":{
 		"request":{
 			"method":"PUT",
 			"path":"/object/" + object.id + "/status/" + status.name,
@@ -201,17 +214,15 @@ var api = [
 			"body":status
 		}
 	},
-	{
-		"name":"删除一个对象的一个状态",
+	"删除一个对象的一个状态":{
 		"request":{
 			"method":" DELETE",
 			"path":"/object/" + object.id + "/status/" + status.name,
 			"query":{},
 		}
 	},
-	{
+	"推荐的status.name":{
 		// 暂未实现
-		"name":"推荐的status.name",
 		"request":{
 			"method":"GET",
 			"path":"status/name",
@@ -228,8 +239,7 @@ var api = [
 	/*
 	 * relative
 	 */
-	{
-		"name":"为一个对象添加或更新一个相关对象",
+	"为一个对象添加或更新一个相关对象":{
 		"request":{
 			"method":"POST",
 			"path":"/object/" + object.id + "/relative/" + relative.role,
@@ -239,17 +249,15 @@ var api = [
 		"response":relative
 
 	},
-	{
-		"name":"删除一个对象的一个相关对象",
+	"删除一个对象的一个相关对象":{
 		"request":{
 			"method":" DELETE",
 			"path":"/object/" + object.id + "/relative/" + relative.role,
 			"query":{}
 		}
 	},
-	{
+	"推荐的relative.relation":{
 		// 暂未实现
-		"name":"推荐的relative.relation",
 		"request":{
 			"method":"GET",
 			"path":"relative/relation",
@@ -268,8 +276,7 @@ var api = [
 	/*
 	 * tag
 	 */
-	{
-		"name":"为一个对象设置标签",
+	"为一个对象设置标签":{
 		"request":{
 			"method":"POST",
 			"path":"/object/" + object.id + "/tag/" + tag.taxonomy,
@@ -280,8 +287,7 @@ var api = [
 		}
 
 	},
-	{
-		"name":"推荐的tag.name",
+	"推荐的tag.name":{
 		"request":{
 			"method":"GET",
 			"path":"tag/name",
@@ -298,16 +304,19 @@ var api = [
 	/**
 	 * permission
 	 */
-	{
-		"name":"为一个对象设置权限"
+	"为一个对象设置权限":{
+		"request":{
+			"method":"POST",
+			"path":"/object/" + object.id + ("/authorize" | "/prohibit") + ("/read" | "/write" | "/grant"),
+			"body":user.id | [user.id]
+		}
 	},
 	
 	
 	/*
 	 * 其他api
 	 */
-	{
-		"name":"用户登录",
+	"用户登录":{
 		"request":{
 			"method":"GET/POST",
 			"path":"/login",
@@ -318,21 +327,18 @@ var api = [
 			}
 		}
 	},
-	{
-		"name":"用户登出",
+	"用户登出":{
 		"request":{
 			"method":"GET",
 			"path":"/logout"
 		}
 	},
-	{
-		"name":"页面框架",
+	"页面框架":{
 		"request":{
 			"path":"/"
 		}
 	},
-	{
-		"name":"导航菜单",
+	"导航菜单":{
 		"request":{
 			"path":"/nav",
 		},
@@ -346,13 +352,12 @@ var api = [
 						"type":"客户",
 						"tag":["潜在客户"]
 					},
-					"parent":0
+					"parent":""
 				}
 			]
 		}
 	},
-	{
-		"name":"菜单存储",
+	"菜单存储":{
 		"request":{
 			"method":"POST",
 			"path":"/nav",
@@ -369,8 +374,7 @@ var api = [
 			]
 		}
 	},
-	{
-		"name":"菜单更新",
+	"菜单更新":{
 		"request":{
 			"method":"PUT",
 			"path":"/nav",
@@ -390,8 +394,7 @@ var api = [
 			]
 		}
 	},
-	{
-		"name":"菜单删除",
+	"菜单删除":{
 		"request":{
 			"method":"DELETE",
 			"path":"/nav",
@@ -400,7 +403,7 @@ var api = [
 			}
 		}
 	}
-];
+};
 
 /**
  * API中涉及的所有通用的参数
