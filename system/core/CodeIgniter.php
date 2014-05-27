@@ -468,7 +468,11 @@ if ( ! is_php('5.4'))
 	catch(Exception $exception){
 		$OUT->set_status_header($exception->getCode(), lang($exception->getMessage()));
 		if(!$IN->accept('application/json')){
-			show_error(lang($exception->getMessage()), $exception->getCode());
+			if(in_array(ENVIRONMENT, array('testing', 'production'))){
+				show_error(lang($exception->getMessage()), $exception->getCode());
+			}elseif(ENVIRONMENT === 'development'){
+				_exception_handler(E_ERROR, lang($exception->getMessage()), $exception->getFile(), $exception->getLine());
+			}
 		}
 	}
 
@@ -490,7 +494,11 @@ if ( ! is_php('5.4'))
 	catch(Exception $exception){
 		$OUT->set_status_header($exception->getCode(), lang($exception->getMessage()));
 		if(!$IN->accept('application/json')){
-			show_error(lang($exception->getMessage()), $exception->getCode());
+			if(in_array(ENVIRONMENT, array('testing', 'production'))){
+				show_error(lang($exception->getMessage()), $exception->getCode());
+			}elseif(ENVIRONMENT === 'development'){
+				_exception_handler(E_ERROR, lang($exception->getMessage()), $exception->getFile(), $exception->getLine());
+			}
 		}
 	}
 
