@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `object_meta_permission` (
 CREATE TABLE IF NOT EXISTS `object_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object` int(11) NOT NULL,
-  `user` int(11) DEFAULT NULL,
+  `user` int(11) NOT NULL,
   `read` tinyint(1) NOT NULL DEFAULT '0',
   `write` tinyint(1) NOT NULL DEFAULT '0',
   `grant` tinyint(1) NOT NULL DEFAULT '0',
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS `object_relationship` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object` int(11) NOT NULL,
   `relative` int(11) NOT NULL,
-  `relation` varchar(255) DEFAULT '',
+  `relation` varchar(255) NOT NULL,
   `is_on` tinyint(1) DEFAULT NULL,
   `num` varchar(255) NOT NULL DEFAULT '',
   `user` int(11) DEFAULT NULL,

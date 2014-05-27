@@ -3,6 +3,7 @@ class Test extends LB_Controller{
 	function __construct() {
 		parent::__construct();
 		$this->load->library('unit_test');
+		$this->output->enable_profiler();
 	}
 	
 	function index(){
@@ -11,16 +12,14 @@ class Test extends LB_Controller{
 	
 	function object(){
 		
-		$this->db->delete('object', array('type'=>'test'));
+		$this->db->delete('object', array('num'=>'_test'));
 		$this->tag->calibrateCount();
 		
 		// insert an object
 		$object_1 = new Object_model(array(
 			'name'=>'大灰',
-			'type'=>'test',
-			'password'=>'myPassword',
-			'email'=>'dusty.com',
-			'role'=>'admin,test',
+			'type'=>'user',
+			'num'=>'_test',
 			'meta'=>array(
 				array('key'=>'身份证号','value'=>'123456789012345678','unique'=>true),
 				array('key'=>'手机','value'=>'12345678901'),
@@ -32,22 +31,33 @@ class Test extends LB_Controller{
 			),
 			'tag'=>array(
 				'性别'=>'男'
-			)
+			),
 		));
 		$this->unit->run($object_1->name, '大灰', 'insert an object');
 		
 		// insert a user based on an object
-		$user_1_id = $this->user->add(array('name'=>'大灰'), array('object'=>$object_1->id));
+		$user_1_id = $this->user->add(array(
+			'name'=>'大灰',
+			'password'=>'myPassword',
+			'email'=>'dusty@test.com',
+			'roles'=>'admin,test',
+		), array('object'=>$object_1->id));
 		$user_1 = new User_model($user_1_id);
 		$this->unit->run($user_1->name === '大灰' && $user_1_id === $object_1->id, true, 'insert a user based on an object');
+
+		// insert a group, add user to the group
+		$this->user->add(array('name'=>'男人帮', 'type'=>'group', 'num'=>'_test', 'roles'=>'man', 'relative'=>array($object_1->id)));
+		$this->user->initialize($object_1->id);
+		$this->unit->run(in_array('man', $this->user->roles), true, 'insert a group, add user to the group', 'Group role should exists in user role.');
 		
 		// insert a user and the base object at once
 		$user_2 = new User_model(array(
 			'name'=>'大鱼',
-			'type'=>'test',
+			'type'=>'user',
+			'num'=>'_test',
 			'password'=>'myPassword',
 			'email'=>'fish@test.com',
-			'role'=>'admin,test',
+			'roles'=>'admin,test',
 			'meta'=>array(
 				array('key'=>'身份证号','value'=>'123456789012345678','unique'=>true),
 				array('key'=>'手机','value'=>'12345678901'),
@@ -63,6 +73,8 @@ class Test extends LB_Controller{
 		));
 		$this->unit->run($user_2->name === '大鱼', true, 'insert a user and the base object at once');
 		
+		$this->user->add(array('name'=>'女儿国', 'type'=>'group', 'num'=>'_test', 'roles'=>'girl', 'relative'=>array($user_2->id)));
+		
 		// insert meta
 		$object_1->addMeta('爱好', '桌球');
 		$object_1->addMeta('爱好', '编程');
@@ -72,7 +84,7 @@ class Test extends LB_Controller{
 		$object_1->addMeta('年龄', 21, true);
 		try{$object_1->addMeta('年龄', 80, true);}catch(Exception $e){$error = $e->getCode();}
 		$object_1->getMeta();
-		$this->unit->run($object_1->meta['年龄'] === array('21') && $error === 400, true, 'insert unique meta');
+		$this->unit->run($object_1->meta['年龄'] === array('21') && $error === 400, true, 'insert unique meta');unset($error);
 		
 		$object_1->addMeta(array(
 			array('key'=>'工作单位', 'value'=>'Allstar', 'unique'=>true),
@@ -152,7 +164,7 @@ class Test extends LB_Controller{
 		$this->unit->run(array_key_exists('登录', $object_1->status), false, 'remove status');
 		
 		// insert relative
-		$object_1->addRelative('同学', $user_2->id, 0, array('自从'=>'初中','直到'=>'现在'));
+		$object_1->addRelative('同学', $user_2->id, 1, array('自从'=>'初中', '直到'=>'现在'));
 		$object_1->getRelative();
 		$this->unit->run($object_1->relative['同学'][0]['name'], '大鱼', 'insert relative');
 		
@@ -163,6 +175,18 @@ class Test extends LB_Controller{
 		$object_1->setRelativeMeta('同学', $user_2->id, '自从', null);
 		$object_1->getRelative();
 		$this->unit->run(array_key_exists('自从', $object_1->relative['同学'][0]['meta']), false, 'remove relative meta');
+		
+		// read public object as user not logged in
+		$this->user->initialize();
+		$object_1->fetch();
+		$this->unit->run($object_1->name, '大灰', 'reading public object without logged in');
+		
+		// reading private object without logged in
+		$this->user->initialize($user_1->id);
+		$object_1->authorize('private');
+		$this->user->initialize();
+		try{$object_1->fetch();}catch(Exception $e){$error = $e->getCode();}
+		$this->unit->run($error, 403, 'reading private object without logged in');
 		
 		$this->output->set_output($this->unit->report());
 	}

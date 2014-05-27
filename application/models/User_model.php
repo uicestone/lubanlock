@@ -8,31 +8,36 @@ class User_model extends Object_model{
 	
 	static $fields=array(
 		'name'=>'',
-		'email'=>'',
+		'email'=>null,
 		'password'=>'',
 		'roles'=>'',
 		'last_ip'=>'',
-		'last_login'=>NULL
+		'last_login'=>null
 	);
 	
-	function __construct($data = null){
-		parent::__construct($data);
+	function __construct($data = null, array $args = array()){
+		parent::__construct($data, $args);
 	}
 	
 	function initialize($id = null){
-		isset($id) && $this->session_id=$id;
+		
+		$this->session_id = null;
+		$this->group_ids = array();
+		$this->groups = array();
+		
+		isset($id) && $this->session_id = intval($id);
 		
 		if(is_null($this->session_id) && $this->session->userdata('user_id')){
-			$this->session_id=intval($this->session->userdata('user_id'));
+			$this->session_id = intval($this->session->userdata('user_id'));
 		}
 		
 		if(!$this->session_id){
 			return;
 		}
 		
-		$user=$this->fetch($this->session_id, array('with_meta'=>false, 'with_status'=>false, 'with_relative'=>false, 'with_tag'=>false), false);
+		$user = $this->fetch($this->session_id, array('with'=>null), false);
 		
-		$this->name=$user['name'];
+		$this->name = $user['name'];
 		
 		$this->roles = $this->_parse_roles($user['roles']);
 		
@@ -64,6 +69,11 @@ class User_model extends Object_model{
 		}
 	}
 	
+	/**
+	 * 
+	 * @todo 应当避免掉入死循环
+	 * @todo 应当在数据库建立缓存
+	 */
 	function _get_parent_group($children = array()){
 
 		$parents = $this->getList(array(
@@ -72,7 +82,7 @@ class User_model extends Object_model{
 		));
 		
 		$this->groups = array_merge($this->groups, $parents['data']);
-		$parent_group_ids = array_column($parents['data'], 'id');
+		$parent_group_ids = array_map('intval', array_column($parents['data'], 'id'));
 		$this->group_ids = array_merge($this->group_ids, $parent_group_ids);
 		
 		$this->roles = array_merge($this->roles, array_reduce(
@@ -88,19 +98,20 @@ class User_model extends Object_model{
 		
 	}
 
-	function fetch($id=null, array $args = array(), $permission_check = true){
+	function fetch($id = null, array $args = array(), $permission_check = true){
 		
 		if(is_null($id)){
-			$id=$this->id;
-		}
-		elseif(!array_key_exists('set_id', $args) || $args['set_id']){
-			$this->id=$id;
+			$id = $this->id;
 		}
 		
 		$object = parent::fetch($id, $args, $permission_check);
 		
 		$user = $this->db->select('user.id, user.name, user.email, user.roles, user.last_ip, user.last_login')->from('user')->where('id', $id)->get()->row_array();
 		
+		if(!$user){
+			throw new Exception(lang('user').' '.$id.' '.lang('not_found'), 404);
+		}
+
 		return array_merge($object, $user);
 	}
 	
@@ -125,9 +136,6 @@ class User_model extends Object_model{
 		
 		if(array_key_exists('object', $args)){
 			$insert_id = $args['object'];
-		}
-		elseif($this->id){
-			$insert_id = $this->id;
 		}
 		else{
 			$insert_id = parent::add($data);
