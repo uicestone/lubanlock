@@ -15,7 +15,7 @@ var object = {
 	"status":status,
 	"tag":tag,
 	"permission":permission,
-	"user":"",
+	"user":user.id,
 	"time":"1970-01-01 00:00:00",
 	"time_insert":"1970-01-01 00:00:00"
 };
@@ -26,7 +26,12 @@ var object = {
  */
 var meta = {
 	"{key}": ["{value1}", "{value2}"]
-};
+} | [metaRow];
+
+var metaRow = {
+	"key":"",
+	"value":""
+}
 
 /**
  * 关联对象
@@ -46,22 +51,22 @@ var relative = {
 		}
 	]
 } | {
-	"relation": [object.id]
+	"{relation}": [object.id]
 };
 
 /*
  * 一个对象的各种与时间有关的状态
  * 如，案件的立案时间，帐目的应收帐款时间，日程的底线时间
  */
-var status = [
-	{
-		"name":"",
-		"date":"1970-01-01 00:00:00",
-		"comment":""
-	}
-] | {
+var status = {
 	"{name}":"{date}"
-};
+} | [statusRow];
+
+var statusRow = {
+	"name":"",
+	"date":"1970-01-01 00:00:00",
+	"comment":""
+}
 
 /*
  * 一个对象的标签，用于搜索和分类
@@ -80,6 +85,8 @@ var user = {
 	"roles":[],
 	"email":""
 } + object;
+
+var nav = [navItem];
 
 var navItem = {
 	"id":"",
@@ -110,7 +117,7 @@ var api = {
 	},
 	"创建单个对象":{
 		"request":{
-			"method":"PUT/POST",
+			"method":"POST",
 			"path":"/object",
 			"body":object//without id, uid, time, timeinsert attributes
 		},
@@ -135,7 +142,7 @@ var api = {
 		},
 		"response":{
 			"headers":{
-				"Total-Objects":1000,//去除分页参数后的对象数目
+				"Status-Text":""// 一个经过JSON编码的HTTP StatusText字符串
 			},
 			"body":[
 				object
@@ -153,7 +160,7 @@ var api = {
 	"为一个对象添加一个元数据":{
 		"request":{
 			"method":"POST",
-			"path":"/object/" + object.id + "/meta/" + meta.key,
+			"path":"/object/" + object.id + "/meta/" + metaRow.key,
 			"query":{},
 			"body":value//without "id" attribute
 		},
@@ -164,7 +171,7 @@ var api = {
 	"更新对象的一个元数据":{
 		"request":{
 			"method":"PUT",
-			"path":"/object/" + object.id + "/meta/" + meta.key,
+			"path":"/object/" + object.id + "/meta/" + metaRow.key,
 			"query":{},
 			"body":value
 		}
@@ -172,9 +179,8 @@ var api = {
 	"删除一个对象的一个元数据":{
 		"request":{
 			"method":" DELETE",
-			"path":"/object/" + object.id + "/meta/" + meta.key,
-			"query":{},
-			"query":meta//with "id" or some attributes for resource locating
+			"path":"/object/" + object.id + "/meta/" + metaRow.key,
+			"query":{"value":""}// 指定要删除的metaRow.value
 		}
 	},
 	"推荐的meta.name":{
@@ -198,7 +204,7 @@ var api = {
 	"为一个对象添加一个状态":{
 		"request":{
 			"method":"POST",
-			"path":"/object/" + object.id + "/status/" + status.name,
+			"path":"/object/" + object.id + "/status/" + statusRow.name,
 			"query":{},
 			"body":status//without "id" attribute
 		},
@@ -209,7 +215,7 @@ var api = {
 	"更新对象的一个状态":{
 		"request":{
 			"method":"PUT",
-			"path":"/object/" + object.id + "/status/" + status.name,
+			"path":"/object/" + object.id + "/status/" + statusRow.name,
 			"query":{},
 			"body":status
 		}
@@ -217,11 +223,11 @@ var api = {
 	"删除一个对象的一个状态":{
 		"request":{
 			"method":" DELETE",
-			"path":"/object/" + object.id + "/status/" + status.name,
-			"query":{},
+			"path":"/object/" + object.id + "/status/" + statusRow.name,
+			"query":{}
 		}
 	},
-	"推荐的status.name":{
+	"推荐的状态名称":{
 		// 暂未实现
 		"request":{
 			"method":"GET",
@@ -293,7 +299,7 @@ var api = {
 			"path":"tag/name",
 			"query":{
 				"object":0,
-				"type":"",
+				"type":""
 			}
 		},
 		"response":[
@@ -323,7 +329,7 @@ var api = {
 			"query/body":{
 				"username":"",
 				"password":"",//开发阶段，明文
-				"remember":FALSE,
+				"remember":FALSE
 			}
 		}
 	},
@@ -340,7 +346,7 @@ var api = {
 	},
 	"导航菜单":{
 		"request":{
-			"path":"/nav",
+			"path":"/nav"
 		},
 		"response":{
 			"body":[
