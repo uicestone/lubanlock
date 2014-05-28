@@ -5,8 +5,6 @@ class Object_model extends CI_Model{
 		$name, $type, $num, $company, $user, $time, $time_insert,
 		$meta, $relative, $status, $tag;
 	
-	protected $CI;
-	
 	static $fields=array(
 		'name'=>NULL,
 		'type'=>'',
@@ -21,8 +19,6 @@ class Object_model extends CI_Model{
 		
 		parent::__construct();
 
-		$this->CI = &get_instance();
-		
 		if(!is_null($data)){
 			
 			if(is_array($data)){
@@ -59,7 +55,7 @@ class Object_model extends CI_Model{
 			->from('object')
 			->where(array(
 				'object.id'=>$this->id,
-				'object.company'=>$this->CI->company->id,
+				'object.company'=>get_instance()->company->id
 			));
 		
 		$object = $this->db->get()->row_array();
@@ -120,8 +116,8 @@ class Object_model extends CI_Model{
 	 */
 	function add(array $data){
 		
-		$data['company'] = $this->CI->company->id;
-		$data['user'] = $this->CI->user->session_id;
+		$data['company'] = get_instance()->company->id;
+		$data['user'] = get_instance()->user->session_id;
 		$data['time_insert'] = date('Y-m-d H:i:s');
 		
 		$this->db->insert('object', array_merge(self::$fields, array_intersect_key($data, self::$fields)));
@@ -177,7 +173,7 @@ class Object_model extends CI_Model{
 		
 		$this->db
 			->from('object')
-			->where('object.company',$this->CI->company->id)
+			->where('object.company',get_instance()->company->id)
 			->like('object.name', $part_of_name);
 		
 		return $this->db->get()->result_array();
@@ -190,7 +186,7 @@ class Object_model extends CI_Model{
 	 *	若对象权限表中没有此对象，且用户为对象创建者或用户就是对象本身，那么有所有权限
 	 *	TODO 若用户roles包含'对象{type}-admin'，则有全部权限
 	 * @param string $permission	read | write | grant
-	 * @param array|int $users	默认为$this->CI->user->group_ids，即当前用户和递归所属组
+	 * @param array|int $users	默认为get_instance()->user->group_ids，即当前用户和递归所属组
 	 * @return boolean
 	 * @throws Exception	argument_error
 	 */
@@ -201,7 +197,7 @@ class Object_model extends CI_Model{
 		}
 		
 		if(is_null($users)){
-			$users = $this->CI->user->group_ids;
+			$users = get_instance()->user->group_ids;
 		}
 		
 		if(!is_array($users)){
@@ -240,7 +236,7 @@ class Object_model extends CI_Model{
 	 *	可选健包括array('read'=>true,'write'=>true,'grant'=>true)
 	 *	为string时自动转换成array(string=>true)
 	 *	另外有public和private 2个特殊值可选
-	 * @param array|int $users	默认为$this->CI->user->session_id，即当前用户
+	 * @param array|int $users	默认为get_instance()->user->session_id，即当前用户
 	 * @param boolean $permission_check 授权时是否检查当前用户的grant权限，此参数只允许在后端内部暴露
 	 * @throws Exception no_permission_to_grant
 	 */
@@ -286,11 +282,11 @@ class Object_model extends CI_Model{
 		
 		if(is_null($users)){
 			
-			if(!$this->CI->user->session_id){
+			if(!get_instance()->user->session_id){
 				throw new Exception('user_not_logged_in', 403);
 			}
 			
-			$users = array($this->CI->user->session_id);
+			$users = array(get_instance()->user->session_id);
 		}
 		
 		if(!is_array($users)){
@@ -311,7 +307,7 @@ class Object_model extends CI_Model{
 	 * 检测某一用户或组对当前对象的某一元数据是否有某种权限
 	 * @param string $key 键名
 	 * @param string $permission 权限值 read|write|grant
-	 * @param array|int $users 要检测的用户或组，默认为$this->CI->user->group_ids，即当前用户和递归所属组
+	 * @param array|int $users 要检测的用户或组，默认为get_instance()->user->group_ids，即当前用户和递归所属组
 	 */
 	function allow_meta($key, $permission = 'read', $users = null){
 		
@@ -320,14 +316,14 @@ class Object_model extends CI_Model{
 		}
 		
 		if(is_null($users)){
-			$users = $this->CI->user->group_ids;
+			$users = get_instance()->user->group_ids;
 		}
 		
 		if(!is_array($users)){
 			$users = array($users);
 		}
 		
-		if(empty($users) && $this->CI->company->config('object_meta_permission_check')){
+		if(empty($users) && get_instance()->company->config('object_meta_permission_check')){
 			return false;
 		}
 		
@@ -345,7 +341,7 @@ class Object_model extends CI_Model{
 	 * 就当前对象的某一元数据，授予某些用户或组某些权限
 	 * @param string $key 键名
 	 * @param array $permission 权限值 array(read|write|grant => true|false)
-	 * @param array|int $users 要授权的用户或组，默认为$this->CI->user->session_id，即当前用户
+	 * @param array|int $users 要授权的用户或组，默认为get_instance()->user->session_id，即当前用户
 	 */
 	function authorize_meta($key, array $permission = array(), $users = null, $permission_check = true){
 		
@@ -357,11 +353,11 @@ class Object_model extends CI_Model{
 		
 		if(is_null($users)){
 			
-			if(!$this->CI->user->session_id){
+			if(!get_instance()->user->session_id){
 				return false;
 			}
 			
-			$users = array($this->CI->user->session_id);
+			$users = array(get_instance()->user->session_id);
 		}
 		
 		if(!is_array($users)){
@@ -528,7 +524,7 @@ class Object_model extends CI_Model{
 
 		$this->db->from('object')->found_rows()->select('object.*');
 		
-		$this->db->where('object.company', $this->CI->company->id);
+		$this->db->where('object.company', get_instance()->company->id);
 		
 		$this->db->where($this->_parse_criteria($args), null, false);
 		
@@ -536,13 +532,13 @@ class Object_model extends CI_Model{
 		$permission_condition = "\n".'`object`.`id` NOT IN ( SELECT `object` FROM `object_permission` )';
 		
 		// 若用户或所在组具有对象{type}-admin role，则具有全部权限
-		if($this->CI->user->roles){
-			$permission_condition .= "\nOR `object`.`type` IN ('".implode("', '", array_map(function($role){return $role . '-admin';}, $this->CI->user->roles))."')";
+		if(get_instance()->user->roles){
+			$permission_condition .= "\nOR `object`.`type` IN ('".implode("', '", array_map(function($role){return $role . '-admin';}, get_instance()->user->roles))."')";
 		}
 		
 		// 一般读权限检查
-		if(is_array($this->CI->user->group_ids) && !empty($this->CI->user->group_ids)){
-			$permission_condition .= "\n".'OR `object`.`id` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( '.implode(', ',$this->CI->user->group_ids).' ) )';
+		if(is_array(get_instance()->user->group_ids) && !empty(get_instance()->user->group_ids)){
+			$permission_condition .= "\n".'OR `object`.`id` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( '.implode(', ',get_instance()->user->group_ids).' ) )';
 		}
 		
 		$this->db->where('( '.$permission_condition.' )', null, false);
@@ -564,7 +560,7 @@ class Object_model extends CI_Model{
 		//使用两种方式来对列表分页
 		if(array_key_exists('page', $args)){
 			if(!array_key_exists('per_page', $args)){
-				$args['per_page'] = $this->CI->company->config('per_page');
+				$args['per_page'] = get_instance()->company->config('per_page');
 				
 				if(!$args['per_page']){
 					$args['per_page'] = 25;
@@ -576,7 +572,7 @@ class Object_model extends CI_Model{
 		
 		if(!array_key_exists('limit', $args)){
 			//默认limit
-			$args['limit'] = $this->CI->company->config('per_page');
+			$args['limit'] = get_instance()->company->config('per_page');
 			
 			if(is_null($args['limit'])){
 				$args['limit'] = 25;
@@ -707,17 +703,15 @@ class Object_model extends CI_Model{
 			return $result;
 		}
 		
-		$meta = array();
+		$this->meta = array();
 		
 		foreach($result as $row){
 			if($this->allow_meta($row['key'])){
-				$meta[$row['key']][] = $row['value'];
+				$this->meta[$row['key']][] = $row['value'];
+				}
 			}
-		}
 		
-		$this->meta = $meta;
-		
-		return $meta;
+		return $this->meta;
 		
 	}
 	
@@ -794,7 +788,7 @@ class Object_model extends CI_Model{
 			'object'=>$this->id,
 			'key'=>$key,
 			'value'=>$value,
-			'user'=>$this->CI->user->session_id
+			'user'=>get_instance()->user->session_id
 		));
 		
 		$meta_id = $this->db->insert_id();
@@ -894,12 +888,12 @@ class Object_model extends CI_Model{
 			return $result;
 		}
 		
-		$relatives = array();
+		$this->relative = array();
 
 		foreach($result as $relationship){
 
 			if(array_key_exists('id_only', $args) && $args['id_only']){
-				$relatives[$relationship['relation']][] = $relationship['relative'];
+				$this->relative[$relationship['relation']][] = $relationship['relative'];
 			}
 			else{
 				$relative = (array) new Object_model($relationship['relative'], array('with'=>null));
@@ -912,14 +906,12 @@ class Object_model extends CI_Model{
 					$relative['meta'] = $this->getRelativeMeta($relationship['id']);
 				}
 				
-				$relatives[$relationship['relation']][] = $relative;
+				$this->relative[$relationship['relation']][] = $relative;
 			}
 			
 		}
 		
-		$this->relative = $relatives;
-		
-		return $relatives;
+		return $this->relative;
 		
 	}
 	
@@ -979,7 +971,7 @@ class Object_model extends CI_Model{
 			'relation'=>$relation,
 			'num'=>$num,
 			'is_on'=>$is_on,
-			'user'=>$this->CI->user->session_id
+			'user'=>get_instance()->user->session_id
 		));
 		
 		//根据参数，先删除不在此次添加之列的键值对
@@ -1032,7 +1024,7 @@ class Object_model extends CI_Model{
 			return $this->db->delete('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key));
 		}
 		else{
-			return $this->db->upsert('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key, 'value'=>$value, 'user'=>$this->CI->user->session_id));
+			return $this->db->upsert('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key, 'value'=>$value, 'user'=>get_instance()->user->session_id));
 		}
 	}
 	
@@ -1068,15 +1060,13 @@ class Object_model extends CI_Model{
 			return $result;
 		}
 		
-		$status = array();
+		$this->status = array();
 		
 		foreach($result as $row){
-			$status[$row['name']][] = $row['date'];
+			$this->status[$row['name']][] = $row['date'];
 		}
 		
-		$this->status = $status;
-		
-		return $status;
+		return $this->status;
 		
 	}
 	
@@ -1138,7 +1128,7 @@ class Object_model extends CI_Model{
 			'name'=>$name,
 			'date'=>$this->_parse_date($date),
 			'comment'=>$comment,
-			'user'=>$this->CI->user->session_id
+			'user'=>get_instance()->user->session_id
 		));
 		
 		return $this->db->insert_id();
@@ -1214,15 +1204,13 @@ class Object_model extends CI_Model{
 			return $result;
 		}
 		
-		$tags = array();
+		$this->tag = array();
 		
 		foreach($result as $row){
-			$tags[$row->taxonomy][] = $row->term;
+			$this->tag[$row->taxonomy][] = $row->term;
 		}
 		
-		$this->tag = $tags;
-		
-		return $tags;
+		return $this->tag;
 	}
 	
 	/**
@@ -1261,8 +1249,8 @@ class Object_model extends CI_Model{
 				$taxonomy = $index;
 			}
 			
-			$tag_taxonomy_id = $this->CI->tag->get($tag, $taxonomy);
-			$query = $this->db->insert_string('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_taxonomy_id, 'user'=>$this->CI->user->session_id));
+			$tag_taxonomy_id = get_instance()->tag->get($tag, $taxonomy);
+			$query = $this->db->insert_string('object_tag', array('object'=>$this->id, 'tag_taxonomy'=>$tag_taxonomy_id, 'user'=>get_instance()->user->session_id));
 			$this->db->query(str_replace('INSERT', 'INSERT IGNORE', $query));
 			if($this->db->affected_rows() === 1){
 				$this->db->where('id', $tag_taxonomy_id)->set('count', '`count` + 1', false)->update('tag_taxonomy');

@@ -471,7 +471,7 @@ if ( ! is_php('5.4'))
 			if(in_array(ENVIRONMENT, array('testing', 'production'))){
 				show_error(lang($exception->getMessage()), $exception->getCode());
 			}elseif(ENVIRONMENT === 'development'){
-				_exception_handler(E_ERROR, lang($exception->getMessage()), $exception->getFile(), $exception->getLine());
+				_exception_handler(E_NOTICE, lang($exception->getMessage()), $exception->getFile(), $exception->getLine());
 			}
 		}
 	}
@@ -497,7 +497,7 @@ if ( ! is_php('5.4'))
 			if(in_array(ENVIRONMENT, array('testing', 'production'))){
 				show_error(lang($exception->getMessage()), $exception->getCode());
 			}elseif(ENVIRONMENT === 'development'){
-				_exception_handler(E_ERROR, lang($exception->getMessage()), $exception->getFile(), $exception->getLine());
+				_exception_handler(E_NOTICE, lang($exception->getMessage()), $exception->getFile(), $exception->getLine());
 			}
 		}
 	}

@@ -14,6 +14,7 @@ class Test extends LB_Controller{
 		
 		$this->db->delete('object', array('num'=>'_test'));
 		$this->tag->calibrateCount();
+		$this->user->sessionLogout();
 		
 		// insert an object
 		$object_1 = new Object_model(array(

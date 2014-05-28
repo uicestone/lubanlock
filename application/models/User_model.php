@@ -35,7 +35,14 @@ class User_model extends Object_model{
 			return;
 		}
 		
-		$user = $this->fetch($this->session_id, array('with'=>null), false);
+		try{
+			$user = $this->fetch($this->session_id, array('with'=>null), false);
+		}catch(Exception $e){
+			if($e->getCode() === 404){
+				$this->sessionLogout();
+				throw new Exception('unauthorized', 401);
+			}
+		}
 		
 		$this->name = $user['name'];
 		
@@ -144,7 +151,7 @@ class User_model extends Object_model{
 		$data = array_merge(self::$fields, array_intersect_key($data,self::$fields));
 		
 		$data['id'] = $insert_id;
-		$data['company'] = $this->CI->company->id;
+		$data['company'] = get_instance()->company->id;
 
 		$this->db->insert('user',$data);
 		
@@ -166,7 +173,7 @@ class User_model extends Object_model{
 		$this->db
 			->from('user')
 			->where('name', $username)
-			->where('company', $this->CI->company->id)
+			->where('company', get_instance()->company->id)
 			->where('password', $password);
 		
 		$user=$this->db->get()->row_array();
@@ -206,6 +213,7 @@ class User_model extends Object_model{
 	 */
 	function sessionLogout(){
 		$this->session->sess_destroy();
+		$this->initialize();
 	}
 
 	/**

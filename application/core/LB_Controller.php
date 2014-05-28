@@ -1,17 +1,6 @@
 <?php
 class LB_Controller extends CI_Controller{
 	
-	var $default_method='index';
-	
-	/**
-	 * 当前控制器允许的用户组
-	 * array()为登录即可
-	 * true为不限制
-	 * 包含子数组时，按照独立方法区分权限，子数组的键名是方法名
-	 * @var bool or array 
-	 */
-	var $permission=array();
-	
 	function __construct(){
 		parent::__construct();
 		
@@ -32,7 +21,7 @@ class LB_Controller extends CI_Controller{
 			echo $output;
 		}
 		else{
-			echo var_export($output);
+			var_export($output);
 		}
 		
 	}

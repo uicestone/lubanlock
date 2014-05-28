@@ -215,5 +215,3 @@ class Object extends LB_Controller{
 	}
 	
 }
-
-?>
