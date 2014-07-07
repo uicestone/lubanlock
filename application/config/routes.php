@@ -74,12 +74,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'welcome';
+$route['default_controller'] = 'index';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
-
-$route['(login|logout|profile|signup)']='user/$1';
-$route['user/(:num)']='user/index/$1';
 
 $route['object/(:num)']='object/index/$1';
 $route['object/(:num)/meta']='object/meta/$1';
@@ -93,7 +90,12 @@ $route['object/(:num)/tag/(:any)']='object/tag/$1/$2';
 $route['object/(:num)/permission']='object/permission/$1';
 $route['object/(:num)/(authorize|prohibit)/(read|write|grant)']='object/permission/$1/$2/$3';
 
+$route['(login|logout|profile|signup)']='user/$1';
+$route['user/(:num)']='user/index/$1';
+
 $route['nav/(:any)'] = 'nav/index/$1';
+
+$route['robots.txt'] = 'index/robots';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
