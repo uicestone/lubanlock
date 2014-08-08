@@ -15,10 +15,10 @@
 					
 		<script src="js/dropzone.js"></script>
 
-		<script type="text/javascript" src="js/angular/angular.js"></script>
-		<script type="text/javascript" src="js/angular/angular-route.js"></script>
-		<script type="text/javascript" src="js/angular/angular-resource.js"></script>
-		<script type="text/javascript" src="js/ui-bootstrap-tpls-0.10.0.js"></script>
+		<script type="text/javascript" src="js/angular/angular.min.js"></script>
+		<script type="text/javascript" src="js/angular/angular-route.min.js"></script>
+		<script type="text/javascript" src="js/angular/angular-resource.min.js"></script>
+		<script type="text/javascript" src="js/angular/ui-bootstrap.min.js"></script>
 		
 		<script type="text/javascript" src="app.js"></script>
 		<script type="text/javascript" src="controllers.js"></script>
