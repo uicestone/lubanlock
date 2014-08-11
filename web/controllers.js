@@ -62,8 +62,8 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'obje
 		//从responseHeaders中获得status-text，用正则匹配出分页参数
 		var statusText = objectsResponse.statusText;
 		$scope.totalObjects = Number(statusText.match(/(\d+) Objects in Total/)[1]);
-		$scope.objectListStart = Number(statusText.match(/(\d+) \-/)[1]);
-		$scope.objectListEnd = Number(statusText.match(/\- (\d+)/)[1]);
+		$scope.objectListStart = Number(statusText.match(/(\d+)\-/)[1]);
+		$scope.objectListEnd = Number(statusText.match(/\-(\d+)/)[1]);
 
 		$scope.nextPage = function(){
 			$location.search('page', ++$scope.currentPage);

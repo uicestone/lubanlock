@@ -47,7 +47,7 @@ class Object extends LB_Controller{
 		$result=$this->object->getList($args);
 
 		$this->output->set_output($result['data']);
-		$this->output->set_status_header(200, 'OK, '.$result['info']['total'].' Objects in Total, '.$result['info']['from'].' - '.$result['info']['to'].' Listed');
+		$this->output->set_status_header(200, 'OK, '.$result['info']['total'].' Objects in Total, '.$result['info']['from'].'-'.$result['info']['to'].' Listed');
 	}
 	
 	function update($id){
