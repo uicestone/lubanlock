@@ -3,7 +3,7 @@
 /* Directives */
 var lubanlockDirectives = angular.module('lubanlockDirectives', []);
 
-lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$location', function(Object, ObjectMeta, $location){
+lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function($location, Object){
 	return {
 		restrict: 'A',				//此指令通过HTML属性方式调用
 		templateUrl: 'partials/editable.html',
@@ -84,7 +84,7 @@ lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$locati
 					case 'meta':
 						//接受手动传入的键名，没有的话再去键值表达式中匹配
 						var key = scope.key === undefined ? scope.name.match(/\['(.*?)'\]/)[1] : scope.key;
-						ObjectMeta.update({object: scope.object.id, key: key}, scope.value);
+						Object.updateMeta({object: scope.object.id, key: key}, scope.value);
 						break;
 
 					case 'status':

@@ -1,3 +1,4 @@
+<!--对象基本信息-->
 <div class="page-header">
 	<h1 luban-editable="object.name" object="object" placeholder="对象名称">
 		<small>
@@ -6,12 +7,14 @@
 		</small>
 		<button class="btn btn-danger pull-right" ng-if="object.$resolved" ng-click="remove()">删除</button>
 	</h1>
-</div><!-- /.page-header -->
+</div>
 
 <div class="row">
 	<div class="col-xs-12">
 
 		<div id="user-profile-1" class="user-profile row">
+			
+			<!--对象分类方式-->
 			<div class="col-xs-12 col-sm-3">
 
 				<div class="profile-contact-info">
@@ -40,7 +43,7 @@
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('tag')"></button>
 				</form>
 				
-				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个分类标签 " ng-click="openPropAddForm('tag')" ng-hide="adding.tag"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个分类标签 " ng-click="openPropAddForm('tag', $event)" ng-hide="adding.tag"></button>
 				
 				<div class="hr hr16 dotted"></div>
 				
@@ -78,7 +81,7 @@
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('meta')"></button>
 				</form>
 				
-				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个元数据" ng-click="openPropAddForm('meta')" ng-hide="adding.meta"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个元数据" ng-click="openPropAddForm('meta', $event)" ng-hide="adding.meta"></button>
 				
 				<hr>
 
@@ -95,23 +98,22 @@
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{relative.name}}</a>
 								<a class="icon-trash pointer-cursur" ng-click="removeRelative(relation, relative.id)"></a>
 							</span>
-							<a class="icon-trash pointer-cursur pull-right" ng-click="removeRelative(relation)"></a>
 						</div>
 					</div>
 				</div>
 				
 				<form class="form-inline" ng-show="adding.relative" ng-submit="addRelative($event)">
 					<div class="form-group">
-						<input type="text" class="form-control form-control-xs" placeholder="关系" ng-model="new.relationship.relation" />
+						<input type="text" class="form-control form-control-xs" placeholder="关系" ng-model="new.relative.relation" />
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control form-control-xs" placeholder="关联对象" ng-model="new.relationship.relative_name" typeahead="object as object.name for object in search($viewValue)" typeahead-template-url="partials/object_autocomplete.html" typeahead-wait-ms="100" typeahead-on-select="onRelativeSelect($item)" />
+						<input type="text" class="form-control form-control-xs" placeholder="关联对象" ng-model="new.relative.name" typeahead="object as object.name for object in search($viewValue)" typeahead-template-url="partials/object_autocomplete.html" typeahead-wait-ms="100" typeahead-on-select="onRelativeSelect($item)" />
 					</div>
 					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('relative')"></button>
 				</form>
 
-				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个关联对象" ng-click="openPropAddForm('relative')" ng-hide="adding.relative"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个关联对象" ng-click="openPropAddForm('relative', $event)" ng-hide="adding.relative"></button>
 				
 				<hr>
 
@@ -126,31 +128,32 @@
 								<div class="timeline-item clearfix" ng-repeat="status in object.status">
 									<div class="timeline-info">
 										<span class="timeline-date"> {{status.date.replace(' 00:00:00','')}} </span>
-
 										<i class="timeline-indicator btn btn-info no-hover"></i>
 									</div>
-
 									<div class="widget-box transparent">
 										<div class="widget-body">
 											<div class="widget-main no-padding">
 												<span class="bigger-110">
 													{{status.name}}
 												</span>
+												<a class="icon-trash pointer-cursur" ng-click="removeStatus(status.name, status.date)"></a>
 											</div>
 										</div>
 									</div>
-									
-									<a class="icon-trash pointer-cursur pull-right" ng-click="removeStatus(status.name, status.date)"></a>
 								</div>
-
-							</div><!-- /.timeline-items -->
-						</div><!-- /.timeline-container -->
+							</div>
+						</div>
 					</div>
 				</div>
 				
 				<form class="form-inline" ng-show="adding.status" ng-submit="addStatus($event)">
 					<div class="form-group">
-						<input type="text" class="form-control form-control-xs" placeholder="日期时间" ng-model="new.status.date" datepicker-popup />
+						<div class="input-group">
+							<input class="form-control form-control-xs" type="text" placeholder="日期时间" ng-model="new.status.date" datepicker-popup is-open="new.status.isDatepickerOpen" style="width:auto">
+							<span class="input-group-btn" style="width:auto">
+								<button type="button" class="btn btn-xs icon-calendar" ng-click="toggleStatusDatepicker($event)"></button>
+							</span>
+						</div>
 					</div>
 					<div class="form-group">
 						<input type="text" class="form-control form-control-xs" placeholder="状态名称" ng-model="new.status.name" />
@@ -159,9 +162,9 @@
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('status')"></button>
 				</form>
 
-				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个状态" ng-click="openPropAddForm('status')" ng-hide="adding.status"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个状态" ng-click="openPropAddForm('status', $event)" ng-hide="adding.status"></button>
 				
 			</div>
 		</div>
-	</div><!-- /.col -->
-</div><!-- /.row -->
+	</div>
+</div>

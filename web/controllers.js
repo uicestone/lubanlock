@@ -51,16 +51,14 @@ lubanlockControllers.controller('NavCtrl', ['$scope', 'Nav', 'UserConfig', '$loc
 	}
 ]);
 
-lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'objectsResponse',
-	function($scope, $location, Nav, objectsResponse) {
+lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'objects',
+	function($scope, $location, Nav, objects) {
 		//列表分页
 		$scope.currentPage = $location.search().page || 1;
 		
-		$scope.headers = objectsResponse.headers();
-		$scope.objects = objectsResponse.data;
-		
-		//从responseHeaders中获得status-text，用正则匹配出分页参数
-		var statusText = objectsResponse.statusText;
+		$scope.objects = objects;
+		// get pagination argument from statusText
+		var statusText = $scope.objects.$response.statusText;
 		$scope.totalObjects = Number(statusText.match(/(\d+) Objects in Total/)[1]);
 		$scope.objectListStart = Number(statusText.match(/(\d+)\-/)[1]);
 		$scope.objectListEnd = Number(statusText.match(/\-(\d+)/)[1]);
@@ -101,25 +99,31 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'obje
 	}
 ]);
 
-lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'ObjectMeta', 'ObjectRelative', 'ObjectStatus', 'ObjectTag', '$location', 'Object',
-	function($scope, objectResponse, ObjectMeta, ObjectRelative, ObjectStatus, ObjectTag, $location, Object) {
+/*
+ * This is a common controller for detail page of any object.
+ * We can view and modify Tags, Metas, Relatives and Statuses if we are permitted
+ */
+lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 'Alert', 'object',
+	function($scope, $location, Object, Alert, object) {
 		
-		if(objectResponse){
-			$scope.object = objectResponse.resource;
-			$scope.headers = objectResponse.headers();
-		}
+		$scope.angular = angular; // we need call angular.equal() in template
 		
-		$scope.adding = {
-			meta: false,
-			relative: false,
-			status: false,
-			tag: false
-		}
+		// objectResponse are resolved before route in routeProvider. So page is redirected after data ready.
+		$scope.object = object;
 		
-		$scope['new'] = {};
+		// flags for property adding form toggling
+		$scope.adding = {meta: false, relative: false, status: false, tag: false}
 		
-		$scope.openPropAddForm = function(prop){
+		// collection of new property models. 'new' are wrapped in '[]' here because it's a reserved word in ECMA Script 3.
+		$scope['new'] = {meta: {}, relative: {}, status: {}, tag: {}};
+		
+		$scope.openPropAddForm = function(prop, $event){
 			$scope.adding[prop] = true;
+			// auto-select the first input field after expanding property adding
+			// since the form won't expand after above change were applied, we trigger 'select' after a while
+			setTimeout(function(){
+				angular.element($event.target).siblings('form').find(':input:first').trigger('select');
+			});
 		}
 		
 		$scope.closePropAddForm = function(prop){
@@ -128,65 +132,77 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'Obje
 		}
 		
 		$scope.addMeta = function($event){
-			
-			ObjectMeta.save({object: $scope.object.id, key: $scope['new'].meta.key}, $scope['new'].meta.value, function(){
-				
-				if($scope.object.meta[$scope['new'].meta.key] === undefined){
-					$scope.object.meta[$scope['new'].meta.key] = [];
-				}
-
-				$scope.object.meta[$scope['new'].meta.key].push($scope['new'].meta.value);
-			
+			Object.saveMeta({object: $scope.object.id, key: $scope['new'].meta.key}, $scope['new'].meta.value, function(meta){
+				$scope.object.meta = meta;
 				$scope['new'].meta.value = undefined;
+				// we keep the key and select it, for faster continuously input
 				angular.element($event.target).find(':input:first').trigger('select');
 			});
-			
 		}
 		
 		$scope.removeMeta = function(key, value){
-			ObjectMeta.remove({object: $scope.object.id, key: key, value: value}, function(meta){
+			Object.removeMeta({object: $scope.object.id, key: key, value: value}, function(meta){
+				console.log(meta);
 				$scope.object.meta = meta;
 			});
 		}
 		
-		$scope.addStatus = function(){
-			
-			ObjectStatus.save({object: $scope.object.id, name: $scope['new'].status.name, as_rows: true, order_by: 'date desc'}, $scope['new'].status.date, function(status){
+		$scope.addStatus = function($event){
+			Object.saveStatus({object: $scope.object.id, name: $scope['new'].status.name, as_rows: true, order_by: 'date desc'}, $scope['new'].status.date, function(status){
 				$scope.object.status = status;
-				$scope['new'].status = {};
+				$scope['new'].status = undefined;
+				angular.element($event.target).find(':input:first').trigger('select');
 			});
-			
 		}
 		
 		$scope.removeStatus = function(name, date){
-			ObjectStatus.remove({object: $scope.object.id, name: name, date: date, as_rows: true, order_by: 'date desc'}, function(status){
+			Object.removeStatus({object: $scope.object.id, name: name, date: date, as_rows: true, order_by: 'date desc'}, function(status){
 				$scope.object.status = status;
 			});
+		}
+		
+		$scope.toggleStatusDatepicker = function($event){
+			// a 'keng' of angular-ui-bootstrap: button default behavior needs to be prevent to trigger datepick popup
+			$event.preventDefault();
+			$event.stopPropagation();
+			$scope['new'].status.isDatepickerOpen = !$scope['new'].status.isDatepickerOpen;
 		}
 		
 		$scope.addRelative = function($event){
 			
-			if($scope['new'].relationship === undefined || $scope['new'].relationship.relative === undefined){
-				alert('no relative defined');
+			if($scope['new'].relative === undefined || $scope['new'].relative.id === undefined){
+				Alert.addAlert('请选择关联对象');
 				return;
 			}
 			
-			ObjectRelative.save({object: $scope.object.id, relation: $scope['new'].relationship.relation}, $scope['new'].relationship.relative, function(relative){
+			Object.saveRelative({object: $scope.object.id, relation: $scope['new'].relative.relation}, $scope['new'].relative.id, function(relative){
 				$scope.object.relative = relative;
-				$scope['new'].relationship.relative = $scope['new'].relationship.relative_name = undefined;
+				$scope['new'].relative.id = $scope['new'].relative.name = undefined;
 				angular.element($event.target).find(':input:first').trigger('select');
 			});
 		}
 		
 		$scope.removeRelative = function(relation, relative){
-			ObjectRelative.remove({object: $scope.object.id, relation: relation, relative: relative}, function(relative){
+			Object.removeRelative({object: $scope.object.id, relation: relation, relative: relative}, function(relative){
 				$scope.object.relative = relative;
 			});
 		}
 		
-		$scope.addTag = function(){
-			ObjectTag.save({object: $scope.object.id, taxonomy: $scope['new'].tag.taxonomy}, $scope['new'].tag.term, function(tag){
+		// used in typeahead for relative name auto complete
+		$scope.search = function(name){
+			// a promise can be parsed by typeahead, no then() wrapping required
+			return Object.query({name:{like:name}}).$promise;
+		};
+		
+		$scope.onRelativeSelect = function($item){
+			$scope['new'].relative.id = $item.id;
+		}
+		
+		$scope.addTag = function($event){
+			Object.saveTag({object: $scope.object.id, taxonomy: $scope['new'].tag.taxonomy}, $scope['new'].tag.term, function(tag){
 				$scope.object.tag = tag;
+				$scope['new'].tag = {};
+				angular.element($event.target).find(':input:first').trigger('select');
 			});
 		}
 		
@@ -204,20 +220,6 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'Obje
 			$scope.object.$remove({}, function(){
 				history.back();
 			});
-		}
-		
-		$scope.search = function(name){
-			return Object.query({name:{like:name}}).$promise.then(function(res){
-				var objects = [];
-				angular.forEach(res.data, function(object){
-					objects.push({id: object.id, type: object.type, name: object.name, num: object.num});
-				});
-				return objects;
-			});
-		};
-		
-		$scope.onRelativeSelect = function($item){
-			$scope['new'].relationship.relative = $item.id;
 		}
 		
 	}

@@ -11,8 +11,8 @@ var lubanlockApp = angular.module('lubanlockApp', [
 	'ui.bootstrap'
 ]);
 
-lubanlockApp.config(['$routeProvider', '$httpProvider',
-	function($routeProvider, $httpProvider) {
+lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
+	function($routeProvider, $httpProvider, $parseProvider) {
 		$routeProvider
 			.when('/user', {
 				templateUrl: 'partials/list_user.html',
@@ -26,7 +26,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider',
 				templateUrl: 'partials/list.html',
 				controller: 'ListCtrl',
 				resolve: {
-					objectsResponse: ['Object', '$route', function(Object, $route){
+					objects: ['Object', '$route', function(Object, $route){
 						return Object.query(angular.extend({with_status: {as_rows: true}, with_tag: true}, $route.current.params)).$promise;
 					}]
 				}
@@ -36,7 +36,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider',
 				controller: 'DetailCtrl',
 				//TODO 模版也需要在路由执行前预加载
 				resolve: {
-					objectResponse: ['$route', 'Object', function($route, Object){
+					object: ['$route', 'Object', function($route, Object){
 						if($route.current.params.id){
 							return Object.get({id: $route.current.params.id, with_status: {as_rows: true, order_by:'date desc'}}).$promise;
 						}
@@ -48,6 +48,8 @@ lubanlockApp.config(['$routeProvider', '$httpProvider',
 			});
 			
 		$httpProvider.interceptors.push('HttpInterceptor');
+		
+		$parseProvider.unwrapPromises(true);
 
 	}
 	

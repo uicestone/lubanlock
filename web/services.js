@@ -4,83 +4,62 @@
 
 var lubanlockServices = angular.module('lubanlockServices', ['ngResource']);
 
-lubanlockServices.factory('Object', ['$resource',
+lubanlockServices.service('Object', ['$resource',
 	function($resource){
+		
+		var responseInterceptor = function(response){
+			if(response.data === 'null'){
+				return null;
+			}
+			response.resource.$response = response;
+			return response.resource;
+		}
+		
 		return $resource('object/:id', {id: '@id'}, {
-			//通过改变Resource请求成功时的返回值来达到获得header的目的 TODO 这样做改变了Resource的行为，可能会有未知问题
-			get: {method: 'GET', interceptor: {response: function(response){
-				return response;
-			}}},
-			query: {method: 'GET', isArray: true, interceptor: {response: function(response){
-				return response;
-			}}},
-			update: {method: 'PUT'},
+			get: {method: 'GET', interceptor: {response: responseInterceptor}},
+			query: {method: 'GET', isArray: true, interceptor: {response: responseInterceptor}},
+			update: {method: 'PUT', interceptor: {response: responseInterceptor}},
+			getMeta: {method: 'GET', url: 'object/:object/meta/:key', interceptor: {response: responseInterceptor}},
+			saveMeta: {method: 'POST', url: 'object/:object/meta/:key', interceptor: {response: responseInterceptor}},
+			updateMeta: {method: 'PUT', url: 'object/:object/meta/:key', interceptor: {response: responseInterceptor}},
+			removeMeta: {method: 'DELETE', url: 'object/:object/meta/:key', interceptor: {response: responseInterceptor}},
+			getRelative: {method: 'GET', url: 'object/:object/relative/:relation'},
+			saveRelative: {method: 'POST', url: 'object/:object/relative/:relation', interceptor: {response: responseInterceptor}},
+			removeRelative: {method: 'DELETE', url: 'object/:object/relative/:relation', interceptor: {response: responseInterceptor}},
+			getStatus: {method: 'GET', url: 'object/:object/status/:name', isArray: true},
+			saveStatus: {method: 'POST', url: 'object/:object/status/:name', isArray: true},
+			updateStatus: {method: 'PUT', url: 'object/:object/status/:name', isArray: true},
+			removeStatus: {method: 'DELETE', url: 'object/:object/status/:name', isArray: true},
+			getTag: {method: 'GET', url: 'object/:object/tag/:taxonomy'},
+			saveTag: {method: 'POST', url: 'object/:object/tag/:taxonomy', interceptor: {response: responseInterceptor}},
+			removeTag: {method: 'DELETE', url: 'object/:object/tag/:taxonomy', interceptor: {response: responseInterceptor}}
 		});
 	}
 ]);
 
-lubanlockServices.factory('ObjectMeta', ['$resource',
-	function($resource){
-		return $resource('object/:object/meta/:key', {object: '@object', key: '@key'}, {
-			update: {method: 'PUT'}
-		});
-	}
-]);
-
-lubanlockServices.factory('ObjectRelative', ['$resource',
-	function($resource){
-		return $resource('object/:object/relative/:relation', {object: '@object'}, {
-			update: {method: 'PUT'}
-		});
-	}
-]);
-
-lubanlockServices.factory('ObjectStatus', ['$resource',
-	function($resource){
-		return $resource('object/:object/status/:name', {object: '@object'}, {
-			save: {method: 'POST', isArray: true},
-			update: {method: 'PUT', isArray: true},
-			remove: {method: 'DELETE', isArray: true}
-		});
-	}
-]);
-
-lubanlockServices.factory('ObjectTag', ['$resource',
-	function($resource){
-		return $resource('object/:object/tag/:taxonomy', {object: '@object'}, {
-			update: {method: 'PUT'}
-		});
-	}
-]);
-
-lubanlockServices.factory('User', ['$resource',
+lubanlockServices.service('User', ['$resource',
 	function($resource){
 		return $resource('user/:id', {id: '@id'}, {
 			update: {method: 'PUT'},
+			getConfig: {method: 'GET', url:'user/config/:item'},
+			saveConfig: {method: 'POST', url:'user/config/:item'}
 		});
 	}
 ]);
 
-lubanlockServices.factory('UserConfig', ['$resource',
+lubanlockServices.service('Company', ['$resource',
 	function($resource){
-		return $resource('user/config/:item', {item: '@item'}, {query: angular.noop});
-	}
-]);
-
-lubanlockServices.factory('Company', ['$resource',
-	function($resource){
-		return $resource('company/:id', {id: '@id'});
-	}
-]);
-
-lubanlockServices.factory('CompanyConfig', ['$resource',
-	function($resource){
-		return $resource('company/:company/config/:item', {user: 'company', item: '@item'});
+		return $resource('company/:id', {id: '@id'}, {
+			update: {method: 'PUT'},
+			getConfig: {method: 'GET', url:'company/config/:item'},
+			saveConfig: {method: 'POST', url:'company/config/:item'}
+		});
 	}
 ]);
 
 // register the interceptor as a service
-lubanlockServices.factory('HttpInterceptor', ['$q', '$window', 'Alert', function($q, $window, Alert) {
+lubanlockServices.service('HttpInterceptor', ['$q', '$window', 'Alert', function($q, $window, Alert) {
+	
 	return {
 		request: function(config) {
 			return config || $q.when(config);
@@ -100,7 +79,7 @@ lubanlockServices.factory('HttpInterceptor', ['$q', '$window', 'Alert', function
 	};
 }]);
 
-lubanlockServices.factory('Alert', ['$rootScope', '$timeout', function($rootScope, $timeout){
+lubanlockServices.service('Alert', ['$rootScope', '$timeout', function($rootScope, $timeout){
 	
 	var alerts = [];
 	
