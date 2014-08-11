@@ -100,7 +100,7 @@ class Object_model extends CI_Model{
 			}
 			
 			if($property_args){
-				$object[$field]=call_user_func(array($this, 'get' . ucfirst($field)), is_array($property_args) ? $property_args : array());
+				$object[$field] = call_user_func(array($this, 'get' . ucfirst($field)), is_array($property_args) ? $property_args : array());
 			}
 			
 		}
@@ -409,6 +409,9 @@ class Object_model extends CI_Model{
 			}
 			elseif($arg_name === 'lte'){
 				$where[] = $field.' <= '.$this->db->escape($arg_value);
+			}
+			elseif($arg_name === 'like'){
+				$where[] = $field.' LIKE \'%'.$this->db->escape_like_str($arg_value) . '%\'';
 			}
 			elseif($arg_name === 'in'){
 				if($arg_value === array()){
@@ -896,11 +899,11 @@ class Object_model extends CI_Model{
 				$this->relative[$relationship['relation']][] = $relationship['relative'];
 			}
 			else{
-				$relative = (array) new Object_model($relationship['relative'], array('with'=>null));
+				$relative = $this->fetch($relationship['relative'], array('with'=>null));
 				
-				$relative['relationship_id'] = $relationship['id'];
+				$relative['relationship_id'] = (int) $relationship['id'];
 				$relative['relationship_num'] = $relationship['num'];
-				$relative['is_on'] = (bool)$relationship['is_on'];
+				$relative['is_on'] = (bool) $relationship['is_on'];
 				
 				if(!array_key_exists('with_meta', $args) || $args['with_meta']){
 					$relative['meta'] = $this->getRelativeMeta($relationship['id']);

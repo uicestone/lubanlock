@@ -75,14 +75,16 @@
 				
 				<hr>
 
-				<div class="profile-user-info" ng-repeat="(relation, relatives) in object.relative">
-					<div class="profile-info-row">
+				<div class="profile-user-info">
+					<div class="profile-info-row" ng-repeat="(relation, relatives) in object.relative">
 						<div class="profile-info-name"> {{relation}} </div>
 
 						<div class="profile-info-value">
 							<span ng-repeat="relative in relatives">
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{relative.name}}</a>
+								<a class="icon-trash pointer-cursur" ng-click="removeRelative(relation, relative.id)"></a>
 							</span>
+							<a class="icon-trash pointer-cursur pull-right" ng-click="removeRelative(relation)"></a>
 						</div>
 					</div>
 				</div>
@@ -92,7 +94,7 @@
 						<input type="text" class="form-control form-control-xs" placeholder="关系" ng-model="new.relationship.relation" />
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control form-control-xs" placeholder="关联对象" ng-model="new.relationship.relative" />
+						<input type="text" class="form-control form-control-xs" placeholder="关联对象" ng-model="new.relationship.relative_name" typeahead="object as object.name for object in search($viewValue)" typeahead-template-url="partials/object_autocomplete.html" typeahead-wait-ms="100" typeahead-on-select="onRelativeSelect($item)" />
 					</div>
 					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('relative')"></button>

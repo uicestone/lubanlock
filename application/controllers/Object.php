@@ -105,7 +105,7 @@ class Object extends LB_Controller{
 	
 	function relative($object_id, $relation = null){
 		
-		$this->object->id=$object_id;
+		$this->object->id = $object_id;
 		
 		switch ($this->input->method) {
 			case 'GET':
@@ -133,7 +133,7 @@ class Object extends LB_Controller{
 				break;
 			
 			case 'DELETE':
-				$this->object->removeRelative($relation, $relative);
+				$this->object->removeRelative($relation, $this->input->get('relative') ? $this->input->get('relative') : null);
 				break;
 		}
 		

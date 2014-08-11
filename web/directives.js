@@ -3,53 +3,6 @@
 /* Directives */
 var lubanlockDirectives = angular.module('lubanlockDirectives', []);
 
-lubanlockDirectives.directive('lubanDropzone', ['Object', function(Object){
-	return {
-		scope: {
-			files: '='
-		},
-		link: function(scope, element){
-			
-			scope.$watch('files.$resolved', function($resolved){
-				
-				$resolved && element.dropzone({
-					paramName: "file", // The name that will be used to transfer the file
-					maxFilesize: 10, // MB
-					url: 'file/upload',
-					addRemoveLinks: true,
-					dictDefaultMessage:
-					'<span class="bigger-150 bolder"><i class="icon-caret-right red"></i> 上传你的简历</span>  拖放到这里\
-					<span class="smaller-80 grey">（或点击选择文件）</span> <br /> \
-					<i class="upload-icon icon-cloud-upload blue icon-3x"></i>',
-					dictResponseError: '上传文件错误',
-					dictRemoveFile: '删除',
-					init: function(){
-						var _this = this;
-						
-						angular.forEach(scope.files, function(file){
-							_this.emit('addedfile', {id: file.id, name: file.name, size: file.meta['file_size'][0] * 1024});
-//							this.options.thumbnail.call(this, mockFile, "http://someserver.com/myimage.jpg");
-						});
-					},
-					removedfile: function(file){
-						Object.remove({id: file.id}, function(){
-							angular.element(file.previewElement).remove();
-						});
-						
-					},
-					success: function(file, serverFile){
-						file.id = serverFile.id;
-						return file.previewElement.classList.add("dz-success");
-					}
-				});
-					
-			});
-			
-			
-		}
-	}
-}]);
-
 lubanlockDirectives.directive('lubanEditable', ['Object', 'ObjectMeta', '$location', function(Object, ObjectMeta, $location){
 	return {
 		restrict: 'A',				//此指令通过HTML属性方式调用

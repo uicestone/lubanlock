@@ -102,8 +102,8 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'obje
 	}
 ]);
 
-lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'ObjectMeta', 'ObjectRelative', 'ObjectStatus', 'ObjectTag', '$location',
-	function($scope, objectResponse, ObjectMeta, ObjectRelative, ObjectStatus, ObjectTag, $location) {
+lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'ObjectMeta', 'ObjectRelative', 'ObjectStatus', 'ObjectTag', '$location', 'Object',
+	function($scope, objectResponse, ObjectMeta, ObjectRelative, ObjectStatus, ObjectTag, $location, Object) {
 		
 		if(objectResponse){
 			$scope.object = objectResponse.resource;
@@ -165,6 +165,26 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'Obje
 			});
 		}
 		
+		$scope.addRelative = function($event){
+			
+			if($scope['new'].relationship === undefined || $scope['new'].relationship.relative === undefined){
+				alert('no relative defined');
+				return;
+			}
+			
+			ObjectRelative.save({object: $scope.object.id, relation: $scope['new'].relationship.relation}, $scope['new'].relationship.relative, function(relative){
+				$scope.object.relative = relative;
+				$scope['new'].relationship.relative = $scope['new'].relationship.relative_name = undefined;
+				angular.element($event.target).find(':input:first').trigger('select');
+			});
+		}
+		
+		$scope.removeRelative = function(relation, relative){
+			ObjectRelative.remove({object: $scope.object.id, relation: relation, relative: relative}, function(relative){
+				$scope.object.relative = relative;
+			});
+		}
+		
 		$scope.addTag = function(){
 			ObjectTag.save({object: $scope.object.id, taxonomy: $scope['new'].tag.taxonomy}, $scope['new'].tag.term, function(tag){
 				$scope.object.tag = tag;
@@ -185,6 +205,20 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'objectResponse', 'Obje
 			$scope.object.$remove({}, function(){
 				history.back();
 			});
+		}
+		
+		$scope.search = function(name){
+			return Object.query({name:{like:name}}).$promise.then(function(res){
+				var objects = [];
+				angular.forEach(res.data, function(object){
+					objects.push({id: object.id, type: object.type, name: object.name, num: object.num});
+				});
+				return objects;
+			});
+		};
+		
+		$scope.onRelativeSelect = function($item){
+			$scope['new'].relationship.relative = $item.id;
 		}
 		
 	}

@@ -239,13 +239,13 @@ class User_model extends Object_model{
 	 * @param string $key
 	 * @param mixed $value
 	 */
-	function config($key=NULL,$value=NULL){
+	function config($key = null, $value = null){
 		
 		if(is_null($key)){
 			
 			$this->db->from('user_config')->where('user',$this->session_id);
 
-			$config=array_column($this->db->get()->result_array(),'value','key');
+			$config = array_column($this->db->get()->result_array(), 'value', 'key');
 
 			return array_map(function($value){
 				
@@ -258,14 +258,14 @@ class User_model extends Object_model{
 		}
 		elseif(is_null($value)){
 			
-			$row=$this->db->select('id,value')
+			$row = $this->db->select('id,value')
 				->from('user_config')
-				->where('user',$this->session_id)
-				->where('key',$key)
+				->where('user', $this->session_id)
+				->where('key', $key)
 				->get()->row();
 
 			if($row){
-				$json_value=json_decode($row->value);
+				$json_value = json_decode($row->value);
 				
 				return $json_value;
 			}
@@ -275,9 +275,9 @@ class User_model extends Object_model{
 		}
 		else{
 			
-			$value=json_encode($value);
+			$value = json_encode($value);
 			
-			return $this->db->upsert('user_config', array('user'=>$this->session_id,'key'=>$key,'value'=>$value));
+			return $this->db->upsert('user_config', array('user'=>$this->session_id, 'key'=>$key, 'value'=>$value));
 		}
 	}
 
