@@ -16,6 +16,9 @@
 
 				<div class="profile-contact-info">
 					<div class="profile-contact-links align-left">
+						<a class="btn btn-link" ng-if="!object.tag">
+							<i class="light-blue">请添加分类</i>
+						</a>
 						<a class="btn btn-link" ng-repeat="(taxonomy, tag) in object.tag">
 							<i class="light-blue">{{taxonomy}}</i>
 							<span class="bigger-120 ">{{tag | plain}}</span>
@@ -45,6 +48,10 @@
 
 			<div class="col-xs-12 col-sm-9">
 				
+				<!--对象元数据-->
+				<div class="col-sm-offset-2 text-muted" ng-if="!object.meta">
+					请添加元数据
+				</div>
 				<div class="profile-user-info">
 					<div class="profile-info-row" ng-repeat="(key, values) in object.meta">
 						<div class="profile-info-name"> {{key}} </div>
@@ -75,6 +82,10 @@
 				
 				<hr>
 
+				<!--对象关联对象-->
+				<div class="col-sm-offset-2 text-muted" ng-if="!object.relative">
+					请添加关联对象
+				</div>
 				<div class="profile-user-info">
 					<div class="profile-info-row" ng-repeat="(relation, relatives) in object.relative">
 						<div class="profile-info-name"> {{relation}} </div>
@@ -104,6 +115,10 @@
 				
 				<hr>
 
+				<!--对象状态-->
+				<div class="col-sm-offset-2 text-muted" ng-if="!object.status">
+					请添加状态
+				</div>
 				<div class="row">
 					<div class="col-xs-12 col-sm-10 col-sm-offset-1">
 						<div class="timeline-container timeline-style2">
