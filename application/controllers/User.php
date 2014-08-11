@@ -135,7 +135,9 @@ class User extends LB_Controller{
 				break;
 		}
 		
-		$this->output->set_output(is_null($item) ? $this->user->config($item) : array($item=>$this->user->config($item)));
+		$config = is_null($item) ? $this->user->config() : array($item=>$this->user->config($item));
+		
+		$this->output->set_output((object)$config);
 		
 	}
 	

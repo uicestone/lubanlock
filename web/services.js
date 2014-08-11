@@ -63,7 +63,7 @@ lubanlockServices.factory('User', ['$resource',
 
 lubanlockServices.factory('UserConfig', ['$resource',
 	function($resource){
-		return $resource('user/config/:item', {item: '@item'});
+		return $resource('user/config/:item', {item: '@item'}, {query: angular.noop});
 	}
 ]);
 

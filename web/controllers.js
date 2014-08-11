@@ -26,8 +26,7 @@ lubanlockControllers.controller('NavCtrl', ['$scope', 'Nav', 'UserConfig', '$loc
 		
 		$scope.items = Nav.query();
 		
-		//TODO 不是很舒服， 考虑改成全局config，但需要解决promise的问题
-		$scope.config = UserConfig.get({item: 'nav_minimized'});
+		$scope.config = UserConfig.get();
 		
 		$scope.toggleMinimize = function(){
 			$scope.config.nav_minimized = !$scope.config.nav_minimized;
