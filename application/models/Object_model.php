@@ -899,14 +899,14 @@ class Object_model extends CI_Model{
 				$this->relative[$relationship['relation']][] = $relationship['relative'];
 			}
 			else{
-				$relative = $this->fetch($relationship['relative'], array('with'=>null));
+				$relative = (array) new Object_model($relationship['relative'], array('with'=>null));
 				
 				$relative['relationship_id'] = (int) $relationship['id'];
 				$relative['relationship_num'] = $relationship['num'];
 				$relative['is_on'] = (bool) $relationship['is_on'];
 				
 				if(!array_key_exists('with_meta', $args) || $args['with_meta']){
-					$relative['meta'] = $this->getRelativeMeta($relationship['id']);
+					$relative['relationship_meta'] = $this->getRelativeMeta($relationship['id']);
 				}
 				
 				$this->relative[$relationship['relation']][] = $relative;
@@ -1018,7 +1018,7 @@ class Object_model extends CI_Model{
 	function getRelativeMeta($relation, $relative = null){
 		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
 		$result = $this->db->from('object_relationship_meta')->where('relationship', $relationship_id)->get()->result_array();
-		return array_column($result, 'value', 'key');
+		return (object) array_column($result, 'value', 'key');
 	}
 	
 	function setRelativeMeta($relation, $relative, $key, $value){
