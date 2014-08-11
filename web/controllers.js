@@ -21,12 +21,12 @@ lubanlockControllers.controller('AlertCtrl', ['$scope', 'Alert',
 	}
 ]);
 
-lubanlockControllers.controller('NavCtrl', ['$scope', 'Nav', 'UserConfig', '$location',
-	function($scope, Nav, UserConfig, $location){
+lubanlockControllers.controller('NavCtrl', ['$scope', '$location', 'Nav', 'User',
+	function($scope, $location, Nav, User){
 		
 		$scope.items = Nav.query();
 		
-		$scope.config = UserConfig.get();
+		$scope.config = User.getConfig();
 		
 		$scope.toggleMinimize = function(){
 			$scope.config.nav_minimized = !$scope.config.nav_minimized;
@@ -246,12 +246,12 @@ lubanlockControllers.controller('UsersCtrl', ['$scope', '$routeParams', 'User', 
 	}
 ]);
 
-lubanlockControllers.controller('UserDetailCtrl', ['$scope', '$routeParams', 'User', 'UserConfig',
-	function($scope, $routeParams, User, UserConfig) {
+lubanlockControllers.controller('UserDetailCtrl', ['$scope', '$routeParams', 'User',
+	function($scope, $routeParams, User) {
 		
 		$scope.user = User.get({id: $routeParams.id});
 		
-		$scope.config = UserConfig.get();
+		$scope.config = User.getConfig();
 		
 		$scope.updateConfig = function(){
 			if($scope.newPassword && $scope.newPassword === $scope.newPasswordConfirm){
