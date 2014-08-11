@@ -5,7 +5,7 @@
 var lubanlockFilters = angular.module('lubanlockFilters', []);
 
 /**
- * 将对象或数组转化为逗号分隔字符串显示
+ * convert an array or an object to a human friendly string
  */
 lubanlockFilters.filter('plain', function(){
 	return function(input){
@@ -25,7 +25,7 @@ lubanlockFilters.filter('plain', function(){
 });
 
 /**
- * 一个数组的对象中取一个属性成为一个一维数组
+ * select a key of elements from an array to a new plain array
  */
 lubanlockFilters.filter('select', function(){
 	return function(input, select){

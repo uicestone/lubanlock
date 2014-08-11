@@ -8,3 +8,5 @@ $lang['object'] = '对象';
 $lang['user'] = '用户';
 $lang['not_found'] = '没有找到';
 $lang['duplicated_matches']='无法确定唯一项';
+$lang['duplicated_meta_key']='元数据属性名重复';
+$lang['duplicated_meta_key_value']='元数据属性名和属性值重复';
