@@ -1059,10 +1059,6 @@ class Object_model extends CI_Model{
 		
 		$result = $this->db->get()->result_array();
 		
-		if(empty($result)){
-			return null;
-		}
-		
 		if(array_key_exists('as_rows', $args) && $args['as_rows']){
 			return $result;
 		}
