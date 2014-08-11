@@ -69,7 +69,7 @@
 				<div class="navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
 
-						<li class="light-blue">
+						<li class="light-blue" dropdown>
 							<a href="" dropdown-toggle>
 								<span class="user-info">
 									<small>你好,</small>
