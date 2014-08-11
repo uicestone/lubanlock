@@ -6,8 +6,7 @@ class LB_Output extends CI_Output {
 		$this->final_output = '';
 	}
 	
-	function set_status_header($code = 200, $text = '') {
-		$this->set_header('Status-Text: '.json_encode($text));
-		parent::set_status_header($code, $text);
+	function set_status_header($code = 200, $text = 'OK') {
+		return parent::set_status_header($code, str_replace('"', '', json_encode($text)));
 	}
 }

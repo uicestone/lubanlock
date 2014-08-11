@@ -82,31 +82,19 @@ lubanlockServices.factory('CompanyConfig', ['$resource',
 // register the interceptor as a service
 lubanlockServices.factory('HttpInterceptor', ['$q', '$window', 'Alert', function($q, $window, Alert) {
 	return {
-		// optional method
-		'request': function(config) {
-			// do something on success
+		request: function(config) {
 			return config || $q.when(config);
 		},
-		// optional method
-		'requestError': function(rejection) {
-			// do something on error
-//			if (canRecover(rejection)) {
-//				return responseOrNewPromise
-//			}
+		requestError: function(rejection) {
 			return $q.reject(rejection);
 		},
-		// optional method
-		'response': function(response) {
-			// do something on success
+		response: function(response) {
+			response.statusText = angular.fromJson('"' + response.statusText + '"');
 			return response || $q.when(response);
 		},
-		// optional method
-		'responseError': function(rejection) {
-//			if (canRecover(rejection)) {
-//				return responseOrNewPromise
-//			}
-			Alert.addAlert(eval(rejection.headers()['status-text']));
-			
+		responseError: function(rejection) {
+			rejection.statusText = angular.fromJson('"' + rejection.statusText + '"');
+			Alert.addAlert(rejection.statusText);
 			return $q.reject(rejection);
 		}
 	};
