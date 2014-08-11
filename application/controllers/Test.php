@@ -171,11 +171,11 @@ class Test extends LB_Controller{
 		
 		$object_1->setRelativeMeta('同学', $user_2->id, '直到', '永远');
 		$object_1->getRelative();
-		$this->unit->run($object_1->relative['同学'][0]['meta']['直到'], '永远', 'set relative meta');
+		$this->unit->run($object_1->relative['同学'][0]['relationship_meta']['直到'], '永远', 'set relative meta');
 		
 		$object_1->setRelativeMeta('同学', $user_2->id, '自从', null);
 		$object_1->getRelative();
-		$this->unit->run(array_key_exists('自从', $object_1->relative['同学'][0]['meta']), false, 'remove relative meta');
+		$this->unit->run(array_key_exists('自从', $object_1->relative['同学'][0]['relationship_meta']), false, 'remove relative meta');
 		
 		// read public object as user not logged in
 		$this->user->initialize();

@@ -37,10 +37,6 @@ class Object extends LB_Controller{
 		
 		$object = $this->object->fetch($id, $args);
 		
-		//meta在后台使用array，在前端使用Object表示，因此输出时要转化
-		array_key_exists('meta', $object) && $object['meta'] = (object)$object['meta'];
-		array_key_exists('tag', $object) && $object['tag'] = (object)$object['tag'];
-		
 		$this->output->set_output($object);
 	}
 	
@@ -99,7 +95,7 @@ class Object extends LB_Controller{
 				break;
 		}
 		
-		$this->output->set_output((object)$this->object->getMeta());
+		$this->output->set_output($this->object->getMeta());
 		
 	}
 	
@@ -197,7 +193,7 @@ class Object extends LB_Controller{
 			
 		}
 		
-		$this->output->set_output((object)$this->object->getTag());
+		$this->output->set_output($this->object->getTag());
 	}
 	
 	function permission($object_id, $type = 'authorize', $name = 'read'){

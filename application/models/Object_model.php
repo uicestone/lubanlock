@@ -706,13 +706,13 @@ class Object_model extends CI_Model{
 			return $result;
 		}
 		
-		$this->meta = array();
+		$this->meta = null;
 		
 		foreach($result as $row){
 			if($this->allow_meta($row['key'])){
 				$this->meta[$row['key']][] = $row['value'];
-				}
 			}
+		}
 		
 		return $this->meta;
 		
@@ -778,12 +778,12 @@ class Object_model extends CI_Model{
 		$metas = $this->getMeta();
 		
 		if($unique){
-			if(array_key_exists($key, $metas)){
+			if(is_array($metas) && array_key_exists($key, $metas)){
 				throw new Exception('duplicated_meta_key', 400);
 			}
 		}
 		
-		if(array_key_exists($key, $metas) && in_array($value, $metas[$key])){
+		if(is_array($metas) && array_key_exists($key, $metas) && in_array($value, $metas[$key])){
 			throw new Exception('duplicated_meta_key_value', 400);
 		}
 		
@@ -891,7 +891,7 @@ class Object_model extends CI_Model{
 			return $result;
 		}
 		
-		$this->relative = array();
+		$this->relative = null;
 
 		foreach($result as $relationship){
 
@@ -1018,7 +1018,7 @@ class Object_model extends CI_Model{
 	function getRelativeMeta($relation, $relative = null){
 		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
 		$result = $this->db->from('object_relationship_meta')->where('relationship', $relationship_id)->get()->result_array();
-		return (object) array_column($result, 'value', 'key');
+		return $result ? array_column($result, 'value', 'key') : null;
 	}
 	
 	function setRelativeMeta($relation, $relative, $key, $value){
@@ -1059,11 +1059,15 @@ class Object_model extends CI_Model{
 		
 		$result = $this->db->get()->result_array();
 		
+		if(empty($result)){
+			return null;
+		}
+		
 		if(array_key_exists('as_rows', $args) && $args['as_rows']){
 			return $result;
 		}
 		
-		$this->status = array();
+		$this->status = null;
 		
 		foreach($result as $row){
 			$this->status[$row['name']][] = $row['date'];
@@ -1207,7 +1211,7 @@ class Object_model extends CI_Model{
 			return $result;
 		}
 		
-		$this->tag = array();
+		$this->tag = null;
 		
 		foreach($result as $row){
 			$this->tag[$row->taxonomy][] = $row->term;
