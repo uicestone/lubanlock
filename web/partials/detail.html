@@ -57,8 +57,7 @@
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
 								<a class="icon-trash pointer-cursur" ng-click="prohibit('read', user.id)"></a>
 							</span>
-							<span ng-if="!object.permission.read.length">公开</span>
-							&nbsp;
+							<span ng-if="!object.permission.read.length">所有人</span>
 						</div>
 					</div>
 					<div class="profile-info-row">
@@ -69,7 +68,7 @@
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
 								<a class="icon-trash pointer-cursur" ng-click="prohibit('write', user.id)"></a>
 							</span>
-							&nbsp;
+							<span ng-if="!object.permission.write.length">添加者</span>
 						</div>
 					</div>
 					<div class="profile-info-row">
@@ -80,7 +79,7 @@
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
 								<a class="icon-trash pointer-cursur" ng-click="prohibit('grant', user.id)"></a>
 							</span>
-							&nbsp;
+							<span ng-if="!object.permission.grant.length">添加者</span>
 						</div>
 					</div>
 				</div>

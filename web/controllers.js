@@ -145,7 +145,6 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		
 		$scope.removeMeta = function(key, value){
 			Object.removeMeta({object: $scope.object.id, key: key, value: value}, function(meta){
-				console.log(meta);
 				$scope.object.meta = meta;
 			});
 		}
@@ -258,6 +257,11 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		 * @returns {Boolean}
 		 */
 		$scope.allow = function(action){
+			
+			if(!$scope.object.permission){
+				return false;
+			}
+			
 			var users = $scope.object.permission[action];
 			
 			if(users.length === 0){
