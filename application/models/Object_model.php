@@ -65,6 +65,7 @@ class Object_model extends CI_Model{
 		}
 		
 		$object['id'] = intval($object['id']);
+		$object['user'] = intval($object['user']);
 		
 		foreach(array_keys(get_object_vars($this)) as $property){
 			array_key_exists($property, $object) && $this->$property = $object[$property];
@@ -155,6 +156,11 @@ class Object_model extends CI_Model{
 	}
 	
 	function remove(){
+		
+		if(!$this->allow('write')){
+			throw new Exception('no_permission', 403);
+		}
+		
 		$result = $this->db->where('id', $this->id)->delete('object');
 		
 		if($this->db->error() && strpos($this->db->error()['message'], 'Cannot delete or update a parent row: a foreign key constraint fails') === 0){
@@ -220,7 +226,7 @@ class Object_model extends CI_Model{
 		else{
 			$this->fetch($this->id, array('with'=>null), false);
 			
-			if(in_array($this->user, $users) || in_array($this->id, $users)){
+			if(in_array($this->user, $users) || (is_null($this->user) && in_array($this->id, $users))){
 				return true;
 			}
 			else{

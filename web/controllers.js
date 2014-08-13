@@ -252,6 +252,35 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 			});
 		}
 		
+		/**
+		 * check if the current object is allowed for current user on certain action
+		 * @param {type} permission
+		 * @returns {Boolean}
+		 */
+		$scope.allow = function(action){
+			var users = $scope.object.permission[action];
+			
+			if(users.length === 0){
+				if($scope.object.permission.read.length === 0 && 
+					$scope.object.permission.write.length === 0 && 
+					$scope.object.permission.grant.length === 0 && 
+					(
+						user.id === $scope.object.user || 
+						($scope.object.user === null && $scope.object.id === user.id)
+					)
+				){
+					return true;
+				}
+				return false;
+			}
+			for(var i = 0; i < users.length; i++){
+				if(users[i].id === user.id){
+					return true
+				}
+			}
+			return false;
+		}
+		
 	}
 ]);
 
