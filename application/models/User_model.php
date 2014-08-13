@@ -36,7 +36,7 @@ class User_model extends Object_model{
 		}
 		
 		try{
-			$user = $this->fetch($this->session_id, array('with'=>null), false);
+			$user = $this->get($this->session_id, array('with'=>null), false);
 		}catch(Exception $e){
 			if($e->getCode() === 404){
 				$this->sessionLogout();
@@ -83,7 +83,7 @@ class User_model extends Object_model{
 	 */
 	function _get_parent_group($children = array()){
 
-		$parents = $this->getList(array(
+		$parents = $this->query(array(
 			'type'=>'group',
 			'has_relative_like'=>array($children)
 		));
@@ -105,13 +105,13 @@ class User_model extends Object_model{
 		
 	}
 
-	function fetch($id = null, array $args = array(), $permission_check = true){
+	function get($id = null, array $args = array(), $permission_check = true){
 		
 		if(is_null($id)){
 			$id = $this->id;
 		}
 		
-		$object = parent::fetch($id, $args, $permission_check);
+		$object = parent::get($id, $args, $permission_check);
 		
 		$user = $this->db->select('user.id, user.name, user.email, user.roles, user.last_ip, user.last_login')->from('user')->where('id', $id)->get()->row_array();
 		
@@ -122,11 +122,11 @@ class User_model extends Object_model{
 		return array_merge($object, $user);
 	}
 	
-	function getList(array $args=array()){
+	function query(array $args=array()){
 		
 		$this->db->join('user','user.id = object.id','inner')->select('user.name, user.email, user.roles, user.last_ip, user.last_login');
 		
-		return parent::getList($args);
+		return parent::query($args);
 	}
 	
 	/**

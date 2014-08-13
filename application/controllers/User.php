@@ -10,10 +10,10 @@ class User extends LB_Controller{
 		switch ($this->input->method) {
 			case 'GET':
 				if(is_null($id)){
-					$this->getList();
+					$this->query();
 				}
 				else{
-					$this->fetch($id);
+					$this->get($id);
 				}
 				break;
 			
@@ -31,20 +31,20 @@ class User extends LB_Controller{
 		}
 	}
 	
-	function fetch($id){
+	function get($id){
 		
 		$args=$this->input->get();
 		
-		$user = $this->user->fetch($id, $args);
+		$user = $this->user->get($id, $args);
 		
 		$this->output->set_output($user);
 	}
 	
-	function getList(){
+	function query(){
 		
 		$args=$this->input->get();
 		
-		$result = $this->user->getList($args);
+		$result = $this->user->query($args);
 
 		$this->output->set_output($result['data']);
 		$this->output->set_status_header(200, 'OK, '.$result['info']['total'].' Users in Total');
@@ -52,13 +52,13 @@ class User extends LB_Controller{
 	
 	function add(){
 		$user_id = $this->user->add($this->input->data(), $this->input->get());
-		$this->fetch($user_id);
+		$this->get($user_id);
 	}
 	
 	function update($id){
 		$this->user->id = $id;
 		$this->user->update($this->input->data());
-		$this->fetch($id);
+		$this->get($id);
 	}
 	
 	function remove($id){
@@ -105,7 +105,7 @@ class User extends LB_Controller{
 	
 	function profile(){
 		
-		$people=array_merge_recursive($this->people->fetch($this->user->session_id),$this->input->sessionPost('people'));
+		$people=array_merge_recursive($this->people->get($this->user->session_id),$this->input->sessionPost('people'));
 		$people_meta=array_merge_recursive(array_column($this->people->getMeta($this->user->session_id),'content','name'),$this->input->sessionPost('people'));
 		$this->load->addViewArrayData(compact('people','people_meta'));
 		

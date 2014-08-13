@@ -138,7 +138,7 @@ var api = {
 	"获取对象列表":{
 		"request":{
 			"path":"/object",
-			"query":args.getList + args.objectField + args.algorithm + args.logical
+			"query":args.query + args.objectField + args.algorithm + args.logical
 		},
 		"response":{
 			"headers":{
@@ -419,7 +419,7 @@ var args = {};
 /**
  * 获得列表的基本参数，这些参数是不具有递归属性的
  */
-args.getList = {
+args.query = {
 	"search":"",//智能搜索
 
 	"order_by":[//支持2种格式

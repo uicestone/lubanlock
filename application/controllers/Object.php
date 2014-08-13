@@ -10,10 +10,10 @@ class Object extends LB_Controller{
 		switch ($this->input->method) {
 			case 'GET':
 				if(is_null($id)){
-					$this->getList();
+					$this->query();
 				}
 				else{
-					$this->fetch($id);
+					$this->get($id);
 				}
 				break;
 			
@@ -31,20 +31,20 @@ class Object extends LB_Controller{
 		}
 	}
 	
-	function fetch($id){
+	function get($id){
 		
 		$args = $this->input->get();
 		
-		$object = $this->object->fetch($id, $args);
+		$object = $this->object->get($id, $args);
 		
 		$this->output->set_output($object);
 	}
 	
-	function getList(){
+	function query(){
 		
 		$args=$this->input->get();
 		
-		$result=$this->object->getList($args);
+		$result=$this->object->query($args);
 
 		$this->output->set_output($result['data']);
 		$this->output->set_status_header(200, 'OK, '.$result['info']['total'].' Objects in Total, '.$result['info']['from'].'-'.$result['info']['to'].' Listed');
@@ -56,7 +56,7 @@ class Object extends LB_Controller{
 		
 		$this->object->update($this->input->data());
 		
-		$this->fetch($this->object->id);
+		$this->get($this->object->id);
 	}
 	
 	function add(){
@@ -64,7 +64,7 @@ class Object extends LB_Controller{
 		
 		$this->object->id = $this->object->add($data);
 		
-		$this->fetch($this->object->id);
+		$this->get($this->object->id);
 	}
 	
 	function remove($id){

@@ -28,7 +28,7 @@ class Object_model extends CI_Model{
 				$this->id = intval($data);
 			}
 			
-			$this->fetch($this->id, $args);
+			$this->get($this->id, $args);
 			
 		}
 	}
@@ -41,7 +41,7 @@ class Object_model extends CI_Model{
 	 * @param bool $permission_check
 	 * @return array
 	 */
-	function fetch($id = null, array $args = array(), $permission_check = true){
+	function get($id = null, array $args = array(), $permission_check = true){
 
 		if(!is_null($id)){
 			$this->id = intval($id);
@@ -224,7 +224,7 @@ class Object_model extends CI_Model{
 			return true;
 		}
 		else{
-			$this->fetch($this->id, array('with'=>null), false);
+			$this->get($this->id, array('with'=>null), false);
 			
 			if(in_array($this->user, $users) || (is_null($this->user) && in_array($this->id, $users))){
 				return true;
@@ -529,7 +529,7 @@ class Object_model extends CI_Model{
 	 *		perpage int
 	 * @return array
 	 */
-	function getList(array $args=array()){
+	function query(array $args=array()){
 
 		$this->db->from('object')->found_rows()->select('object.*');
 		
@@ -662,12 +662,12 @@ class Object_model extends CI_Model{
 	
 	
 	function getArray(array $args=array(),$keyname='name',$keyname_forkey='id'){
-		return array_column($this->getList($args),$keyname,$keyname_forkey);
+		return array_column($this->query($args),$keyname,$keyname_forkey);
 	}
 	
 	function getRow(array $args=array()){
 		!array_key_exists('limit',$args) && $args['limit']=1;
-		$result=$this->getList($args);
+		$result=$this->query($args);
 		if(isset($result['data'][0])){
 			return $result['data'][0];
 		}
