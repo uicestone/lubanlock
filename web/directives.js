@@ -101,7 +101,7 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 
 					default:
 						scope.object[scope.prop] = scope.value;
-						scope.object.$update({with_status:{as_rows:true}});
+						scope.object.$update({with_status: {as_rows: true, order_by: 'date desc'}, with_permission: {with_user_info: true}});
 				}
 			}
 			

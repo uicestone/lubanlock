@@ -1,10 +1,7 @@
 <?php
 class User_model extends Object_model{
 	
-	var $session_id;
 	var $name = '', $email, $password, $roles = array();
-	var $groups = array();
-	var $group_ids = array();//当前用户所属组的object id，包含当前用户的user id
 	
 	static $fields=array(
 		'name'=>'',
@@ -21,22 +18,22 @@ class User_model extends Object_model{
 	
 	function initialize($id = null){
 		
-		$this->session_id = null;
-		$this->group_ids = array();
-		$this->groups = array();
+		$this->session->user_id = null;
+		$this->session->group_ids = array();
+		$this->session->groups = array();
 		
-		isset($id) && $this->session_id = intval($id);
+		isset($id) && $this->session->user_id = intval($id);
 		
-		if(is_null($this->session_id) && $this->session->userdata('user_id')){
-			$this->session_id = intval($this->session->userdata('user_id'));
+		if(is_null($this->session->user_id) && $this->session->userdata('user_id')){
+			$this->session->user_id = intval($this->session->userdata('user_id'));
 		}
 		
-		if(!$this->session_id){
+		if(!$this->session->user_id){
 			return;
 		}
 		
 		try{
-			$user = $this->get($this->session_id, array('with'=>null), false);
+			$user = $this->get($this->session->user_id, array('with'=>null), false);
 		}catch(Exception $e){
 			if($e->getCode() === 404){
 				$this->sessionLogout();
@@ -44,19 +41,19 @@ class User_model extends Object_model{
 			}
 		}
 		
-		$this->name = $user['name'];
+		$this->session->user_name = $user['name'];
 		
-		$this->roles = $this->_parse_roles($user['roles']);
+		$this->session->user_roles = $this->_parse_roles($user['roles']);
 		
-		array_push($this->group_ids, $this->session_id);
+		array_push($this->session->group_ids, $this->session->user_id);
 		
-		$this->_get_parent_group(array($this->session_id));
+		$this->_get_parent_group(array($this->session->user_id));
 		
-		$groups = $this->groups;
-		$this->groups = array();
+		$groups = $this->session->groups;
+		$this->session->groups = array();
 		
 		foreach($groups as $value){
-			$this->groups[$value['id']] = $value;
+			$this->session->groups[$value['id']] = $value;
 		}
 		
 	}
@@ -88,11 +85,11 @@ class User_model extends Object_model{
 			'has_relative_like'=>array($children)
 		));
 		
-		$this->groups = array_merge($this->groups, $parents['data']);
+		$this->session->groups = array_merge($this->session->groups, $parents['data']);
 		$parent_group_ids = array_map('intval', array_column($parents['data'], 'id'));
-		$this->group_ids = array_merge($this->group_ids, $parent_group_ids);
+		$this->session->group_ids = array_merge($this->session->group_ids, $parent_group_ids);
 		
-		$this->roles = array_merge($this->roles, array_reduce(
+		$this->session->user_roles = array_merge($this->session->user_roles, array_reduce(
 			array_map(array($this, '_parse_roles'), array_column($parents['data'], 'roles')),
 			function($result, $item){
 				return array_merge($result, $item);
@@ -222,10 +219,10 @@ class User_model extends Object_model{
 	 */
 	function isLogged($group=NULL){
 		if(is_null($group)){
-			if(empty($this->session_id)){
+			if(empty($this->session->user_id)){
 				return false;
 			}
-		}elseif(empty($this->roles) || !in_array($group,$this->roles)){
+		}elseif(empty($this->session->user_roles) || !in_array($group,$this->session->user_roles)){
 			return false;
 		}
 
@@ -243,7 +240,7 @@ class User_model extends Object_model{
 		
 		if(is_null($key)){
 			
-			$this->db->from('user_config')->where('user',$this->session_id);
+			$this->db->from('user_config')->where('user',$this->session->user_id);
 
 			$config = array_column($this->db->get()->result_array(), 'value', 'key');
 
@@ -260,7 +257,7 @@ class User_model extends Object_model{
 			
 			$row = $this->db->select('id,value')
 				->from('user_config')
-				->where('user', $this->session_id)
+				->where('user', $this->session->user_id)
 				->where('key', $key)
 				->get()->row();
 
@@ -277,7 +274,7 @@ class User_model extends Object_model{
 			
 			$value = json_encode($value);
 			
-			return $this->db->upsert('user_config', array('user'=>$this->session_id, 'key'=>$key, 'value'=>$value));
+			return $this->db->upsert('user_config', array('user'=>$this->session->user_id, 'key'=>$key, 'value'=>$value));
 		}
 	}
 

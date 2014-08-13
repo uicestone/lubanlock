@@ -49,7 +49,7 @@ class Test extends LB_Controller{
 		// insert a group, add user to the group
 		$this->user->add(array('name'=>'男人帮', 'type'=>'group', 'num'=>'_test', 'roles'=>'man', 'relative'=>array($object_1->id)));
 		$this->user->initialize($object_1->id);
-		$this->unit->run(in_array('man', $this->user->roles), true, 'insert a group, add user to the group', 'Group role should exists in user role.');
+		$this->unit->run(in_array('man', $this->session->user_roles), true, 'insert a group, add user to the group', 'Group role should exists in user role.');
 		
 		// insert a user and the base object at once
 		$user_2 = new User_model(array(
@@ -179,14 +179,14 @@ class Test extends LB_Controller{
 		
 		// read public object as user not logged in
 		$this->user->initialize();
-		$object_1->fetch();
+		$object_1->get();
 		$this->unit->run($object_1->name, '大灰', 'reading public object without logged in');
 		
 		// reading private object without logged in
 		$this->user->initialize($user_1->id);
 		$object_1->authorize('private');
 		$this->user->initialize();
-		try{$object_1->fetch();}catch(Exception $e){$error = $e->getCode();}
+		try{$object_1->get();}catch(Exception $e){$error = $e->getCode();}
 		$this->unit->run($error, 403, 'reading private object without logged in');
 		
 		$this->output->set_output($this->unit->report());

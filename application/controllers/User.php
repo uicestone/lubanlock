@@ -105,8 +105,8 @@ class User extends LB_Controller{
 	
 	function profile(){
 		
-		$people=array_merge_recursive($this->people->get($this->user->session_id),$this->input->sessionPost('people'));
-		$people_meta=array_merge_recursive(array_column($this->people->getMeta($this->user->session_id),'content','name'),$this->input->sessionPost('people'));
+		$people=array_merge_recursive($this->people->get($this->session->user_id),$this->input->sessionPost('people'));
+		$people_meta=array_merge_recursive(array_column($this->people->getMeta($this->session->user_id),'content','name'),$this->input->sessionPost('people'));
 		$this->load->addViewArrayData(compact('people','people_meta'));
 		
 		$this->output->title='用户资料';

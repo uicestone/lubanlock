@@ -73,7 +73,7 @@
 							<a href="" dropdown-toggle>
 								<span class="user-info">
 									<small>你好,</small>
-									<?=$this->user->name?>
+									<?=$this->session->user_name?>
 								</span>
 
 								<i class="icon-caret-down"></i>

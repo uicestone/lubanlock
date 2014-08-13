@@ -7,7 +7,7 @@ class Nav_model extends CI_Model{
 		parent::__construct();
 		
 		self::$fields=array(
-			'user' => $this->user->session_id,
+			'user' => $this->session->user_id,
 			'name' => '',
 			'template'=>'',
 			'params' => '',
@@ -15,12 +15,13 @@ class Nav_model extends CI_Model{
 			'order' => 0
 		);
 		
+		
 	}
 	
 	function fetch($name){
 		return $this->db->from('nav')
 			->where('name', $name)
-			->where_in('user', $this->user->group_ids)
+			->where_in('user', $this->session->group_ids)
 			->get()->row();
 	}
 	
@@ -52,7 +53,7 @@ class Nav_model extends CI_Model{
 	function get(){
 		
 		$result = $this->db->from('nav')
-			->where_in('user', $this->user->group_ids)
+			->where_in('user', $this->session->group_ids)
 			->or_where('user', null)
 			->get()->result_array();
 		
