@@ -32,7 +32,9 @@ lubanlockServices.service('Object', ['$resource',
 			removeStatus: {method: 'DELETE', url: 'object/:object/status/:name', isArray: true},
 			getTag: {method: 'GET', url: 'object/:object/tag/:taxonomy'},
 			saveTag: {method: 'POST', url: 'object/:object/tag/:taxonomy', interceptor: {response: responseInterceptor}},
-			removeTag: {method: 'DELETE', url: 'object/:object/tag/:taxonomy', interceptor: {response: responseInterceptor}}
+			removeTag: {method: 'DELETE', url: 'object/:object/tag/:taxonomy', interceptor: {response: responseInterceptor}},
+			authorize: {method: 'POST', url: 'object/:object/authorize/:permission'},
+			prohibit: {method: 'POST', url: 'object/:object/prohibit/:permission'}
 		});
 	}
 ]);

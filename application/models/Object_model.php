@@ -667,6 +667,10 @@ class Object_model extends CI_Model{
 		}
 	}
 	
+	/**
+	 * @param array $args
+	 *	with_user_info: whether we return user info, if is false, only user id is returned. default is false
+	 */
 	function getPermission(array $args = array()){
 		if(!$this->allow()){
 			throw new Exception('no_permission', 403);
@@ -678,7 +682,7 @@ class Object_model extends CI_Model{
 		
 		foreach($result as $row){
 			foreach(array('read', 'write', 'grant') as $type){
-				$row->$type && $permission[$type][] = $row->user;
+				$row->$type && $permission[$type][] = empty($args['with_user_info']) ? $row->user : new User_model($row->user, array('with'=>null));
 			}
 		}
 		

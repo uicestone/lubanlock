@@ -14,9 +14,9 @@
 
 		<div id="user-profile-1" class="user-profile row">
 			
-			<!--对象分类方式-->
 			<div class="col-xs-12 col-sm-3">
 
+				<!--对象分类方式-->
 				<div class="profile-contact-info">
 					<div class="profile-contact-links align-left">
 						<a class="btn btn-link" ng-if="!object.tag">
@@ -47,6 +47,59 @@
 				
 				<div class="hr hr16 dotted"></div>
 				
+				<!--对象权限-->
+				<div class="profile-user-info object-permission">
+					<div class="profile-info-row">
+						<div class="profile-info-name"> 查看 </div>
+
+						<div class="profile-info-value">
+							<span ng-repeat="user in object.permission.read">
+								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
+								<a class="icon-trash pointer-cursur" ng-click="prohibit('read', user.id)"></a>
+							</span>
+							<span ng-if="!object.permission.read.length">公开</span>
+							&nbsp;
+						</div>
+					</div>
+					<div class="profile-info-row">
+						<div class="profile-info-name"> 修改 </div>
+
+						<div class="profile-info-value">
+							<span ng-repeat="user in object.permission.write">
+								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
+								<a class="icon-trash pointer-cursur" ng-click="prohibit('write', user.id)"></a>
+							</span>
+							&nbsp;
+						</div>
+					</div>
+					<div class="profile-info-row">
+						<div class="profile-info-name"> 授权 </div>
+
+						<div class="profile-info-value">
+							<span ng-repeat="user in object.permission.grant">
+								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
+								<a class="icon-trash pointer-cursur" ng-click="prohibit('grant', user.id)"></a>
+							</span>
+							&nbsp;
+						</div>
+					</div>
+				</div>
+				
+				<form class="form-inline row row-compact" ng-show="adding.permission" ng-submit="authorize()">
+					<div class="form-group col-sm-3">
+						<select ng-model="new.permission.permission" ng-options="item.name as item.label for item in [{name:'read',label:'查看'},{name:'write',label:'修改'},{name:'grant',label:'授权'}]" class="form-control-xs"></select>
+					</div>
+					<div class="form-group col-sm-4">
+						<input class="form-control form-control-xs form-control-justify" type="text" class="form-control form-control-xs" placeholder="用户" ng-model="new.permission.users_name" typeahead="object as object.name for object in searchUser($viewValue)" typeahead-template-url="partials/object_autocomplete.html" typeahead-wait-ms="100" typeahead-on-select="onAuthorizedUserSelected($item)">
+					</div>
+					<button type="submit" class="btn btn-primary btn-xs icon-key"></button>
+					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('permission')"></button>
+				</form>
+				
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加授权用户 / 组 " ng-click="openPropAddForm('permission', $event)" ng-hide="adding.permission"></button>
+				
+				<hr>
+
 			</div>
 
 			<div class="col-xs-12 col-sm-9">

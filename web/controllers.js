@@ -103,8 +103,8 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'obje
  * This is a common controller for detail page of any object.
  * We can view and modify Tags, Metas, Relatives and Statuses if we are permitted
  */
-lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 'Alert', 'object',
-	function($scope, $location, Object, Alert, object) {
+lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 'User', 'Alert', 'object',
+	function($scope, $location, Object, User, Alert, object) {
 		
 		$scope.angular = angular; // we need call angular.equal() in template
 		
@@ -112,10 +112,10 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		$scope.object = object;
 		
 		// flags for property adding form toggling
-		$scope.adding = {meta: false, relative: false, status: false, tag: false}
+		$scope.adding = {meta: false, relative: false, status: false, tag: false, permission: false}
 		
 		// collection of new property models. 'new' are wrapped in '[]' here because it's a reserved word in ECMA Script 3.
-		$scope['new'] = {meta: {}, relative: {}, status: {}, tag: {}};
+		$scope['new'] = {meta: {}, relative: {}, status: {}, tag: {}, permission: {}};
 		
 		$scope.openPropAddForm = function(prop, $event){
 			$scope.adding[prop] = true;
@@ -124,6 +124,9 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 			setTimeout(function(){
 				angular.element($event.target).siblings('form').find(':input:first').trigger('select');
 			});
+			if(prop === 'permission'){
+				$scope.new.permission.permission = 'read';
+			}
 		}
 		
 		$scope.closePropAddForm = function(prop){
@@ -191,7 +194,12 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		// used in typeahead for relative name auto complete
 		$scope.search = function(name){
 			// a promise can be parsed by typeahead, no then() wrapping required
-			return Object.query({name:{like:name}}).$promise;
+			return Object.query({name: {like: name}}).$promise;
+		};
+		
+		$scope.searchUser = function(name){
+			// a promise can be parsed by typeahead, no then() wrapping required
+			return User.query({name: {like: name}}).$promise;
 		};
 		
 		$scope.onRelativeSelect = function($item){
@@ -214,6 +222,28 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 			}
 			
 			$location.url('detail/' + id);
+		}
+		
+		$scope.authorize = function(permission, users){
+			if(permission === undefined){
+				permission = $scope['new'].permission.permission;
+			}
+			if(users === undefined){
+				users = $scope['new'].permission.users;
+			}
+			Object.authorize({object: $scope.object.id, permission: permission, with_user_info: true}, users, function(permission){
+				$scope.object.permission = permission;
+			});
+		}
+		
+		$scope.prohibit = function(permission, userId){
+			Object.prohibit({object: $scope.object.id, permission: permission, with_user_info: true}, userId, function(permission){
+				$scope.object.permission = permission;
+			});
+		}
+		
+		$scope.onAuthorizedUserSelected = function($item){
+			$scope['new'].permission.users = $item.id;
 		}
 		
 		$scope.remove = function(){

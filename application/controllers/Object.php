@@ -99,7 +99,7 @@ class Object extends LB_Controller{
 		
 	}
 	
-	function relative($object_id, $relation = null){
+	function relative($object_id, $relation = ''){
 		
 		$this->object->id = $object_id;
 		

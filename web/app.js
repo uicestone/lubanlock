@@ -38,7 +38,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 				resolve: {
 					object: ['$route', 'Object', function($route, Object){
 						if($route.current.params.id){
-							return Object.get({id: $route.current.params.id, with_status: {as_rows: true, order_by:'date desc'}}).$promise;
+							return Object.get({id: $route.current.params.id, with_status: {as_rows: true, order_by:'date desc'}, with_permission: {with_user_info: true}}).$promise;
 						}
 					}]
 				}

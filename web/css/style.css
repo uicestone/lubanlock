@@ -101,3 +101,11 @@ form.prop-add .profile-info-name{
 form.prop-add .btn{
 	vertical-align: bottom;
 }
+
+.profile-user-info.object-permission .profile-info-name {
+	width: 40px;
+}
+
+.profile-user-info.object-permission .profile-info-value {
+	margin-left: 40px;
+}
