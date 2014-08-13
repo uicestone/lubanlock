@@ -286,6 +286,14 @@ class Object_model extends CI_Model{
 		
 		$permission = array_intersect_key($permission, array('read'=>true, 'write'=>true, 'grant'=>true));
 		
+		if(array_key_exists('grant', $permission) && $permission['grant']){
+			$permission['write'] = true;
+		}
+		
+		if(array_key_exists('write', $permission) && $permission['write']){
+			$permission['read'] = true;
+		}
+		
 		if(is_null($users)){
 			
 			if(!get_instance()->user->session_id){
