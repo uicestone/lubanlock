@@ -30,7 +30,7 @@ lubanlockControllers.controller('NavCtrl', ['$scope', '$location', 'Nav', 'User'
 		
 		$scope.toggleMinimize = function(){
 			$scope.config.nav_minimized = !$scope.config.nav_minimized;
-			$scope.config.$save();
+			$scope.config.$saveConfig();
 		}
 		
 		$scope.navigateTo = function(item){
