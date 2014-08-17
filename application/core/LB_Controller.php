@@ -10,6 +10,8 @@ class LB_Controller extends CI_Controller{
 			$this->output->set_content_type('application/json');
 		}
 		
+		$this->output->set_header('X-UA-Compatible: IE=edge');
+		
 	}
 	
 	function _output($output){

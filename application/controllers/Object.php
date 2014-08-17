@@ -42,12 +42,16 @@ class Object extends LB_Controller{
 	
 	function query(){
 		
-		$args=$this->input->get();
-		
-		$result=$this->object->query($args);
+		$result = $this->object->query($this->input->get());
 
-		$this->output->set_output($result['data']);
-		$this->output->set_status_header(200, 'OK, '.$result['info']['total'].' Objects in Total, '.$result['info']['from'].'-'.$result['info']['to'].' Listed');
+		if(is_array($result) && array_key_exists('data', $result) && array_key_exists('info', $result)){
+			$this->output->set_output($result['data']);
+			$this->output->set_status_header(200, 'OK, '.$result['info']['total'].' Objects in Total, '.$result['info']['from'].'-'.$result['info']['to'].' Listed');
+		}
+		else{
+			$this->output->set_output($result);
+		}
+		
 	}
 	
 	function update($id){

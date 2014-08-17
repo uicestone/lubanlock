@@ -97,7 +97,7 @@
 								<li class="divider"></li>
 
 								<li>
-									<a href="<?=site_url()?>/logout">
+									<a href="<?=site_url()?>logout">
 										<i class="icon-off"></i>
 										退出
 									</a>

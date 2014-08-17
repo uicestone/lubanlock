@@ -203,6 +203,10 @@ class Object_model extends CI_Model{
 		}
 		
 		if(is_null($users)){
+			$this->get($this->id, array('with'=>null), false);
+			if(is_array($this->session->user_roles) && in_array($this->type . '-admin', $this->session->user_roles)){
+				return true;
+			}
 			$users = $this->session->group_ids;
 		}
 		
@@ -320,6 +324,9 @@ class Object_model extends CI_Model{
 	function _parse_criteria($args, $field='`object`.`id`', $logical_operator = 'AND'){
 		
 		if(!is_array($args)){
+			if($args === 'ME'){
+				$args = $this->session->user_id;
+			}
 			return $field.' = '.$this->db->escape($args);
 		}
 		
@@ -412,7 +419,7 @@ class Object_model extends CI_Model{
 				}
 			}
 			
-			elseif(in_array($arg_name,array('id','name','type','user','time','time_insert'))){
+			elseif(in_array($arg_name,array('id','name','type','num','user','time','time_insert'))){
 				if($field === '`object`.`id`'){
 					$where[] = $this->_parse_criteria($arg_value, '`object`.'.$arg_name);
 				}else{
@@ -591,6 +598,14 @@ class Object_model extends CI_Model{
 			}
 			
 		}
+		
+		array_walk($result_array, function(&$row, $index){
+			$row['id'] = intval($row['id']);
+		});
+
+		if(array_key_exists('limit', $args) && $args['limit'] === 1){
+			return $result_array ? $result_array[0] : null;
+		}
 
 		$result['data'] = $result_array;
 		
@@ -602,12 +617,9 @@ class Object_model extends CI_Model{
 		return array_column($this->query($args),$keyname,$keyname_forkey);
 	}
 	
-	function getRow(array $args=array()){
-		!array_key_exists('limit',$args) && $args['limit']=1;
-		$result=$this->query($args);
-		if(isset($result['data'][0])){
-			return $result['data'][0];
-		}
+	function getRow(array $args = array()){
+		!array_key_exists('limit', $args) && $args['limit']=1;
+		return $this->query($args);
 	}
 	
 	/**
@@ -814,6 +826,7 @@ class Object_model extends CI_Model{
 	 *	id_only
 	 *	include_disabled
 	 *	with_meta default:true
+	 *	order_by
 	 * @return array
 	 */
 	function getRelative(array $args = array()){
@@ -828,6 +841,10 @@ class Object_model extends CI_Model{
 		
 		if(!array_key_exists('include_disabled', $args) || !$args['include_disabled']){
 			$this->db->where('object_relationship.is_on', true);
+		}
+		
+		if(array_key_exists('order_by', $args)){
+			$this->db->order_by($args['order_by']);
 		}
 		
 		$result = $this->db->get()->result_array();

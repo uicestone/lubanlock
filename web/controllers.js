@@ -125,7 +125,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 				angular.element($event.target).siblings('form').find(':input:first').trigger('select');
 			});
 			if(prop === 'permission'){
-				$scope.new.permission.permission = 'read';
+				$scope['new'].permission.permission = 'read';
 			}
 		}
 		

@@ -81,7 +81,6 @@ class User_model extends Object_model{
 	function _get_parent_group($children = array()){
 
 		$parents = $this->query(array(
-			'type'=>'group',
 			'has_relative_like'=>array($children)
 		));
 		

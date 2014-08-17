@@ -15,14 +15,15 @@
 			</a>
 		</li>
 
+<?php if($this->user->isLogged('admin')){ ?>
 		<li>
 			<a href="#/list">
 				<i class="icon-cloud"></i>
 				<span class="menu-text"> 所有数据 </span>
 			</a>
 		</li>
-
-<?php if($this->user->isLogged('user_admin')){ ?>
+<?php } ?>
+<?php if($this->user->isLogged('user-admin')){ ?>
 		<li>
 			<a href="#/user">
 				<i class="icon-user"></i>

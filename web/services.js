@@ -8,8 +8,16 @@ lubanlockServices.service('Object', ['$resource',
 	function($resource){
 		
 		var responseInterceptor = function(response){
+			
+			// preventing 'null' response from being parsed as string
+			// angular did right itself because JSON doesn't actually support single value. 
+			// TODO: we need to find a way out to better encode null, empty array and object at backend
 			if(response.data === 'null'){
-				return null;
+				angular.forEach(response.resource, function(value, key){
+					if(!isNaN(key)){
+						delete response.resource[key];
+					}
+				});
 			}
 			response.resource.$response = response;
 			return response.resource;
@@ -123,6 +131,8 @@ lubanlockServices.service('Alert', ['$rootScope', '$timeout', function($rootScop
 
 lubanlockServices.service('Nav', ['$resource',
 	function($resource){
+		
+		return $resource('nav/:name');
 		
 		var Resource = $resource('nav/:name', {name:'@name'});
 		var items = Resource.query();

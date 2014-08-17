@@ -1,20 +1,22 @@
-<a href="#/detail" class="btn btn-primary icon-plus"></a>
-<form class="form-inline" ng-show="showNavSaveForm" ng-submit="addNavItem()" style="display: inline;">
-	<div class="form-group">
-		<input type="text" placeholder="名称" class="form-control" ng-model="newNavItemName">
-	</div>
-	<div class="form-group">
-		<input type="text" placeholder="模板" class="form-control" ng-model="newNavItemTemplate">
-	</div>
-	<button type="submit" class="btn btn-primary">保存</button>
-</form>
-<a class="btn" ng-if="!inNav" ng-click="toggleNavSaveForm()" ng-class="{'icon-bookmark': !showNavSaveForm, 'icon-chevron-left': showNavSaveForm}"></a>
-<span id="paginator" class="pull-right">
-	<span class="dataTables_info">{{objectListStart}} - {{objectListEnd}}, {{totalObjects}}</span>
-	<button class="btn icon-chevron-left" ng-click="previousPage()" ng-disabled="!currentPage || currentPage === 1"></button>
-	<button class="btn icon-chevron-right" ng-click="nextPage()" ng-disabled="objectListEnd >= totalObjects"></button>
-</span>
-<hr>
+<div>
+	<a href="#/detail" class="btn btn-primary icon-plus"></a>
+	<form class="form-inline" ng-show="showNavSaveForm" ng-submit="addNavItem()" style="display: inline;">
+		<div class="form-group">
+			<input type="text" placeholder="名称" class="form-control" ng-model="newNavItemName">
+		</div>
+		<div class="form-group">
+			<input type="text" placeholder="模板" class="form-control" ng-model="newNavItemTemplate">
+		</div>
+		<button type="submit" class="btn btn-primary">保存</button>
+	</form>
+	<a class="btn" ng-if="!inNav" ng-click="toggleNavSaveForm()" ng-class="{'icon-bookmark': !showNavSaveForm, 'icon-chevron-left': showNavSaveForm}"></a>
+	<span id="paginator" class="pull-right">
+		<span class="dataTables_info">{{objectListStart}} - {{objectListEnd}}, {{totalObjects}}</span>
+		<button class="btn icon-chevron-left" ng-click="previousPage()" ng-disabled="!currentPage || currentPage === 1"></button>
+		<button class="btn icon-chevron-right" ng-click="nextPage()" ng-disabled="objectListEnd >= totalObjects"></button>
+	</span>
+</div>
+<hr class="hr-10">
 <table class="table table-bordered table-striped table-hover">
 	<thead>
 		<tr>
