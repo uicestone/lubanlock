@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS `object` (
   `user` int(11) DEFAULT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `time_insert` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `flag` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `company` (`company`),
   KEY `user` (`user`),
@@ -84,21 +85,6 @@ CREATE TABLE IF NOT EXISTS `object_meta` (
   KEY `key-value` (`key`,`value`(255))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `object_meta_permission` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `object` int(11) NOT NULL,
-  `key` varchar(255) NOT NULL,
-  `user` int(11) DEFAULT NULL,
-  `read` tinyint(1) NOT NULL DEFAULT '0',
-  `write` tinyint(1) NOT NULL DEFAULT '0',
-  `grant` tinyint(1) NOT NULL DEFAULT '0',
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `object-key-user` (`object`,`key`,`user`),
-  KEY `user` (`user`),
-  KEY `key` (`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE IF NOT EXISTS `object_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object` int(11) NOT NULL,
@@ -116,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `object_relationship` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object` int(11) NOT NULL,
   `relative` int(11) NOT NULL,
-  `relation` varchar(255) NOT NULL,
+  `relation` varchar(255) NOT NULL DEFAULT '',
   `is_on` tinyint(1) DEFAULT NULL,
   `num` varchar(255) NOT NULL DEFAULT '',
   `user` int(11) DEFAULT NULL,
@@ -233,6 +219,7 @@ ALTER TABLE `company_config`
   ADD CONSTRAINT `company_config_ibfk_1` FOREIGN KEY (`company`) REFERENCES `company` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 ALTER TABLE `nav`
+  ADD CONSTRAINT `nav_ibfk_2` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `nav_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `nav` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `object`
@@ -242,9 +229,6 @@ ALTER TABLE `object`
 ALTER TABLE `object_meta`
   ADD CONSTRAINT `object_meta_ibfk_1` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `object_meta_ibfk_2` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
-ALTER TABLE `object_meta_permission`
-  ADD CONSTRAINT `object_meta_permission_ibfk_2` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `object_permission`
   ADD CONSTRAINT `object_permission_ibfk_1` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,

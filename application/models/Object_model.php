@@ -317,77 +317,6 @@ class Object_model extends CI_Model{
 		$this->authorize($permission, $users);
 	}
 	
-	/**
-	 * 检测某一用户或组对当前对象的某一元数据是否有某种权限
-	 * @param string $key 键名
-	 * @param string $permission 权限值 read|write|grant
-	 * @param array|int $users 要检测的用户或组，默认为$this->session->group_ids，即当前用户和递归所属组
-	 */
-	function allow_meta($key, $permission = 'read', $users = null){
-		
-		if(!in_array($permission, array('read', 'write', 'grant'))){
-			throw new Exception('permission_name_error', 400);
-		}
-		
-		if(is_null($users)){
-			$users = $this->session->group_ids;
-		}
-		
-		if(!is_array($users)){
-			$users = array($users);
-		}
-		
-		if(empty($users) && get_instance()->company->config('object_meta_permission_check')){
-			return false;
-		}
-		
-		$result = $this->db->from('object_meta_permission')->where('object', $this->id)->where('key', $key)->where_in('user', $users)->get()->row();
-		
-		if(is_null($result) || (bool)$result->$permission === true){
-			return true;
-		}
-		
-		return false;
-		
-	}
-	
-	/**
-	 * 就当前对象的某一元数据，授予某些用户或组某些权限
-	 * @param string $key 键名
-	 * @param array $permission 权限值 array(read|write|grant => true|false)
-	 * @param array|int $users 要授权的用户或组，默认为$this->session->user_id，即当前用户
-	 */
-	function authorize_meta($key, array $permission = array(), $users = null, $permission_check = true){
-		
-		if(!is_array($permission)){
-			$permission = array($permission => true);
-		}
-		
-		$permission = array_intersect_key($permission, array('read'=>true,'write'=>true,'grant'=>true));
-		
-		if(is_null($users)){
-			
-			if(!$this->session->user_id){
-				return false;
-			}
-			
-			$users = array($this->session->user_id);
-		}
-		
-		if(!is_array($users)){
-			$users = array($users);
-		}
-		
-		if($permission_check && (!$this->allow('grant') || !$this->allow_meta($key, 'grant'))){
-			throw new Exception('no_permission_to_grant', 403);
-		}
-		
-		foreach($users as $user){
-			$this->db->upsert('object_meta_permission', array('object'=>$this->id, 'key'=>$key, 'user'=>$user) + $permission);
-		}
-		
-	}
-	
 	function _parse_criteria($args, $field='`object`.`id`', $logical_operator = 'AND'){
 		
 		if(!is_array($args)){
@@ -727,9 +656,7 @@ class Object_model extends CI_Model{
 		$this->meta = null;
 		
 		foreach($result as $row){
-			if($this->allow_meta($row['key'])){
-				$this->meta[$row['key']][] = $row['value'];
-			}
+			$this->meta[$row['key']][] = $row['value'];
 		}
 		
 		return $this->meta;
@@ -789,7 +716,7 @@ class Object_model extends CI_Model{
 			return;
 		}
 		
-		if(!$this->allow('write') || !$this->allow_meta($key, 'write')){
+		if(!$this->allow('write')){
 			throw new Exception('no_permission', 403);
 		}
 		
@@ -827,7 +754,7 @@ class Object_model extends CI_Model{
 	 */
 	function updateMeta($key, $value, $prev_value = null){
 		
-		if(!$this->allow('write') || !$this->allow_meta($key, 'write')){
+		if(!$this->allow('write')){
 			throw new Exception('no_permission', 403);
 		}
 		
@@ -867,7 +794,7 @@ class Object_model extends CI_Model{
 	 */
 	function removeMeta($key, $value = null){
 		
-		if(!$this->allow('write') || !$this->allow_meta($key, 'write')){
+		if(!$this->allow('write')){
 			throw new Exception('no_permission', 403);
 		}
 		
