@@ -11,6 +11,8 @@ class LB_Controller extends CI_Controller{
 		}
 		
 		$this->output->set_header('X-UA-Compatible: IE=edge');
+		$this->output->set_header('Cache-Control: no-cache, must-revalidate');
+		$this->output->set_header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 		
 	}
 	
