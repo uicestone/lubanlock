@@ -9,6 +9,21 @@ update people set id = 32 where id = 1;
 delete from company where id = 3;
 update company set id = 3 where id = 1;
 update express set company = 3 where company is null;
+update people set type = '教师' where type = 'staff' and company = 2;
+update people set type = '班级' where type = 'classes' and company = 2;
+update people set type = '教研组' where type = 'cource_group' and company = 2;
+update people set type = '年级' where type = 'grade' and company = 2;
+update people set type = '家长' where type = 'parent' and company = 2;
+update people set type = '社团' where type = 'society' and company = 2;
+update people set type = '学生' where type = 'student' and company = 2;
+update people set type = '人员' where type = 'people' and company = 2;
+update people set type = '备课组' where type = 'teacher_group' and company = 2;
+update project set type = '评价' where type = 'evaluation' and company = 2;
+update project set type = '考试' where type = 'exam' and company = 2;
+update project set type = '学科考试' where type = 'exam_paper' and company = 2;
+update document set time = id;
+ALTER TABLE `document` ADD `previous_id` INT NOT NULL ;
+update document set previous_id = id;
 
 -- 将各大对象表的id顺序衔接，以便并表
 ALTER TABLE  `account` DROP FOREIGN KEY  `account_ibfk_12` ;
@@ -34,8 +49,8 @@ insert into lubanlock.object (id,type,num,name,company,user,time,time_insert)
 select id, type, num, name, company, if(uid is null, 1 , uid), from_unixtime(time),from_unixtime(time_insert) from people;
 
 -- 导入user
-insert into lubanlock.user (id,name,email,alias,password,`roles`,last_ip,last_login,company)
-select user.id,user.name,if(email = '', null, email),alias,password,`group`,lastip,from_unixtime(lastlogin), user.company
+insert into lubanlock.user (id,name,email,password,`roles`,last_ip,last_login,company)
+select user.id,user.name,if(email = '', null, email),password,`group`,lastip,from_unixtime(lastlogin), user.company
 from user inner join people using (id);
 
 -- 导入其他object
@@ -43,8 +58,8 @@ insert into lubanlock.object (id, type, name, company, user, time, time_insert)
 select account,'资金',name,company,uid,from_unixtime(time),from_unixtime(time_insert)
 from account group by account;
 
-insert into lubanlock.object (id, type, name, company, user, time, time_insert)
-select id,'文档',name,company,uid,from_unixtime(time),from_unixtime(time_insert)
+insert into lubanlock.object (id, type, name, company, user, time, time_insert, flag)
+select id,'文档',name,company,uid,from_unixtime(time),from_unixtime(time_insert), previous_id
 from document;
 
 insert into lubanlock.object (id, type, num, name, company, user, time, time_insert)
@@ -345,6 +360,10 @@ select project,people,role,uid,from_unixtime(time) from project_people;
 insert into lubanlock.object_relationship (object,relative,relation,user,time)
 select schedule,people,'people',1,0 from schedule_people;
 
+-- document permission
+insert into lubanlock.object_permission (`object`, `user`, `read`, `write`, `grant`)
+select document, people, CAST((`mod` & 1) / 1 AS SIGNED), CAST((`mod` & 2) / 2 AS SIGNED), CAST((`mod` & 4) / 4 AS SIGNED) from document_mod;
+
 -- user_config
 insert into lubanlock.user_config (user,`key`,value)
 SELECT uid,'taskboard_sort_data',sort_data FROM `schedule_taskboard`;
@@ -356,22 +375,22 @@ select 'message',LEFT(content,255),user.company,uid,from_unixtime(time),from_uni
 insert into lubanlock.object (type, company, user, time, time_insert, flag)
 select 'dialog',user.company,uid,from_unixtime(time),from_unixtime(time),dialog.id from dialog inner join user on dialog.uid = user.id;
 
-insert into lubanlock.object_relationship (object, relative, relation,user,time)
-select object.id, dialog_user.user, 'user',1,0 from dialog_user inner join lubanlock.object on object.flag = dialog_user.dialog and object.type = 'dialog';
+insert ignore into lubanlock.object_relationship (object, relative, relation,is_on,user,time)
+select object.id, dialog_user.user, 'user',1,1,0 from dialog_user inner join lubanlock.object on object.flag = dialog_user.dialog and object.type = 'dialog';
 
-insert into lubanlock.object_relationship (object, relative,relation,user,time)
-select dialog_object.id, message_object.id,'message',1,0
+insert ignore into lubanlock.object_relationship (object, relative,relation,is_on,user,time)
+select dialog_object.id, message_object.id,'message',1,1,0
 from dialog_message 
 inner join lubanlock.object dialog_object on dialog_object.flag = dialog_message.dialog and dialog_object.type = 'dialog' 
 inner join lubanlock.object message_object on message_object.flag = dialog_message.message and message_object.type = 'message';
 
-insert into lubanlock.object_relationship (object,relative,relation,user,time)
-select message_object.id, message_user.user,'user',1,0
+insert ignore into lubanlock.object_relationship (object,relative,relation,is_on,user,time)
+select message_object.id, message_user.user,'user',1,1,0
 from message_user 
 inner join lubanlock.object message_object on message_object.flag = message_user.message and message_object.type = 'message';
 
-insert into lubanlock.object_relationship (object,relative,relation,user,time)
-select message_object.id, message_document.document,'document',1,0
+insert ignore into lubanlock.object_relationship (object,relative,relation,is_on,user,time)
+select message_object.id, message_document.document,'document',1,1,0
 from message_document inner join lubanlock.object message_object on message_object.flag = message_document.message and message_object.type = 'message';
 
 SET FOREIGN_KEY_CHECKS=1;
