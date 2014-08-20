@@ -1,5 +1,6 @@
 .DS_Store
 /nbproject
+/uploads/
 /sys.sublime-*
 /application/logs
 /web/test.*
