@@ -7,22 +7,21 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
 		<!--[if !IE]> -->
-		<script type="text/javascript" src="js/jquery/jquery-2.1.0.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery.min.js?v=2.1.1"></script>
 		<!-- <![endif]-->
 		<!--[if IE]>
-		<script type="text/javascript" src="js/jquery/jquery-1.11.0.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-1.x.min.js?v=1.11.1"></script>
 		<![endif]-->
 					
-		<link rel="stylesheet" href="css/font-awesome.css" />
-		<link rel="stylesheet" href="css/bootstrap.css" />
-		<link rel="stylesheet" href="css/ace-fonts.css" />
+		<link rel="stylesheet" href="css/font-awesome.min.css?v=3.2.1" />
+		<link rel="stylesheet" href="css/bootstrap.min.css?v=3.2.0" />
 		<link rel="stylesheet" href="css/ace.css" />
 		
-		<!--[if lte IE 8]>
+		<!--[if lt IE 9]>
 		<link rel="stylesheet" href="css/ace-ie.css" />
 		<![endif]-->
 
-		<link rel="stylesheet" href="css/style.css" />
+		<link rel="stylesheet" href="css/style.css?v=2014-08-18-1" />
 		
 		<!--[if lt IE 9]>
 		<script src="js/html5shiv.js"></script>
