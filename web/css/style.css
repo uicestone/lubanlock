@@ -1,4 +1,8 @@
 /*common*/
+body {
+	font: 14px/1.5 STHeiti, 'Microsoft Yahei', Helvetica, Arial, Tahoma, Verdana, Sans-Serif;
+}
+
 .btn {
 	padding: 2px 15px;
 }
@@ -49,15 +53,17 @@
 .alert-container {
 	position: fixed;
 	top: 0;
-	width: 100%;
+	width: 40%;
 	text-align: center;
 	z-index: 2000;
+	left: 30%;
 }
 
 .alert-container .alert{
 	display: inline-block;
 	min-width: 6%;
 	padding: 4px 10px;
+	margin-bottom: 0;
 }
 
 /*form*/
