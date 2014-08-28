@@ -328,7 +328,12 @@ class Object_model extends CI_Model{
 			if($args === 'ME'){
 				$args = $this->session->user_id;
 			}
-			return $field.' = '.$this->db->escape($args);
+			if($args === 'MY_GROUPS'){
+				$args = $this->session->group_ids;
+			}
+			else{
+				return $field.' = '.$this->db->escape($args);
+			}
 		}
 		
 		//如果参数数组不为空，且全是数字键，则作in处理
@@ -588,19 +593,17 @@ class Object_model extends CI_Model{
 			}
 			
 			if($property_args){
-				
-				array_walk($result_array, function(&$row, $index, $userdata){
+				foreach($result_array as &$row){
 					$this->id = intval($row['id']);
 					//参数值可以不是true而是一个数组，那样的话这个数组将被传递给get{property}()方法作为参数
-					!is_array($userdata['property_args']) && $userdata['property_args'] = array();
-					$row[$userdata['property']] = call_user_func(array($this, 'get'.$userdata['property']), $userdata['property_args']);
-				}, array('property'=>$field, 'property_args'=>$property_args));
-				
+					!is_array($property_args) && $property_args = array();
+					$row[$field] = call_user_func(array($this, 'get'. $field), $property_args);
+				}
 			}
 			
 		}
 		
-		array_walk($result_array, function(&$row, $index){
+		array_walk($result_array, function(&$row){
 			$row['id'] = intval($row['id']);
 			$row['type'] = lang($row['type']);
 		});

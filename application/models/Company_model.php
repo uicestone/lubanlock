@@ -1,84 +1,80 @@
 <?php
 class Company_model extends Object_model{
 	
-	var $name;
-	var $type;
-	var $syscode;
-	var $sysname;
+	var $name, $type, $syscode, $sysname,
+		$config;
 	
 	function __construct(){
 		parent::__construct();
-		$this->table='company';
-		$this->recognize($this->input->server('SERVER_NAME'));
+		
+		// recognize the company by host
+		$this->recognize();
 
-		//获取存在数据库中的公司配置项
-		$this->db->from('company_config')
-			->where('company',$this->id);
-		
-		$config=array_column($this->db->get()->result_array(),'value','key');
-		
-		array_walk($config, function(&$value){
-			$decoded=json_decode($value,true);
-			if(!is_null($decoded)){
-				$value=$decoded;
-			}
-		});
-		
-		$this->config->company=$config;
+		// load company config
+		$this->config();
 		
 	}
 
-	function recognize($host_name){
-		$this->db->select('id,name,type,syscode,sysname')
+	function recognize(){
+		
+		$host_name = $this->input->server('SERVER_NAME');
+		
+		$this->db->select('id, name, type, syscode, sysname')
 			->from('company')
-			->or_where(array('host'=>$host_name,'syscode'=>$host_name));
+			->or_where(array('host'=>$host_name, 'syscode'=>$host_name));
 
-		$row=$this->db->get()->row();
+		$row = $this->db->get()->row();
 		
 		if(!$row){
-			throw new Exception('"'.$host_name.'" isn\'t leading you to any company.', 404);
+			throw new Exception('"' . $host_name . '" isn\'t leading you to any company in LubanLock. Please check your url.', 404);
 		}
 		
-		$this->id=intval($row->id);
-		$this->name=$row->name;
-		$this->type=$row->type;
-		$this->syscode=$row->syscode;
-		$this->sysname=$row->sysname;
+		$this->id = intval($row->id);
+		$this->name = $row->name;
+		$this->type = $row->type;
+		$this->syscode = $row->syscode;
+		$this->sysname = $row->sysname;
 	}
 	
 	/**
-	 * set or get a  company config value
+	 * set or get a company config value
+	 * or get all config values of a company
 	 * json_decode/encode automatically
 	 * @param string $key
 	 * @param mixed $value
-	 * @return
-	 *	get: the config value, false if not found
-	 *	set: the insert or update query
 	 */
-	function config($key,$value=NULL){
-		$db = $this->load->database('', true);
-		$row=$db->select('id,value')->from('company_config')->where('company',$this->id)->where('key',$key)
-			->get()->row();
+	function config($key = null, $value = null){
 		
-		if(is_null($value)){
-			if($row){
-				$json_value=json_decode($row->value);
-				if(is_null($json_value)){
-					return $row->value;
-				}else{
-					return $json_value;
-				}
-			}else{
+		if(is_null($key)){
+			
+			$this->db->from('company_config')->where('company', $this->session->company_id);
+
+			$config = array_column($this->db->get()->result_array(), 'value', 'key');
+
+			$this->config =  array_map(function($value){
+				
+				$value = json_decode($value,true);
+				
+				return $value;
+				
+			}, $config);
+			
+			return $this->config;
+			
+		}
+		elseif(is_null($value)){
+			
+			if(array_key_exists($key, $this->config)){
+				return $this->config[$key];
+			}
+			else{
 				return;
 			}
+			
 		}
 		else{
-			
-			if(is_array($value)){
-				$value=json_encode($value);
-			}
-			
-			return $db->upsert('company_config', array('value'=>$value, 'id'=>$row->id));
+			$value = json_encode($value);
+			return $this->db->upsert('company_config', array('company'=>$this->session->company_id, 'key'=>$key, 'value'=>$value));
 		}
 	}
 }
