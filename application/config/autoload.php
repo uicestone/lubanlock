@@ -145,7 +145,7 @@ $autoload['config'] = array();
 |
 */
 
-$autoload['language'] = array('message');
+$autoload['language'] = array('object', 'message');
 
 
 /*

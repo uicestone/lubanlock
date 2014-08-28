@@ -65,6 +65,7 @@ class Object_model extends CI_Model{
 		}
 		
 		$object['id'] = intval($object['id']);
+		$object['type'] = lang($object['type']);
 		!is_null($object['user']) && $object['user'] = intval($object['user']);
 		
 		foreach(array_keys(get_object_vars($this)) as $property){
@@ -601,6 +602,7 @@ class Object_model extends CI_Model{
 		
 		array_walk($result_array, function(&$row, $index){
 			$row['id'] = intval($row['id']);
+			$row['type'] = lang($row['type']);
 		});
 
 		if(array_key_exists('limit', $args) && $args['limit'] === 1){
