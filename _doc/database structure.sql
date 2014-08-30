@@ -33,21 +33,6 @@ CREATE TABLE IF NOT EXISTS `log` (
   PRIMARY KEY (`id`)
 ) ENGINE=ARCHIVE DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `nav` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user` int(11) DEFAULT NULL,
-  `name` varchar(16) NOT NULL,
-  `template` varchar(16) NOT NULL DEFAULT '',
-  `params` text,
-  `parent` int(11) DEFAULT NULL,
-  `order` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `parent` (`parent`),
-  KEY `order` (`order`),
-  UNIQUE `user-name` (`user`, `name`),
-  KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE IF NOT EXISTS `object` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` varchar(255) NOT NULL,

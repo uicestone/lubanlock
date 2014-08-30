@@ -733,6 +733,10 @@ class Object_model extends CI_Model{
 			return;
 		}
 		
+		if(is_object($value) || is_array($value)){
+			$value = json_encode($value, JSON_UNESCAPED_UNICODE);
+		}
+		
 		if(!$this->allow('write')){
 			throw new Exception('no_permission', 403);
 		}
@@ -818,6 +822,9 @@ class Object_model extends CI_Model{
 		$condition = array('key'=>$key);
 		
 		if(!is_null($value)){
+			if(is_object($value) || is_array($value)){
+				$value = json_encode($value, JSON_UNESCAPED_UNICODE);
+			}
 			$condition += array('value'=>$value);
 		}
 		

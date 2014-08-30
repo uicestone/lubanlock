@@ -132,9 +132,7 @@ lubanlockServices.service('Alert', ['$rootScope', '$timeout', function($rootScop
 lubanlockServices.service('Nav', ['$resource',
 	function($resource){
 		
-		return $resource('nav/:name');
-		
-		var Resource = $resource('nav/:name', {name:'@name'});
+		var Resource = $resource('object/:id', {id: '@id'}, {query: {method: 'GET', isArray: true, params: {type:'nav', has_relative_like: 'MY_GROUPS', with: ['meta']}}});
 		var items = Resource.query();
 		
 		return {
@@ -142,16 +140,37 @@ lubanlockServices.service('Nav', ['$resource',
 				return items;
 			},
 			save: function(data, success){
-				var item = new Resource(data);
-				items.push(item);
-				item.$save({}, function(){
-					success();
+				
+				angular.forEach(data.params, function(item){
+					if(angular.isObject(item) || angular.isArray(item)){
+						item = angular.toJson(item);
+					}
 				});
+				
+				var params = angular.toJson(data.params);
+				
+				var item = new Resource({
+					name: data.name,
+					type: 'nav',
+					meta: {
+						params: params
+					},
+					relative: {
+						user: user.id
+					},
+					permission: 'private'
+				});
+				
+				item.$save({}, function(){
+					items.push(item);
+					angular.isFunction(success) && success();
+				});
+				
 			},
 			remove: function(item, success){
-				var index;
-				for(index in items){
-					if(items[index].name === item.name){
+				
+				for(var index in items){
+					if(items[index].id === item.id){
 						items.splice(index, 1);
 					}
 				}
