@@ -20,14 +20,14 @@ CREATE TABLE IF NOT EXISTS `company_config` (
 
 CREATE TABLE IF NOT EXISTS `log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uri` varchar(255) NOT NULL,
   `host` varchar(255) NOT NULL,
-  `get` text NOT NULL,
-  `post` text NOT NULL,
-  `client` varchar(255) NOT NULL,
+  `uri` varchar(255) NOT NULL,
+  `body` text DEFAULT NULL,
+  `agent` varchar(255) NOT NULL,
   `duration` float NOT NULL,
   `ip` char(15) NOT NULL,
   `company` varchar(255) DEFAULT NULL,
+  `user` int(11) DEFAULT NULL,
   `username` varchar(255) DEFAULT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
