@@ -91,38 +91,46 @@
 												</fieldset>
 											</form>
 
+											<?php if($this->company->config('oauth_login')){ ?>
 											<div class="social-or-login center">
 												<span class="bigger-110">其他登录方式</span>
 											</div>
-
+											
 											<div class="social-login center">
+												<?php if($this->company->config('oauth_login')->weibo){ ?>
 												<a class="btn btn-primary">
 													<i class="icon-weibo"></i>
 												</a>
-
+												<?php } ?>
+												<?php if($this->company->config('oauth_login')->weixin){ ?>
 												<a class="btn btn-info">
 													<i class="icon-qrcode"></i>
 												</a>
+												<?php } ?>
 											</div>
-										</div><!-- /widget-main -->
+											<?php } ?>
+										</div>
 
 										<div class="toolbar clearfix">
+											<?php if($this->company->config('allow_reset_password')){ ?>
 											<div>
 												<a href="#" onclick="show_box('forgot-box'); return false;" class="forgot-password-link">
 													<i class="icon-arrow-left"></i>
 													忘记密码
 												</a>
 											</div>
-
+											<?php } ?>
+											<?php if($this->company->config('allow_register')){ ?>
 											<div>
 												<a href="#" onclick="show_box('signup-box'); return false;" class="user-signup-link">
 													我要注册
 													<i class="icon-arrow-right"></i>
 												</a>
 											</div>
+											<?php } ?>
 										</div>
-									</div><!-- /widget-body -->
-								</div><!-- /login-box -->
+									</div>
+								</div>
 
 								<div id="forgot-box" class="forgot-box widget-box no-border">
 									<div class="widget-body">

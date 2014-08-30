@@ -9,28 +9,28 @@
 
 		<li ng-repeat="item in items">
 			<a ng-click="navigateTo(item)">
-				<i class="icon-trash" ng-if="removable[item.name]" ng-mouseleave="makeRemovable(item.name, false)" ng-click="remove(item, $event)"></i>
-				<i class="icon-{{item.icon}}" ng-hide="removable[item.name]" ng-mouseenter="makeRemovable(item.name)"></i>
+				<i class="icon-trash" ng-if="removable[item.id]" ng-mouseleave="makeRemovable(item, false)" ng-click="remove(item, $event)"></i>
+				<i class="icon-{{item.meta.icon[0]}}" ng-hide="removable[item.id]" ng-mouseenter="makeRemovable(item)"></i>
 				<span class="menu-text"> {{item.name}} </span>
 			</a>
 		</li>
 
-<?php if($this->user->isLogged('admin')){ ?>
+		<?php if($this->user->isLogged('admin')){ ?>
 		<li>
 			<a href="#/list">
 				<i class="icon-cloud"></i>
 				<span class="menu-text"> 所有数据 </span>
 			</a>
 		</li>
-<?php } ?>
-<?php if($this->user->isLogged('user-admin')){ ?>
+		<?php } ?>
+		<?php if($this->user->isLogged('user-admin')){ ?>
 		<li>
 			<a href="#/user">
 				<i class="icon-user"></i>
 				<span class="menu-text"> 用户管理 </span>
 			</a>
 		</li>
-<?php } ?>
+		<?php } ?>
 
 	</ul>
 

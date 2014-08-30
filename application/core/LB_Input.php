@@ -17,20 +17,18 @@ class LB_input extends CI_Input{
 		
 		$data = $this->data;
 		
-		$headers=$this->request_headers();
+		$headers = $this->request_headers();
 
-		//parse as form data
+		// parse as form data
 		if(array_key_exists('Content-Type', $headers) && (
-			strpos($headers['Content-Type'],'application/x-www-form-urlencoded') === 0
-			|| strpos($headers['Content-Type'],'multipart/form-data') === 0)
+			strpos($headers['Content-Type'], 'application/x-www-form-urlencoded') === 0
+			|| strpos($headers['Content-Type'], 'multipart/form-data') === 0)
 		){
-			parse_str($data,$data);
+			parse_str($data, $data);
 		}
-		//parse as json
-		//不根据request header来判断解码方式，而是直接尝试json_decode根据执行结果判断
-		//这是因为Angular将非数组/对象的postData未经json编码直接发送，并且请求头内带有Content-Type: application/json
+		// parse as json
 		elseif(!is_null(json_decode($data))){
-			$data=json_decode($data,JSON_OBJECT_AS_ARRAY);
+			$data = json_decode($data, JSON_OBJECT_AS_ARRAY);
 		}
 
 		if(!is_null($index)){

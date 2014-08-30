@@ -34,12 +34,14 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 			.when('/detail/:id?', {
 				templateUrl: 'partials/detail.html',
 				controller: 'DetailCtrl',
-				//TODO 模版也需要在路由执行前预加载
 				resolve: {
 					object: ['$route', 'Object', function($route, Object){
 						if($route.current.params.id){
 							return Object.get({id: $route.current.params.id, with_status: {as_rows: true, order_by:'date desc'}, with_permission: {with_user_info: true}}).$promise;
 						}
+					}],
+					templateEditable: ['$http', '$templateCache', function($http, $templateCache){
+						$http.get('partials/editable.html', {cache: $templateCache});
 					}]
 				}
 			})
