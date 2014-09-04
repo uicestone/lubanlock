@@ -4,3 +4,5 @@
 /sys.sublime-*
 /application/logs
 /web/test.*
+/vendor/
+/public/packages/
