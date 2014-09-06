@@ -47,8 +47,8 @@ lubanlockControllers.controller('NavCtrl', ['$scope', '$location', 'Nav', 'User'
 	}
 ]);
 
-lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'objects',
-	function($scope, $location, Nav, objects) {
+lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', 'Nav', 'objects',
+	function($scope, $location, $route, Nav, objects) {
 		//列表分页
 		$scope.currentPage = $location.search().page || 1;
 		
@@ -65,6 +65,10 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', 'Nav', 'obje
 		
 		$scope.previousPage = function(){
 			$location.search('page', --$scope.currentPage);
+		}
+		
+		$scope.reload = function(){
+			$route.reload();
 		}
 		
 		//详情页，TODO，待完善，对于符合一定条件的对象，使用特定模板载入

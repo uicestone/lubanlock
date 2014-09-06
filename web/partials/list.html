@@ -1,5 +1,6 @@
 <div>
 	<a href="#/detail" class="btn btn-primary icon-plus"></a>
+	<button type="button" class="btn icon-refresh" ng-click="reload()"></button>
 	<form class="form-inline" ng-show="showNavSaveForm" ng-submit="addNavItem()" style="display: inline;">
 		<div class="form-group">
 			<input type="text" placeholder="名称" class="form-control" ng-model="newNavItemName">
@@ -7,7 +8,7 @@
 		<div class="form-group">
 			<input type="text" placeholder="模板" class="form-control" ng-model="newNavItemTemplate">
 		</div>
-		<button type="submit" class="btn btn-primary">保存</button>
+		<button type="submit" class="btn btn-primary icon-save"></button>
 	</form>
 	<a class="btn" ng-if="!inNav" ng-click="toggleNavSaveForm()" ng-class="{'icon-bookmark': !showNavSaveForm, 'icon-chevron-left': showNavSaveForm}"></a>
 	<span id="paginator" class="pull-right">
