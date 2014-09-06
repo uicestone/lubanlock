@@ -80,7 +80,8 @@ lubanlockServices.service('HttpInterceptor', ['$q', '$timeout', 'Alert', functio
 			}, 200);
 
 			config.alert.slow.timeout = $timeout(function(){
-				config.alert.slow.timeout = Alert.add('仍在继续...');
+				Alert.close(config.alert.normal.id);
+				config.alert.slow.id = Alert.add('仍在继续...');
 			}, 5000);
 			
 			return config;
