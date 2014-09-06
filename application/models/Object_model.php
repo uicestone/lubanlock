@@ -565,6 +565,10 @@ class Object_model extends CI_Model{
 				'from'=>is_array($args['limit']) ? $args['limit'][1] + 1 : 1,
 				'to'=>is_array($args['limit']) ? $args['limit'][0] + $args['limit'][1] : $args['limit']
 			));
+			
+			if($result['info']['total'] == 0){
+				$result['info']['from'] = 0;
+			}
 
 			if($result['info']['to'] > $result['info']['total']){
 				$result['info']['to'] = $result['info']['total'];
