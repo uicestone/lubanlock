@@ -477,30 +477,37 @@ class Object_model extends CI_Model{
 	 *		limit string, array
 	 *		page int
 	 *		perpage int
+	 *		found_rows boolean
 	 * @return array
 	 */
-	function query(array $args=array()){
+	function query(array $args=array(), $permission_check = true){
 
-		$this->db->from('object')->found_rows()->select('object.*');
+		$this->db->from('object')->select('object.*');
+		
+		if(!array_key_exists('found_rows', $args) || $args['found_rows']){
+			$this->db->found_rows();
+		}
 		
 		$this->db->where('object.company', get_instance()->company->id);
 		
 		$this->db->where($this->_parse_criteria($args), null, false);
 		
-		// 不在object_permission中的对象被视为公共对象，所有访客可读
-		$permission_condition = "\n".'`object`.`id` NOT IN ( SELECT `object` FROM `object_permission` )';
-		
-		// 若用户或所在组具有对象{type}-admin role，则具有全部权限
-		if($this->session->user_roles){
-			$permission_condition .= "\nOR `object`.`type` IN ('".implode("', '", array_map(function($role){return $role . '-admin';}, $this->session->user_roles))."')";
+		if($permission_check){
+			// 不在object_permission中的对象被视为公共对象，所有访客可读
+			$permission_condition = "\n".'`object`.`id` NOT IN ( SELECT `object` FROM `object_permission` )';
+
+			// 若用户或所在组具有对象{type}-admin role，则具有全部权限
+			if($this->session->user_roles){
+				$permission_condition .= "\nOR `object`.`type` IN ('".implode("', '", array_map(function($role){return $role . '-admin';}, $this->session->user_roles))."')";
+			}
+
+			// 一般读权限检查
+			if(is_array($this->session->group_ids) && !empty($this->session->group_ids)){
+				$permission_condition .= "\n".'OR `object`.`id` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( '.implode(', ',$this->session->group_ids).' ) )';
+			}
+
+			$this->db->where('( '.$permission_condition.' )', null, false);
 		}
-		
-		// 一般读权限检查
-		if(is_array($this->session->group_ids) && !empty($this->session->group_ids)){
-			$permission_condition .= "\n".'OR `object`.`id` IN ( SELECT `object` FROM `object_permission` WHERE `read` = TRUE AND `user` IN ( '.implode(', ',$this->session->group_ids).' ) )';
-		}
-		
-		$this->db->where('( '.$permission_condition.' )', null, false);
 		
 		if(!array_key_exists('order_by', $args)){
 			$args['order_by'] = 'object.time desc';
@@ -552,14 +559,16 @@ class Object_model extends CI_Model{
 		
 		$result_array=$this->db->get()->result_array();
 		
-		$result = array('data'=>array(), 'info'=>array(
-			'total'=>$this->db->query('SELECT FOUND_ROWS() rows')->row()->rows,
-			'from'=>is_array($args['limit']) ? $args['limit'][1] + 1 : 1,
-			'to'=>is_array($args['limit']) ? $args['limit'][0] + $args['limit'][1] : $args['limit']
-		));
-		
-		if($result['info']['to'] > $result['info']['total']){
-			$result['info']['to'] = $result['info']['total'];
+		if(!array_key_exists('found_rows', $args) || $args['found_rows']){
+			$result = array('data'=>array(), 'info'=>array(
+				'total'=>$this->db->query('SELECT FOUND_ROWS() rows')->row()->rows,
+				'from'=>is_array($args['limit']) ? $args['limit'][1] + 1 : 1,
+				'to'=>is_array($args['limit']) ? $args['limit'][0] + $args['limit'][1] : $args['limit']
+			));
+
+			if($result['info']['to'] > $result['info']['total']){
+				$result['info']['to'] = $result['info']['total'];
+			}
 		}
 		
 		//获得四属性的参数，决定是否为对象列表获取属性
@@ -612,9 +621,13 @@ class Object_model extends CI_Model{
 			return $result_array ? $result_array[0] : null;
 		}
 
-		$result['data'] = $result_array;
+		if(!array_key_exists('found_rows', $args) || $args['found_rows']){
+			$result['data'] = $result_array;
+			return $result;
+		}
 		
-		return $result;
+		return $result_array;
+		
 	}
 	
 	

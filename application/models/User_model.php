@@ -81,15 +81,16 @@ class User_model extends Object_model{
 	function _get_parent_group($children = array()){
 
 		$parents = $this->query(array(
-			'has_relative_like'=>array($children)
-		));
-		
-		$this->session->groups = array_merge($this->session->groups, $parents['data']);
-		$parent_group_ids = array_map('intval', array_column($parents['data'], 'id'));
+			'has_relative_like'=>array($children),
+			'found_rows'=>false
+		), false);
+
+		$this->session->groups = array_merge($this->session->groups, $parents);
+		$parent_group_ids = array_map('intval', array_column($parents, 'id'));
 		$this->session->group_ids = array_merge($this->session->group_ids, $parent_group_ids);
 		
 		$this->session->user_roles = array_merge($this->session->user_roles, array_reduce(
-			array_map(array($this, '_parse_roles'), array_column($parents['data'], 'roles')),
+			array_map(array($this, '_parse_roles'), array_column($parents, 'roles')),
 			function($result, $item){
 				return array_merge($result, $item);
 			}, array()
@@ -118,11 +119,11 @@ class User_model extends Object_model{
 		return array_merge($object, $user);
 	}
 	
-	function query(array $args=array()){
+	function query(array $args=array(), $permission_check = true){
 		
 		$this->db->join('user','user.id = object.id','inner')->select('user.name, user.email, user.roles, user.last_ip, user.last_login');
 		
-		return parent::query($args);
+		return parent::query($args, $permission_check);
 	}
 	
 	/**
