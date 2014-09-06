@@ -6,18 +6,14 @@ var lubanlockControllers = angular.module('lubanlockControllers', []);
 
 lubanlockControllers.controller('AlertCtrl', ['$scope', 'Alert',
 	function($scope, Alert){
+		$scope.alerts = Alert.get();
+		$scope.close = Alert.close;
+		$scope.previous = function(){};
+		$scope.next = function(){};
 		
-		$scope.alerts = Alert.getAlerts();
-		
-		$scope.$watch('alerts.length', function(length){
-			
-			if(length === 0){
-				return;
-			}
-			
-			$scope.alert = $scope.alerts[$scope.alerts.length - 1];
-		});
-		
+		$scope.toggleCloseButton = function(index){
+			$scope.alerts[index].closeable = !$scope.alerts[index].closeable;
+		};
 	}
 ]);
 

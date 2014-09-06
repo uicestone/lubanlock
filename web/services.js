@@ -68,65 +68,76 @@ lubanlockServices.service('Company', ['$resource',
 ]);
 
 // register the interceptor as a service
-lubanlockServices.service('HttpInterceptor', ['$q', '$window', 'Alert', function($q, $window, Alert) {
+lubanlockServices.service('HttpInterceptor', ['$q', '$timeout', 'Alert', function($q, $timeout, Alert) {
 	
 	return {
 		request: function(config) {
-			return config || $q.when(config);
+			
+			config.alert = {normal: {}, slow: {}};
+			
+			config.alert.normal.timeout = $timeout(function(){
+				config.alert.normal.id = Alert.add('正在加载...');
+			}, 200);
+
+			config.alert.slow.timeout = $timeout(function(){
+				config.alert.slow.timeout = Alert.add('仍在继续...');
+			}, 5000);
+			
+			return config;
 		},
 		requestError: function(rejection) {
 			return $q.reject(rejection);
 		},
 		response: function(response) {
-			response.statusText = angular.fromJson('"' + response.statusText + '"');
+			
+			$timeout.cancel(response.config.alert.normal.timeout);
+			$timeout.cancel(response.config.alert.slow.timeout);
+			Alert.close(response.config.alert.normal.id);
+			Alert.close(response.config.alert.slow.id);
+			
 			return response || $q.when(response);
 		},
 		responseError: function(rejection) {
+			
+			$timeout.cancel(rejection.config.alert.normal.timeout);
+			$timeout.cancel(rejection.config.alert.slow.timeout);
+			Alert.close(rejection.config.alert.normal.id);
+			Alert.close(rejection.config.alert.slow.id);
+			
 			rejection.statusText = angular.fromJson('"' + rejection.statusText + '"');
-			Alert.addAlert(rejection.statusText);
+			Alert.add(rejection.statusText, 'danger', true);
+			
 			return $q.reject(rejection);
 		}
 	};
 }]);
 
-lubanlockServices.service('Alert', ['$rootScope', '$timeout', function($rootScope, $timeout){
+lubanlockServices.service('Alert', [function(){
 	
-	var alerts = [];
-	
-	//监控路由导航状态并给予提示信息 TODO 应该分离到消息服务之外
-	
-	var fastRouteChangeTimeout;
-	var slowRouteChangeTimeout;
-	
-	$rootScope.$on('$routeChangeStart', function(){
+	var items = [];
 		
-		fastRouteChangeTimeout = $timeout(function(){
-			alerts.push({message: '正在加载...'});
-		}, 200);
+	this.get = function(){
+		return items;
+	},
+
+	this.add = function(message, type) {
+		var id = new Date().getTime();
+		items.push({id: id, msg: message, type: type === undefined ? 'warning' : type});
+		return id;
+	},
+
+	this.close = function(id) {
+		if(id === undefined){
+			return;
+		}
+		for(var index in items){
+			if (items[index].id === id){
+				break;
+			}
+		}
+		items.splice(index, 1);
+	}
 		
-		slowRouteChangeTimeout = $timeout(function(){
-			alerts.push({message: '仍在继续...'});
-		}, 5000);
-	});
-	
-	$rootScope.$on('$routeChangeSuccess', function(){
-		//TODO 消息应该可以根据ID删除，这也就意味着消息插入的时候要有ID
-		$timeout.cancel(fastRouteChangeTimeout);
-		$timeout.cancel(slowRouteChangeTimeout);
-		alerts.pop();
-	});
-	
-	return {
-		getAlerts: function(){
-			return alerts;
-		},
-		addAlert: function (message) {
-            alerts.push({ message: message });
-        },
-        closeAlert: function (index) {
-            alerts.splice(index, 1);
-        }
-	};
 }]);
 
 lubanlockServices.service('Nav', ['$resource',
