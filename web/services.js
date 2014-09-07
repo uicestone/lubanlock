@@ -165,7 +165,8 @@ lubanlockServices.service('Nav', ['$resource',
 					name: data.name,
 					type: 'nav',
 					meta: {
-						params: params
+						params: params,
+						template: data.template
 					},
 					relative: {
 						user: user.id
