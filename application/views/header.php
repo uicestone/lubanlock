@@ -40,10 +40,14 @@
 		<script src="js/html5shiv.js"></script>
 		<script src="js/respond.min.js"></script>
 		<![endif]-->
+		
+		<?php foreach($this->company->config('modules') as $module){ ?>
+		<script type="text/javascript" src="modules/<?=$module?>/index.js"></script>
+		<?php } ?>
 
 		<script type="text/javascript">
 			var company = <?=json_encode($this->company)?>;
-			var user = <?=json_encode($this->user)?>;
+			var user = <?=json_encode($this->session->user)?>;
 		</script>
 		
 	</head>
