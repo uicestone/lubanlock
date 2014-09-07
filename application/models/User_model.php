@@ -18,10 +18,6 @@ class User_model extends Object_model{
 	
 	function initialize($id = null){
 		
-		$this->session->user_id = null;
-		$this->session->group_ids = array();
-		$this->session->groups = array();
-		
 		isset($id) && $this->session->user_id = intval($id);
 		
 		if(is_null($this->session->user_id) && $this->session->userdata('user_id')){
@@ -41,6 +37,7 @@ class User_model extends Object_model{
 			}
 		}
 		
+		$this->session->user = $user;
 		$this->session->user_name = $user['name'];
 		
 		$this->session->user_roles = $this->_parse_roles($user['roles']);

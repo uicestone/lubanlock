@@ -1,7 +1,7 @@
 <?php
-class Company_model extends Object_model{
+class Company_model extends CI_Model {
 	
-	var $name, $type, $syscode, $sysname,
+	var $id, $name, $type, $syscode, $sysname,
 		$config;
 	
 	function __construct(){
@@ -30,6 +30,7 @@ class Company_model extends Object_model{
 		}
 		
 		$this->id = intval($row->id);
+		$this->session->company_id = $this->id;
 		$this->name = $row->name;
 		$this->type = $row->type;
 		$this->syscode = $row->syscode;
@@ -51,7 +52,7 @@ class Company_model extends Object_model{
 
 			$config = array_column($this->db->get()->result_array(), 'value', 'key');
 
-			$this->config =  array_map(function($value){
+			$this->config = array_map(function($value){
 				
 				$value = json_decode($value,true);
 				
