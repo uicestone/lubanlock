@@ -6779,6 +6779,7 @@ td,
 }
 .table.table-bordered thead tr th {
   vertical-align: middle;
+  border-bottom: 0;
 }
 .table.table-bordered thead tr th:first-child {
   border-left-color: #DDD;
