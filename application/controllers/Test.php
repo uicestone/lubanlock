@@ -185,7 +185,7 @@ class Test extends LB_Controller{
 		// reading private object without logged in
 		$this->user->initialize($user_1->id);
 		$object_1->authorize('private');
-		$this->user->initialize();
+		$this->user->sessionLogout();
 		try{$object_1->get();}catch(Exception $e){$error = $e->getCode();}
 		$this->unit->run($error, 403, 'reading private object without logged in');
 		

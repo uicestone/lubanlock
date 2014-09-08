@@ -109,6 +109,8 @@ class User_model extends Object_model{
 		
 		$user = $this->db->select('user.id, user.name, user.email, user.roles, user.last_ip, user.last_login')->from('user')->where('id', $id)->get()->row_array();
 		
+		$user['id'] = intval($user['id']);
+		
 		if(!$user){
 			throw new Exception(lang('user').' '.$id.' '.lang('not_found'), 404);
 		}

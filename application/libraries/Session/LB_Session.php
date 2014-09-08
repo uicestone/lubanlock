@@ -10,4 +10,11 @@ class LB_Session extends CI_Session {
 	function __construct($params = array()) {
 		parent::__construct($params);
 	}
+	
+	function sess_destroy() {
+		$this->user = $this->user_id = $this->company_id = null;
+		$this->user_roles = $this->groups = $this->group_ids = array();
+		return parent::sess_destroy();
+	}
+	
 }
