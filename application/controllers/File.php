@@ -28,13 +28,13 @@ class File extends LB_Controller{
 			'meta'=>$file_info
 		));
 		
-		$this->output->set_output($this->object->fetch($file_id));
+		$this->output->set_output($this->object->get($file_id));
 		
 	}
 	
 	function download($id){
 		
-		$file = $this->object->fetch($id);
+		$file = $this->object->get($id);
 		
 		$path = end($file['meta']['full_path']);
 		
