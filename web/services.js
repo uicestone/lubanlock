@@ -151,7 +151,7 @@ lubanlockServices.service('Alert', [function(){
 lubanlockServices.service('Nav', ['$resource',
 	function($resource){
 		
-		var Resource = $resource('object/:id', {id: '@id'}, {query: {method: 'GET', isArray: true, params: {type:'nav', has_relative_like: 'MY_GROUPS', with: ['meta']}}});
+		var Resource = $resource('object/:id', {id: '@id'}, {query: {method: 'GET', isArray: true, params: {type:'nav', has_relative_like: 'MY_GROUPS', 'with': ['meta']}}});
 		var items = Resource.query();
 		
 		return {
