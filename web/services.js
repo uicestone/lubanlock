@@ -72,29 +72,36 @@ lubanlockServices.service('HttpInterceptor', ['$q', '$timeout', 'Alert', functio
 	
 	return {
 		request: function(config) {
-			
-			config.alert = {normal: {}, slow: {}};
-			
-			config.alert.normal.timeout = $timeout(function(){
-				config.alert.normal.id = Alert.add('正在加载...');
-			}, 200);
 
-			config.alert.slow.timeout = $timeout(function(){
-				Alert.close(config.alert.normal.id);
-				config.alert.slow.id = Alert.add('仍在继续...');
-			}, 5000);
+			if(config && config.cache === undefined){
+				
+				config.alert = {normal: {}, slow: {}};
+
+				config.alert.normal.timeout = $timeout(function(){
+					config.alert.normal.id = Alert.add('正在加载...');
+				}, 200);
+
+				config.alert.slow.timeout = $timeout(function(){
+					Alert.close(config.alert.normal.id);
+					config.alert.slow.id = Alert.add('仍在继续...');
+				}, 5000);
+				
+				return config;
+			}
 			
-			return config;
+			return config || $q.when(config);
 		},
 		requestError: function(rejection) {
 			return $q.reject(rejection);
 		},
 		response: function(response) {
-			
-			$timeout.cancel(response.config.alert.normal.timeout);
-			$timeout.cancel(response.config.alert.slow.timeout);
-			Alert.close(response.config.alert.normal.id);
-			Alert.close(response.config.alert.slow.id);
+
+			if(response && response.config.cache === undefined){
+				$timeout.cancel(response.config.alert.normal.timeout);
+				$timeout.cancel(response.config.alert.slow.timeout);
+				Alert.close(response.config.alert.normal.id);
+				Alert.close(response.config.alert.slow.id);
+			}
 			
 			return response || $q.when(response);
 		},
