@@ -41,9 +41,9 @@
 		<script src="js/respond.min.js"></script>
 		<![endif]-->
 		
-		<?php foreach($this->company->config('modules') as $module){ ?>
+		<?php if($this->company->config('modules')): foreach($this->company->config('modules') as $module): ?>
 		<script type="text/javascript" src="modules/<?=$module?>/index.js"></script>
-		<?php } ?>
+		<?php endforeach; endif; ?>
 
 		<script type="text/javascript">
 			var company = <?=json_encode($this->company)?>;
