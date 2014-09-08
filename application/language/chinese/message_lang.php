@@ -1,6 +1,7 @@
 <?php
 $lang['property_name_error'] = '属性名称错误';
 $lang['argument_error'] = '参数错误';
+$lang['unauthorized'] = '尚未授权，您可能需要重新登录';
 $lang['no_permission'] = '没有权限';
 $lang['no_permission_to_grant'] = '没有权限进行授权';
 $lang['login_info_error'] = '用户名或密码错误';
