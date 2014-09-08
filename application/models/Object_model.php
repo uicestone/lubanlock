@@ -498,7 +498,7 @@ class Object_model extends CI_Model{
 
 			// 若用户或所在组具有对象{type}-admin role，则具有全部权限
 			if($this->session->user_roles){
-				$permission_condition .= "\nOR `object`.`type` IN ('".implode("', '", array_map(function($role){return $role . '-admin';}, $this->session->user_roles))."')";
+				$permission_condition .= "\nOR `object`.`type` IN ('".implode("', '", array_map(function($role){return preg_replace('/-admin$/', '', $role);}, $this->session->user_roles))."')";
 			}
 
 			// 一般读权限检查
@@ -890,17 +890,19 @@ class Object_model extends CI_Model{
 				$this->relative[$relationship['relation']][] = $relationship['relative'];
 			}
 			else{
-				$relative = (array) new Object_model($relationship['relative'], array('with'=>null));
-				
-				$relative['relationship_id'] = (int) $relationship['id'];
-				$relative['relationship_num'] = $relationship['num'];
-				$relative['is_on'] = (bool) $relationship['is_on'];
-				
-				if(!array_key_exists('with_meta', $args) || $args['with_meta']){
-					$relative['relationship_meta'] = $this->getRelativeMeta($relationship['id']);
-				}
-				
-				$this->relative[$relationship['relation']][] = $relative;
+				try{
+					$relative = (array) new Object_model($relationship['relative'], array('with'=>null));
+
+					$relative['relationship_id'] = (int) $relationship['id'];
+					$relative['relationship_num'] = $relationship['num'];
+					$relative['is_on'] = (bool) $relationship['is_on'];
+
+					if(!array_key_exists('with_meta', $args) || $args['with_meta']){
+						$relative['relationship_meta'] = $this->getRelativeMeta($relationship['id']);
+					}
+
+					$this->relative[$relationship['relation']][] = $relative;
+				}catch(Exception $e){}
 			}
 			
 		}
