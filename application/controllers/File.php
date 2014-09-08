@@ -28,7 +28,11 @@ class File extends LB_Controller{
 			'meta'=>$file_info
 		));
 		
-		$this->output->set_output($this->object->get($file_id));
+		if(!$this->input->accept('application/json')){
+			show_error('文件已经上传，但由于你的浏览器太旧，无法为你正常跳转，请手动<a href="javascript:history.back();">返回</a>', 400);
+		}else{
+			$this->output->set_output($this->object->get($file_id));
+		}
 		
 	}
 	
