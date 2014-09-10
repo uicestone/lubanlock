@@ -265,7 +265,7 @@ class Object_model extends CI_Model {
 
 				extract($permission);
 
-				$this->authorize($permission, $users);
+				$this->authorize($permission, $users, $permission_check);
 			}
 			
 			return;
@@ -281,7 +281,7 @@ class Object_model extends CI_Model {
 		}
 		
 		if($permission === 'private'){
-			$user = null;
+			$users = null;
 			$permission = array('read'=>true, 'write'=>true, 'grant'=>true);
 		}
 		
@@ -307,7 +307,7 @@ class Object_model extends CI_Model {
 			
 			$users = array($this->session->user_id);
 		}
-		
+
 		if(!is_array($users)){
 			$users = array($users);
 		}
@@ -767,7 +767,7 @@ class Object_model extends CI_Model {
 					$this->addMeta($key, $value, $unique, $check_permission);
 				}
 				else{
-					$this->addMeta($sub_key, $sub_func_args, $unique, $check_permission);
+					$this->addMeta($sub_key, $sub_func_args, false, $check_permission);
 				}
 			}catch(Exception $e){
 				//TODO不中断程序的错误应该也有地方输出错误信息

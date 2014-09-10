@@ -30,7 +30,7 @@ lubanlockControllers.controller('NavCtrl', ['$scope', '$location', 'Nav', 'User'
 		}
 		
 		$scope.navigateTo = function(item){
-			$location.path(item.meta.template ? item.meta.template[0] : 'list').search(angular.fromJson(item.meta.params[0]));
+			$location.path(item.meta && item.meta.template ? item.meta.template[0] : 'list').search(item.meta && item.meta.params ? angular.fromJson(item.meta.params[0]) : {});
 		}
 		
 		$scope.removable = {};
