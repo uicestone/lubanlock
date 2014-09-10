@@ -1,5 +1,5 @@
 <?php
-class Object_model extends CI_Model{
+class Object_model extends CI_Model {
 	
 	var $id,
 		$name, $type, $num, $company, $user, $time, $time_insert,
@@ -126,9 +126,9 @@ class Object_model extends CI_Model{
 		
 		$this->id = $this->db->insert_id();
 		
-		foreach(array('meta', 'relative', 'status', 'tag', 'permission') as $property){
+		foreach(array('meta'=>'addMetas', 'relative'=>'setRelatives', 'status'=>'addStatuses', 'tag'=>'addTags', 'permission'=>'authorize') as $property => $function){
 			if(array_key_exists($property, $data)){
-				call_user_func(array($this, 'add' . ucfirst($property)), $data[$property]);
+				call_user_func(array($this, $function), $data[$property], false);
 			}
 		}
 		
@@ -316,10 +316,6 @@ class Object_model extends CI_Model{
 			$this->db->upsert('object_permission', array('user'=>$user, 'object'=>$this->id) + $permission);
 		}
 		
-	}
-	
-	function addPermission($permission = 'read', $users = null){
-		$this->authorize($permission, $users);
 	}
 	
 	function _parse_criteria($args, $field='`object`.`id`', $logical_operator = 'AND'){
@@ -716,35 +712,7 @@ class Object_model extends CI_Model{
 	 * @param boolean $unique
 	 * @return boolean
 	 */
-	function addMeta($key, $value = null, $unique = false){
-		
-		if(is_array($key)){
-			
-			foreach($key as $sub_key => $sub_func_args){
-				try{
-					if(is_array($sub_func_args)){
-
-						$sub_func_args = array_merge(array(
-							'key' => null,
-							'value' => null,
-							'unique' => false,
-						), $sub_func_args);
-
-						extract($sub_func_args);
-
-						$this->addMeta($key, $value, $unique);
-					}
-					else{
-						$this->addMeta($sub_key, $sub_func_args, $unique);
-					}
-				}catch(Exception $e){
-					//TODO不中断程序的错误应该也有地方输出错误信息
-					continue;
-				}
-			}
-			
-			return;
-		}
+	function addMeta($key, $value = null, $unique = false, $check_permission = true){
 		
 		if(is_null($value)){
 			return;
@@ -754,7 +722,7 @@ class Object_model extends CI_Model{
 			$value = json_encode($value, JSON_UNESCAPED_UNICODE);
 		}
 		
-		if(!$this->allow('write')){
+		if($check_permission && !$this->allow('write')){
 			throw new Exception('no_permission', 403);
 		}
 		
@@ -780,6 +748,33 @@ class Object_model extends CI_Model{
 		$meta_id = $this->db->insert_id();
 		
 		return $meta_id;
+	}
+	
+	function addMetas(array $data, $check_permission = true){
+		
+		foreach($data as $sub_key => $sub_func_args){
+			try{
+				if(is_array($sub_func_args)){
+
+					$sub_func_args = array_merge(array(
+						'key' => null,
+						'value' => null,
+						'unique' => false,
+					), $sub_func_args);
+
+					extract($sub_func_args);
+
+					$this->addMeta($key, $value, $unique, $check_permission);
+				}
+				else{
+					$this->addMeta($sub_key, $sub_func_args, $unique, $check_permission);
+				}
+			}catch(Exception $e){
+				//TODO不中断程序的错误应该也有地方输出错误信息
+				continue;
+			}
+		}
+		
 	}
 	
 	/**
@@ -922,36 +917,10 @@ class Object_model extends CI_Model{
 	 * @return int|array new meta id(s)
 	 * @throws Exception
 	 */
-	function setRelative($relation, $relative = null, $num = '', array $meta = array(), $is_on = true, array $args = array()){
+	function setRelative($relation, $relative = null, $num = '', array $meta = array(), $is_on = true, array $args = array(), $check_permission = true){
 		
-		if(is_array($relation)){
-			
-			$relationship_ids = array();
-			
-			foreach($relation as $key => $sub_func_args){
-				if(is_array($sub_func_args)){
-					
-					$sub_func_args = array_merge(array(
-						'relation' => null,
-						'relative' => null,
-						'num' => '',
-						'meta' => array(),
-						'is_on' => true,
-						'args' => array(),
-					), $sub_func_args);
-					
-					extract($sub_func_args);
-					
-					$relationship_ids[] = $this->setRelative($relation, $relative, $num, $meta, $is_on, $args);
-				}
-				else{
-					$relation = is_int($key) ? '' : $key;
-					$relationship_ids[] = $this->setRelative($relation, $sub_func_args);
-				}
-			}
-			
-			return $relationship_ids;
-			
+		if($check_permission && !$this->allow('write')){
+			throw new Exception('no_permission', 403);
 		}
 		
 		try{
@@ -989,11 +958,40 @@ class Object_model extends CI_Model{
 		return $return;
 	}
 	
-	function addRelative($relation, $relative = null, $num = '', array $meta = array(), $is_on = true, array $args = array()){
-		return $this->setRelative($relation, $relative, $num, $meta, $is_on, $args);
+	function setRelatives(array $data, $check_permission = true){
+			
+		$relationship_ids = array();
+
+		foreach($data as $key => $sub_func_args){
+			if(is_array($sub_func_args)){
+
+				$sub_func_args = array_merge(array(
+					'relation' => null,
+					'relative' => null,
+					'num' => '',
+					'meta' => array(),
+					'is_on' => true,
+					'args' => array(),
+				), $sub_func_args);
+
+				extract($sub_func_args);
+
+				$relationship_ids[] = $this->setRelative($relation, $relative, $num, $meta, $is_on, $args, $check_permission);
+			}
+			else{
+				$relation = is_int($key) ? '' : $key;
+				$relationship_ids[] = $this->setRelative($relation, $sub_func_args, '', array(), true, array(), $check_permission);
+			}
+		}
+
+		return $relationship_ids;
+			
 	}
 	
 	function removeRelative($relation, $relative){
+		if(!$this->allow('write')){
+			throw new Exception('no_permission', 403);
+		}
 		return $this->db->delete('object_relationship', array('object'=>$this->id, 'relation'=>$relation, 'relative'=>$relative));
 	}
 	
@@ -1015,6 +1013,10 @@ class Object_model extends CI_Model{
 	}
 	
 	function setRelativeMeta($relation, $relative, $key, $value){
+		if(!$this->allow('write')){
+			throw new Exception('no_permission', 403);
+		}
+		
 		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
 		if(is_null($value)){
 			return $this->db->delete('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key));
@@ -1025,6 +1027,9 @@ class Object_model extends CI_Model{
 	}
 	
 	function removeRelativeMeta($relation, $relative, $key){
+		if(!$this->allow('write')){
+			throw new Exception('no_permission', 403);
+		}
 		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
 		return $this->db->delete('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key));
 	}
@@ -1092,31 +1097,10 @@ class Object_model extends CI_Model{
 		return $date;
 	}
 
-	function addStatus($name, $date = null, $comment = null){
+	function addStatus($name, $date = null, $comment = null, $check_permission = true){
 		
-		if(is_array($name)){
-			
-			$status_ids = array();
-			
-			foreach($name as $sub_name => $sub_func_args){
-				if(is_array($sub_func_args)){
-					
-					$sub_func_args = array_merge(array(
-						'name' => '',
-						'date' => null,
-						'comment' => null,
-					), $sub_func_args);
-					
-					extract($sub_func_args);
-					
-					$status_ids[] = $this->addStatus($name, $date, $comment);
-				}
-				else{
-					$status_ids[] = $this->addStatus($sub_name, $sub_func_args);
-				}
-			}
-			
-			return $status_ids;
+		if($check_permission && !$this->allow('write')){
+			throw new Exception('no_permission', 403);
 		}
 		
 		$this->db->insert('object_status',array(
@@ -1130,6 +1114,28 @@ class Object_model extends CI_Model{
 		return $this->db->insert_id();
 	}
 	
+	function addStatuses(array $data, $check_permission = true){
+			
+		foreach($data as $sub_name => $sub_func_args){
+			if(is_array($sub_func_args)){
+
+				$sub_func_args = array_merge(array(
+					'name' => '',
+					'date' => null,
+					'comment' => null,
+				), $sub_func_args);
+
+				extract($sub_func_args);
+
+				$this->addStatus($name, $date, $comment, $check_permission);
+			}
+			else{
+				$this->addStatus($sub_name, $sub_func_args, null, $check_permission);
+			}
+		}
+
+	}
+	
 	/**
 	 * 更新对象状态
 	 * @param string $name 要更新的状态名
@@ -1138,6 +1144,10 @@ class Object_model extends CI_Model{
 	 * @param string|int $prev_date 为null则更新日期最新一条名称为$name的状态，否则更新名称为$name且日期为$prev_date的状态
 	 */
 	function updateStatus($name, $date = null, $comment = null, $prev_date = null){
+		
+		if(!$this->allow('write')){
+			throw new Exception('no_permission', 403);
+		}
 		
 		$set = array();
 		
@@ -1165,6 +1175,10 @@ class Object_model extends CI_Model{
 	}
 	
 	function removeStatus($name, $date = null){
+		
+		if(!$this->allow('write')){
+			throw new Exception('no_permission', 403);
+		}
 		
 		$where = array(
 			'object'=>$this->id,
@@ -1215,7 +1229,11 @@ class Object_model extends CI_Model{
 	 * @param string $taxonomy 分类
 	 * @param bool $append 是否追加，false将用$tags重写此分类的值，否则保留原值
 	 */
-	function setTag($tags, $taxonomy = null, $append = false){
+	function setTag($tags, $taxonomy = null, $append = false, $check_permission = true){
+		
+		if($check_permission && !$this->allow('write')){
+			throw new Exception('no_permission', 403);
+		}
 		
 		if(!$tags){
 			$tags = array();
@@ -1255,8 +1273,17 @@ class Object_model extends CI_Model{
 		
 	}
 	
-	function addTag($tags, $taxonomy = null, $append = false){
-		return $this->setTag($tags, $taxonomy, $append);
+	function setTags(array $data, $check_permission = true){
+		foreach($data as $taxonomy => $tags){
+			$this->setTag($tags, $taxonomy, false, $check_permission);
+		}
 	}
+	
+	function addTags(array $data, $check_permission = true){
+		foreach($data as $taxonomy => $tags){
+			$this->setTag($tags, $taxonomy, true, $check_permission);
+		}
+	}
+	
 }
 ?>

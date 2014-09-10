@@ -87,7 +87,7 @@ class Test extends LB_Controller{
 		$object_1->getMeta();
 		$this->unit->run($object_1->meta['年龄'] === array('21') && $error === 400, true, 'insert unique meta');unset($error);
 		
-		$object_1->addMeta(array(
+		$object_1->addMetas(array(
 			array('key'=>'工作单位', 'value'=>'Allstar', 'unique'=>true),
 			array('key'=>'项目', 'value'=>'89jian'),
 			'项目'=>'zhouyi'
@@ -113,22 +113,22 @@ class Test extends LB_Controller{
 		$this->unit->run($object_1->meta['项目'], array('Circle', 'CMCC'), 'update meta (specific previous meta value)');
 		
 		// insert tag
-		$object_1->addTag('外省', '户籍');
+		$object_1->setTag('外省', '户籍');
 		$object_1->getTag();
 		$this->unit->run($object_1->tag['户籍'] , array('外省'), 'insert tag');
 		
 		// insert tag (appending)
-		$object_1->addTag(array('本市', '外省'), '户籍', true);
+		$object_1->setTag(array('本市', '外省'), '户籍', true);
 		$object_1->getTag();
 		$this->unit->run($object_1->tag['户籍'] , array('外省', '本市'), 'insert tag (appending)');
 		
 		// insert tag (replacing)
-		$object_1->addTag('本市', '户籍');
+		$object_1->setTag('本市', '户籍');
 		$object_1->getTag();
 		$this->unit->run($object_1->tag['户籍'] , array('本市'), 'insert tag (replacing)');
 
 		// batch insert tag
-		$object_1->addTag(array(
+		$object_1->setTag(array(
 			'劳动关系'=>'派遣',
 			'居住地'=>'宝山',
 		));
@@ -165,7 +165,7 @@ class Test extends LB_Controller{
 		$this->unit->run(array_key_exists('登录', $object_1->status), false, 'remove status');
 		
 		// insert relative
-		$object_1->addRelative('同学', $user_2->id, 1, array('自从'=>'初中', '直到'=>'现在'));
+		$object_1->setRelative('同学', $user_2->id, 1, array('自从'=>'初中', '直到'=>'现在'));
 		$object_1->getRelative();
 		$this->unit->run($object_1->relative['同学'][0]['name'], '大鱼', 'insert relative');
 		
