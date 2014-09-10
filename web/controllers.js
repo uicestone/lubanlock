@@ -73,12 +73,6 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', 'N
 		
 		//详情页，TODO，待完善，对于符合一定条件的对象，使用特定模板载入
 		$scope.showDetail = function(id, type){
-			
-			if(type === 'file'){
-				window.open('/file/download/' + id);
-				return;
-			}
-			
 			$location.url('detail/' + id);
 		}
 		

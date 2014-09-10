@@ -8,3 +8,4 @@ $lang['schedule'] = '日程';
 $lang['task'] = '任务';
 $lang['project'] = '项目';
 $lang['member'] = '成员';
+$lang['file'] = '文件';
