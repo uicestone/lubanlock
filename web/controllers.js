@@ -208,12 +208,6 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		}
 		
 		$scope.showDetail = function(id, type){
-			
-			if(type === 'file'){
-				window.open('/file/download/' + id);
-				return;
-			}
-			
 			$location.url('detail/' + id);
 		}
 		
