@@ -1,5 +1,6 @@
 <?php
 $lang['object'] = '对象';
+$lang['user'] = '用户';
 $lang['group'] = '用户组';
 $lang['nav'] = '菜单项';
 $lang['people'] = '人员';

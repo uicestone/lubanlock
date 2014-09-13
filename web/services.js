@@ -49,7 +49,17 @@ lubanlockServices.service('Object', ['$resource',
 
 lubanlockServices.service('User', ['$resource',
 	function($resource){
+		
+		var responseInterceptor = function(response){
+			if(response.data === 'null'){
+				return null;
+			}
+			response.resource.$response = response;
+			return response.resource;
+		}
+		
 		return $resource('user/:id', {id: '@id'}, {
+			query: {method: 'GET', isArray: true, interceptor: {response: responseInterceptor}},
 			update: {method: 'PUT'},
 			getConfig: {method: 'GET', url:'user/config/:item'},
 			saveConfig: {method: 'POST', url:'user/config/:item'}

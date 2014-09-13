@@ -16,7 +16,12 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 		$routeProvider
 			.when('/user', {
 				templateUrl: 'partials/list_user.html',
-				controller: 'UsersCtrl'
+				controller: 'UsersCtrl',
+				resolve: {
+					users: ['User', '$route', function(User, $route){
+						return User.query($route.current.params).$promise;
+					}]
+				}
 			})
 			.when('/user/:id', {
 				templateUrl: 'partials/detail_user.html',

@@ -27,7 +27,7 @@
 		<li>
 			<a href="#/user">
 				<i class="icon-user"></i>
-				<span class="menu-text"> 用户管理 </span>
+				<span class="menu-text"> 用户 </span>
 			</a>
 		</li>
 		<?php } ?>

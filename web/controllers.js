@@ -276,17 +276,19 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 	}
 ]);
 
-lubanlockControllers.controller('UsersCtrl', ['$scope', '$routeParams', 'User', '$location',
-	function($scope, $routeParams, User, $location) {
+lubanlockControllers.controller('UsersCtrl', ['$scope', '$location', 'User', 'users',
+	function($scope, $location, User, users) {
 		
-		$scope.users = User.query($routeParams);
+		//列表分页
 		$scope.currentPage = $location.search().page || 1;
 		
-		$scope.showDetail = function(id){
-			//因为使用了表格，无法使用a，因此绑定ng-click
-			$location.url('detail/' + id);
-		}
-		
+		$scope.users = users;
+		// get pagination argument from statusText
+		var statusText = $scope.users.$response.statusText;
+		$scope.total = Number(statusText.match(/(\d+) Users in Total/)[1]);
+		$scope.listStart = Number(statusText.match(/(\d+)\-/)[1]);
+		$scope.listEnd = Number(statusText.match(/\-(\d+)/)[1]);
+
 		$scope.nextPage = function(){
 			$location.search('page', ++$scope.currentPage);
 		}
@@ -294,6 +296,12 @@ lubanlockControllers.controller('UsersCtrl', ['$scope', '$routeParams', 'User', 
 		$scope.previousPage = function(){
 			$location.search('page', --$scope.currentPage);
 		}
+		
+		$scope.showDetail = function(id){
+			//因为使用了表格，无法使用a，因此绑定ng-click
+			$location.url('detail/' + id);
+		}
+		
 	}
 ]);
 
