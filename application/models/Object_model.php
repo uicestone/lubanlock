@@ -3,7 +3,7 @@ class Object_model extends CI_Model {
 	
 	var $id,
 		$name, $type, $num, $company, $user, $time, $time_insert,
-		$meta, $relative, $status, $tag, $permission;
+		$meta, $relative, $parents, $status, $tag, $permission;
 	
 	static $fields=array(
 		'name'=>NULL,
@@ -72,7 +72,7 @@ class Object_model extends CI_Model {
 			array_key_exists($property, $object) && $this->$property = $object[$property];
 		}
 
-		foreach( array('meta', 'relative', 'status', 'tag', 'permission') as $field ){
+		foreach( array('meta', 'relative', 'parents', 'status', 'tag', 'permission') as $field ){
 			
 			$property_args = true;
 			
@@ -572,7 +572,7 @@ class Object_model extends CI_Model {
 		}
 		
 		//获得四属性的参数，决定是否为对象列表获取属性
-		foreach( array('meta', 'relative', 'status', 'tag', 'permission') as $field ){
+		foreach( array('meta', 'relative', 'parents', 'status', 'tag', 'permission') as $field ){
 			
 			$property_args = false;
 			
@@ -851,16 +851,24 @@ class Object_model extends CI_Model {
 	 *	include_disabled
 	 *	with_meta default:true
 	 *	order_by
+	 *	get_parents
 	 * @return array
 	 */
 	function getRelative(array $args = array()){
 		
+		if(array_key_exists('get_parents', $args) && $args['get_parents']){
+			$get = 'object'; $by = 'relative'; $save_as = $this->parents;
+		}
+		else{
+			$get = 'relative'; $by = 'object'; $save_as = $this->relative;
+		}
+		
 		$this->db
 			->from('object_relationship')
-			->where('object_relationship.object',$this->id);
+			->where('object_relationship.' . $by, $this->id);
 		
 		if(array_key_exists('relation', $args)){
-			$this->db->where('object_relationship.relation',$args['relation']);
+			$this->db->where('object_relationship.relation', $args['relation']);
 		}
 		
 		if(!array_key_exists('include_disabled', $args) || !$args['include_disabled']){
@@ -877,16 +885,16 @@ class Object_model extends CI_Model {
 			return $result;
 		}
 		
-		$this->relative = null;
+		$save_as = null;
 
 		foreach($result as $relationship){
 
 			if(array_key_exists('id_only', $args) && $args['id_only']){
-				$this->relative[$relationship['relation']][] = $relationship['relative'];
+				$save_as[$relationship['relation']][] = $relationship[$get];
 			}
 			else{
 				try{
-					$relative = (array) new Object_model($relationship['relative'], array('with'=>null));
+					$relative = (array) new Object_model($relationship[$get], array('with'=>null));
 
 					$relative['relationship_id'] = (int) $relationship['id'];
 					$relative['relationship_num'] = $relationship['num'];
@@ -896,14 +904,19 @@ class Object_model extends CI_Model {
 						$relative['relationship_meta'] = $this->getRelativeMeta($relationship['id']);
 					}
 
-					$this->relative[$relationship['relation']][] = $relative;
+					$save_as[$relationship['relation']][] = $relative;
 				}catch(Exception $e){}
 			}
 			
 		}
 		
-		return $this->relative;
+		return $save_as;
 		
+	}
+	
+	function getParents(array $args = array()){
+		$args['get_parents'] = true;
+		return $this->getRelative($args);
 	}
 	
 	/**
