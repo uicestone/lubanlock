@@ -78,22 +78,21 @@ $route['default_controller'] = 'index';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
-$route['object/(:num)']='object/index/$1';
-$route['object/(:num)/meta']='object/meta/$1';
-$route['object/(:num)/meta/(:any)']='object/meta/$1/$2';
-$route['object/(:num)/relative']='object/relative/$1';
-$route['object/(:num)/relative/(:any)']='object/relative/$1/$2';
-$route['object/(:num)/status']='object/status/$1';
-$route['object/(:num)/status/(:any)']='object/status/$1/$2';
-$route['object/(:num)/tag']='object/tag/$1';
-$route['object/(:num)/tag/(:any)']='object/tag/$1/$2';
-$route['object/(:num)/permission']='object/permission/$1';
-$route['object/(:num)/(authorize|prohibit)/(read|write|grant)']='object/permission/$1/$2/$3';
+$route['object']='object_controller/index';
+$route['object/(:num)']='object_controller/index/$1';
+$route['object/(:num)/meta']='object_controller/meta/$1';
+$route['object/(:num)/meta/(:any)']='object_controller/meta/$1/$2';
+$route['object/(:num)/relative']='object_controller/relative/$1';
+$route['object/(:num)/relative/(:any)']='object_controller/relative/$1/$2';
+$route['object/(:num)/status']='object_controller/status/$1';
+$route['object/(:num)/status/(:any)']='object_controller/status/$1/$2';
+$route['object/(:num)/tag']='object_controller/tag/$1';
+$route['object/(:num)/tag/(:any)']='object_controller/tag/$1/$2';
+$route['object/(:num)/permission']='object_controller/permission/$1';
+$route['object/(:num)/(authorize|prohibit)/(read|write|grant)']='object_controller/permission/$1/$2/$3';
 
 $route['(login|logout|profile|signup)']='user/$1';
 $route['user/(:num)']='user/index/$1';
-
-$route['nav/(:any)'] = 'nav/index/$1';
 
 $route['robots.txt'] = 'index/robots';
 

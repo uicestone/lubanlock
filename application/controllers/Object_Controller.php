@@ -1,5 +1,5 @@
 <?php
-class Object extends LB_Controller{
+class Object_Controller extends LB_Controller{
 	
 	function __construct() {
 		parent::__construct();
@@ -35,7 +35,7 @@ class Object extends LB_Controller{
 		
 		$args = $this->input->get();
 		
-		$object = $this->object->get($id, $args);
+		$object = new Object($id, $args);
 		
 		$this->output->set_output($object);
 	}
@@ -55,30 +55,30 @@ class Object extends LB_Controller{
 	}
 	
 	function update($id){
-		
-		$this->object->id=$id;
-		
-		$this->object->update($this->input->data());
-		
-		$this->get($this->object->id);
+		$object = new Object($id, array('get_data'=>false));
+		$object->update($this->input->data());
+		$this->get($object->id);
 	}
 	
 	function add(){
 		$data = $this->input->data();
 		
-		$this->object->id = $this->object->add($data);
+		if(!is_array($data)){
+			throw new Exception('Object data must be array.', 400);
+		}
 		
-		$this->get($this->object->id);
+		$object = new Object($data);
+		$this->get($object->id);
 	}
 	
 	function remove($id){
-		$this->object->id = $id;
-		$this->object->remove();
+		$object = new Object($id, array('get_data'=>false));
+		$object->remove();
 	}
 	
 	function meta($object_id, $key = null){
 		
-		$this->object->id=$object_id;
+		$object = new Object($object_id, array('get_data'=>false));
 		
 		$key = urldecode($key);
 		
@@ -87,25 +87,25 @@ class Object extends LB_Controller{
 				break;
 			
 			case 'POST':
-				$this->object->addMeta($key, $this->input->data(), $this->input->get('unique'));
+				$object->addMeta($key, $this->input->data(), $this->input->get('unique'));
 				break;
 			
 			case 'PUT':
-				$this->object->updateMeta($key, $this->input->data(), $this->input->get('prev_value') ? $this->input->get('prev_value') : null);
+				$object->updateMeta($key, $this->input->data(), $this->input->get('prev_value') ? $this->input->get('prev_value') : null);
 				break;
 			
 			case 'DELETE':
-				$this->object->removeMeta($key, $this->input->get('value') ? $this->input->get('value') : null);
+				$object->removeMeta($key, $this->input->get('value') ? $this->input->get('value') : null);
 				break;
 		}
 		
-		$this->output->set_output($this->object->getMeta());
+		$this->output->set_output($object->getMeta());
 		
 	}
 	
 	function relative($object_id, $relation = ''){
 		
-		$this->object->id = $object_id;
+		$object = new Object($object_id, array('get_data'=>false));
 		
 		switch ($this->input->method) {
 			case 'GET':
@@ -129,20 +129,20 @@ class Object extends LB_Controller{
 					array_key_exists('is_on', $data) && $is_on = $data['is_on'];
 				}
 				
-				$this->object->setRelative($relation, $relative, $num, $meta, $is_on, $this->input->get());
+				$object->setRelative($relation, $relative, $num, $meta, $is_on, $this->input->get());
 				break;
 			
 			case 'DELETE':
-				$this->object->removeRelative($relation, $this->input->get('relative') ? $this->input->get('relative') : null);
+				$object->removeRelative($relation, $this->input->get('relative') ? $this->input->get('relative') : null);
 				break;
 		}
 		
-		$this->output->set_output($this->object->getRelative($this->input->get()));
+		$this->output->set_output($object->getRelative($this->input->get()));
 	}
 	
 	function status($object_id, $name = null){
 		
-		$this->object->id=$object_id;
+		$object = new Object($object_id, array('get_data'=>false));
 		
 		switch ($this->input->method) {
 			case 'GET':
@@ -161,13 +161,13 @@ class Object extends LB_Controller{
 					$date = array_key_exists('date', $data) ? $data['date'] : null;
 				}
 				
-				$this->object->addStatus($name, $date, $comment);
+				$object->addStatus($name, $date, $comment);
 				
 				break;
 			
 			case 'PUT':
 				
-				$this->object->updateStatus($name, 
+				$object->updateStatus($name, 
 					$this->input->data('date') ? $this->input->data('date') : null, 
 					$this->input->data('comment') ? $this->input->data('comment') : null, 
 					$this->input->get('prev_date') ? $this->input->get('prev_date') : null
@@ -176,42 +176,43 @@ class Object extends LB_Controller{
 				break;
 			
 			case 'DELETE':
-				$this->object->removeStatus($name, $this->input->get('date') ? $this->input->get('date') : null);
+				$object->removeStatus($name, $this->input->get('date') ? $this->input->get('date') : null);
 				break;
 		}
 		
-		$this->output->set_output($this->object->getStatus($this->input->get()));
+		$this->output->set_output($object->getStatus($this->input->get()));
 	}
 	
 	function tag($object_id, $taxonomy = null){
 		
-		$this->object->id=$object_id;
+		$object = new Object($object_id, array('get_data'=>false));
 		
 		switch ($this->input->method) {
 			case 'GET':
 				break;
 			
 			case 'POST':
-				$this->object->setTag($this->input->data(), $taxonomy, $this->input->get('append') ? $this->input->get('append') : false);
+				$object->setTag($this->input->data(), $taxonomy, $this->input->get('append') ? $this->input->get('append') : false);
 				break;
 			
 		}
 		
-		$this->output->set_output($this->object->getTag());
+		$this->output->set_output($object->getTag());
 	}
 	
 	function permission($object_id, $type = 'authorize', $name = 'read'){
-		$this->object->id = $object_id;
+		
+		$object = new Object($object_id, array('get_data'=>false));
 		
 		switch ($this->input->method){
 			case 'GET':
 				break;
 			
 			case 'POST':
-				$this->object->authorize(array($name=>$type === 'authorize'), $this->input->data());
+				$object->authorize(array($name=>$type === 'authorize'), $this->input->data());
 		}
 		
-		$this->output->set_output($this->object->getPermission($this->input->get()));
+		$this->output->set_output($object->getPermission($this->input->get()));
 	}
 	
 }

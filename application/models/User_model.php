@@ -1,5 +1,5 @@
 <?php
-class User_model extends Object_model{
+class User_model extends Object {
 	
 	var $name = '', $email, $password, $roles = array();
 	

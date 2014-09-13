@@ -17,7 +17,7 @@ class Test extends LB_Controller{
 		$this->user->sessionLogout();
 		
 		// insert an object
-		$object_1 = new Object_model(array(
+		$object_1 = new Object(array(
 			'name'=>'大灰',
 			'type'=>'user',
 			'num'=>'_test',
@@ -142,26 +142,26 @@ class Test extends LB_Controller{
 		
 		// insert status
 		$object_1->addStatus('登录');
-		$object_1->getStatus();
+		$object_1->getStatus(array('as_rows'=>false));
 		$this->unit->run(strtotime($object_1->status['登录'][count($object_1->status['登录']) - 1]), time(), 'insert status');
 		
 		// update status
 		$object_1->updateStatus('登录', time() + 1000, 'A Comment Message.');
-		$object_1->getStatus();
+		$object_1->getStatus(array('as_rows'=>false));
 		$this->unit->run($object_1->status['登录'][count($object_1->status['登录']) - 1], date('Y-m-d H:i:s', time() + 1000), 'update status');
 		
 		// update status
 		$object_1->updateStatus('登录', time(), null, '2014-05-12 00:00:03');
-		$object_1->getStatus();
+		$object_1->getStatus(array('as_rows'=>false));
 		$this->unit->run($object_1->status['登录'][0], date('Y-m-d H:i:s', time()), 'update status (specified previous date)');
 		
 		// remove status
 		$object_1->removeStatus('登录', time() + 1000);
-		$object_1->getStatus();
+		$object_1->getStatus(array('as_rows'=>false));
 		$this->unit->run($object_1->status['登录'][0], date('Y-m-d H:i:s', time()), 'remove status (specified previous date)');
 		
 		$object_1->removeStatus('登录');
-		$object_1->getStatus();
+		$object_1->getStatus(array('as_rows'=>false));
 		$this->unit->run(array_key_exists('登录', $object_1->status), false, 'remove status');
 		
 		// insert relative

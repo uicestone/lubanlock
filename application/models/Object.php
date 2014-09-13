@@ -1,5 +1,5 @@
 <?php
-class Object_model extends CI_Model {
+class Object extends CI_Model {
 	
 	var $id,
 		$name, $type, $num, $company, $user, $time, $time_insert,
@@ -15,31 +15,39 @@ class Object_model extends CI_Model {
 		'time_insert'=>NULL
 	);
 	
-	function __construct($data = null, $args = array()) {
+	/**
+	 * create an Object instance by fetching from database, or create a new object in database
+	 * @param $data
+	 * @param array $args
+	 *	get_data get_data from database when $data is not something for save but an id for retrieving an object, default is true
+	 */
+	function __construct($data = null, array $args = array()) {
 		
 		parent::__construct();
 
 		if(!is_null($data)){
 			
 			if(is_array($data)){
-				$this->id = $this->add($data);
+				$data['id'] = $this->add($data);
 			}
 			else{
-				$this->id = intval($data);
+				$data = !array_key_exists('get_data', $args) || $args['get_data'] ? $this->get(intval($data), $args) : array('id'=>intval($data));
 			}
 			
-			$this->get($this->id, $args);
-			
+			foreach(array_keys(get_object_vars($this)) as $property){
+				$this->$property = array_key_exists($property, $data) ? $data[$property] : null;
+			}
+
 		}
 	}
 	
 	/**
-	 * 根据id获得单个对象，将属性保存到Object_model并返回一个object数组
+	 * 根据id获得单个对象，将属性保存到Object
 	 * @param int $id
 	 * @param array $args
-	 *	with 请求的对象是否包含附加属性，默认包含五种附加属性
+	 *	with 请求的对象是否包含附加属性，默认包含6种附加属性
 	 * @param bool $permission_check
-	 * @return array
+	 * @return array array version of the object
 	 */
 	function get($id = null, array $args = array(), $permission_check = true){
 
@@ -68,10 +76,6 @@ class Object_model extends CI_Model {
 		$object['type'] = lang($object['type']);
 		!is_null($object['user']) && $object['user'] = intval($object['user']);
 		
-		foreach(array_keys(get_object_vars($this)) as $property){
-			array_key_exists($property, $object) && $this->$property = $object[$property];
-		}
-
 		foreach( array('meta', 'relative', 'parents', 'status', 'tag', 'permission') as $field ){
 			
 			$property_args = true;
@@ -112,7 +116,8 @@ class Object_model extends CI_Model {
 	}
 	
 	/**
-	 * 
+	 * create a new object in database
+	 * will also create properties if meta, status... field is defined
 	 * @param array $data
 	 * @return int insert id
 	 */
@@ -135,6 +140,11 @@ class Object_model extends CI_Model {
 		return $this->id;
 	}
 	
+	/**
+	 * update an object and save to database
+	 * @param array $data
+	 * @return int affected rows
+	 */
 	function update(array $data){
 
 		$data=array_intersect_key($data, self::$fields);
@@ -861,10 +871,10 @@ class Object_model extends CI_Model {
 		}
 		
 		if(array_key_exists('get_parents', $args) && $args['get_parents']){
-			$get = 'object'; $by = 'relative'; $save_as = $this->parents;
+			$get = 'object'; $by = 'relative'; $save_as = &$this->parents;
 		}
 		else{
-			$get = 'relative'; $by = 'object'; $save_as = $this->relative;
+			$get = 'relative'; $by = 'object'; $save_as = &$this->relative;
 		}
 		
 		$this->db
@@ -890,7 +900,7 @@ class Object_model extends CI_Model {
 		}
 		
 		$save_as = null;
-
+		
 		foreach($result as $relationship){
 
 			if(array_key_exists('id_only', $args) && $args['id_only']){
@@ -898,7 +908,7 @@ class Object_model extends CI_Model {
 			}
 			else{
 				try{
-					$relative = (array) new Object_model($relationship[$get], array('with'=>null));
+					$relative = (array) new Object($relationship[$get], array('with'=>null));
 
 					$relative['relationship_id'] = (int) $relationship['id'];
 					$relative['relationship_num'] = $relationship['num'];
@@ -941,10 +951,10 @@ class Object_model extends CI_Model {
 		}
 		
 		try{
-			new Object_model($relative);
+			new Object($relative, array('with'=>null));
 		}
 		catch(Exception $e){
-			throw new Exception('invalid_relative', 400);
+			throw new Exception(lang('invalid_relative') . ': ' . lang($e->getMessage()), 400);
 		}
 		
 		$return = $this->db->upsert('object_relationship', array(
@@ -1081,7 +1091,7 @@ class Object_model extends CI_Model {
 		
 		$result = $this->db->get()->result_array();
 		
-		if(!array_key_exists('as_rows', $args) || !$args['as_rows']){
+		if(!array_key_exists('as_rows', $args) || $args['as_rows']){
 			return $result;
 		}
 		
