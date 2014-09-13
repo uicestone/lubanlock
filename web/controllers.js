@@ -276,8 +276,8 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 	}
 ]);
 
-lubanlockControllers.controller('UsersCtrl', ['$scope', '$location', 'User', 'users',
-	function($scope, $location, User, users) {
+lubanlockControllers.controller('UsersCtrl', ['$scope', '$location', 'users',
+	function($scope, $location, users) {
 		
 		//列表分页
 		$scope.currentPage = $location.search().page || 1;
@@ -299,7 +299,7 @@ lubanlockControllers.controller('UsersCtrl', ['$scope', '$location', 'User', 'us
 		
 		$scope.showDetail = function(id){
 			//因为使用了表格，无法使用a，因此绑定ng-click
-			$location.url('detail/' + id);
+			$location.url('user/' + id);
 		}
 		
 	}
