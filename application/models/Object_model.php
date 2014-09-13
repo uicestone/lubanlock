@@ -856,6 +856,10 @@ class Object_model extends CI_Model {
 	 */
 	function getRelative(array $args = array()){
 		
+		if(!$this->allow()){
+			throw new Exception('no_permission', 403);
+		}
+		
 		if(array_key_exists('get_parents', $args) && $args['get_parents']){
 			$get = 'object'; $by = 'relative'; $save_as = $this->parents;
 		}
@@ -1020,6 +1024,9 @@ class Object_model extends CI_Model {
 	}
 	
 	function getRelativeMeta($relation, $relative = null){
+		if(!$this->allow()){
+			throw new Exception('no_permission', 403);
+		}
 		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
 		$result = $this->db->from('object_relationship_meta')->where('relationship', $relationship_id)->get()->result_array();
 		return $result ? array_column($result, 'value', 'key') : null;
@@ -1054,6 +1061,10 @@ class Object_model extends CI_Model {
 	 * $return array|object
 	 */
 	function getStatus(array $args = array()){
+		
+		if(!$this->allow()){
+			throw new Exception('no_permission', 403);
+		}
 		
 		$this->db->select('object_status.*')
 			->select('UNIX_TIMESTAMP(`date`) `timestamp`', false)
@@ -1210,6 +1221,10 @@ class Object_model extends CI_Model {
 	 * @return array
 	 */
 	function getTag(array $args = array()){
+		
+		if(!$this->allow()){
+			throw new Exception('no_permission', 403);
+		}
 		
 		$this->db->from('object_tag')
 			->join('tag_taxonomy','tag_taxonomy.id = object_tag.tag_taxonomy','inner')
