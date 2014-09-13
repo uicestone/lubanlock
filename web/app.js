@@ -32,7 +32,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 				controller: 'ListCtrl',
 				resolve: {
 					objects: ['Object', '$route', function(Object, $route){
-						return Object.query(angular.extend({with_status: {as_rows: true}, with_tag: true}, $route.current.params)).$promise;
+						return Object.query(angular.extend({with_status: true, with_tag: true}, $route.current.params)).$promise;
 					}]
 				}
 			})

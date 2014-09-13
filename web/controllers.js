@@ -144,7 +144,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		}
 		
 		$scope.addStatus = function($event){
-			Object.saveStatus({object: $scope.object.id, name: $scope['new'].status.name, as_rows: true, order_by: 'date desc'}, $scope['new'].status.date, function(status){
+			Object.saveStatus({object: $scope.object.id, name: $scope['new'].status.name, order_by: 'date desc'}, $scope['new'].status.date, function(status){
 				$scope.object.status = status;
 				$scope['new'].status = undefined;
 				angular.element($event.target).find(':input:first').trigger('select');
@@ -152,7 +152,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		}
 		
 		$scope.removeStatus = function(name, date){
-			Object.removeStatus({object: $scope.object.id, name: name, date: date, as_rows: true, order_by: 'date desc'}, function(status){
+			Object.removeStatus({object: $scope.object.id, name: name, date: date, order_by: 'date desc'}, function(status){
 				$scope.object.status = status;
 			});
 		}

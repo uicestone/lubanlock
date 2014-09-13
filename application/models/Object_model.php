@@ -1057,7 +1057,7 @@ class Object_model extends CI_Model {
 	/**
 	 * 获得对象的当前状态或者状态列表
 	 * @property array $args
-	 *	as_rows bool default: false 对象属性是无序的，需要有序序列时，将本参数设置为true来获得一个数组
+	 *	as_rows bool default: true 对象属性是无序的，需要有序序列时，将本参数设置为true来获得一个数组
 	 * $return array|object
 	 */
 	function getStatus(array $args = array()){
@@ -1081,7 +1081,7 @@ class Object_model extends CI_Model {
 		
 		$result = $this->db->get()->result_array();
 		
-		if(array_key_exists('as_rows', $args) && $args['as_rows']){
+		if(!array_key_exists('as_rows', $args) || !$args['as_rows']){
 			return $result;
 		}
 		
