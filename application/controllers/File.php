@@ -40,13 +40,12 @@ class File extends LB_Controller{
 		
 		$file = $this->object->get($id);
 		
-		$path = end($file['meta']['full_path']);
+		$path = get_meta($file, 'full_path');
 		
-		header('Content-Type: ' . end($file['meta']['file_type']));
-		header('Content-Length: ' . end($file['meta']['file_size']) * 1024);
-		header('Content-Disposition: attachment; filename="'.end($file['meta']['orig_name']).'"');
+		header('Content-Type: ' . get_meta($file, 'file_type'));
+		header('Content-Length: ' . round(get_meta($file, 'file_size') * 1024));
+		header('Content-Disposition: attachment; filename="' . get_meta($file, 'orig_name') . '"');
 		header('Expires: 0');
-		
 		
 		readfile($path);
 

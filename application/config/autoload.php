@@ -113,7 +113,7 @@ $autoload['drivers'] = array('session');
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('array','date','form','html','language','string','url');
+$autoload['helper'] = array('array','date','form','html','language','object','string','url');
 
 
 /*
