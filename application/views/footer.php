@@ -10,6 +10,11 @@
 				</button>
 				{{alert.msg}}
 			</alert>
+			<!--[if lt IE 9]>
+			<div class="alert alert-warning">
+				您正使用不受支持的旧版本IE浏览器。建议使用Chrome，Firefox，Safari或是360，搜狗，傲游等浏览器的“极速模式”（在地址栏右侧关闭兼容模式）
+			</div>
+			<![endif]-->
 		</div>
 		
 	</body>
