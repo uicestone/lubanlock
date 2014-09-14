@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `object_meta` (
   `object` int(11) NOT NULL,
   `key` varchar(255) NOT NULL,
   `value` longtext NOT NULL,
+  `visibility` TINYINT NOT NULL DEFAULT '1',
   `comment` text,
   `user` int(11) DEFAULT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -67,7 +68,8 @@ CREATE TABLE IF NOT EXISTS `object_meta` (
   KEY `time` (`time`),
   KEY `object` (`object`),
   KEY `value` (`value`(255)),
-  KEY `key-value` (`key`,`value`(255))
+  KEY `key-value` (`key`,`value`(255)),
+  KEY (`visibility`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_permission` (

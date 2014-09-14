@@ -674,6 +674,8 @@ class Object extends CI_Model {
 	
 	/**
 	 * 返回一个对象的资料项列表
+	 * $args array
+	 *	visibility
 	 * @return array
 	 */
 	function getMeta(array $args = array()){
@@ -682,9 +684,14 @@ class Object extends CI_Model {
 			throw new Exception('no_permission', 403);
 		}
 		
+		if(!array_key_exists('visibility', $args)){
+			$args['visibility'] = 1;
+		}
+		
 		$this->db->select('object_meta.*')
 			->from('object_meta')
 			->where("`object_meta`.`object`",$this->id)
+			->where('object_meta.visibility', $args['visibility'])
 			->order_by('`object_meta`.`time`');
 		
 		$result = $this->db->get()->result_array();
@@ -722,7 +729,7 @@ class Object extends CI_Model {
 	 * @param boolean $unique
 	 * @return boolean
 	 */
-	function addMeta($key, $value = null, $unique = false, $check_permission = true){
+	function addMeta($key, $value = null, $unique = false, $visibility = 1, $check_permission = true){
 		
 		if(is_null($value)){
 			return;
@@ -752,6 +759,7 @@ class Object extends CI_Model {
 			'object'=>$this->id,
 			'key'=>$key,
 			'value'=>$value,
+			'visibility'=>$visibility,
 			'user'=>$this->session->user_id
 		));
 		
@@ -770,14 +778,15 @@ class Object extends CI_Model {
 						'key' => null,
 						'value' => null,
 						'unique' => false,
+						'visibility' => 1
 					), $sub_func_args);
 
 					extract($sub_func_args);
 
-					$this->addMeta($key, $value, $unique, $check_permission);
+					$this->addMeta($key, $value, $unique, $visibility, $check_permission);
 				}
 				else{
-					$this->addMeta($sub_key, $sub_func_args, false, $check_permission);
+					$this->addMeta($sub_key, $sub_func_args, false, 1, $check_permission);
 				}
 			}catch(Exception $e){
 				//TODO不中断程序的错误应该也有地方输出错误信息
@@ -795,7 +804,7 @@ class Object extends CI_Model {
 	 * @param string $prev_value optional 如果不为null，则只更新原来值为$prev_value的记录
 	 * @return boolean
 	 */
-	function updateMeta($key, $value, $prev_value = null){
+	function updateMeta($key, $value, $prev_value = null, $visibility = 1){
 		
 		if(!$this->allow('write')){
 			throw new Exception('no_permission', 403);
