@@ -110,7 +110,11 @@ class Object extends CI_Model {
 			}
 			
 		}
-
+		
+		foreach(array_keys(get_object_vars($this)) as $property){
+			$this->$property = array_key_exists($property, $object) ? $object[$property] : null;
+		}
+		
 		return $object;
 
 	}
