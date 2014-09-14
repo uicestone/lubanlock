@@ -33,6 +33,10 @@ class File extends LB_Controller{
 			'meta'=>$file_meta
 		));
 		
+		$user = new Object($this->session->user_id);
+		$user->setTag('简历已上传', '简历上传状态');
+		$user->setRelative('简历', $object->id);
+		
 		if(!$this->input->accept('application/json')){
 			show_error('文件已经上传，但由于你的浏览器太旧，无法为你正常跳转，请手动<a href="javascript:history.back();">返回</a>', 400);
 		}else{
@@ -43,13 +47,17 @@ class File extends LB_Controller{
 	
 	function download($id){
 		
+		$args = $this->input->get();
+		
+		$content_disposition = array_key_exists('force_download', $args) && $args['force_download'] ? 'attachment' : 'inline';
+		
 		$file = (array) new Object($id, array('with_meta'=>array('visibility'=>array('gte'=>0))));
 		
 		$path = get_meta($file, 'full_path');
 		
 		header('Content-Type: ' . get_meta($file, 'file_type'));
 		header('Content-Length: ' . round(get_meta($file, 'file_size') * 1024));
-		header('Content-Disposition: attachment; filename="' . get_meta($file, 'orig_name') . '"');
+		header('Content-Disposition: ' . $content_disposition . '; filename="' . get_meta($file, 'orig_name') . '"');
 		header('Expires: 0');
 		
 		readfile($path);
