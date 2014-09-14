@@ -690,9 +690,10 @@ class Object extends CI_Model {
 		
 		$this->db->select('object_meta.*')
 			->from('object_meta')
-			->where("`object_meta`.`object`",$this->id)
-			->where('object_meta.visibility', $args['visibility'])
+			->where("`object_meta`.`object`", $this->id)
 			->order_by('`object_meta`.`time`');
+		
+		$this->db->where($this->_parse_criteria($args['visibility'], '`object_meta`.`visibility`'));
 		
 		$result = $this->db->get()->result_array();
 		

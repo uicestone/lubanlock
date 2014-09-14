@@ -43,7 +43,7 @@ class File extends LB_Controller{
 	
 	function download($id){
 		
-		$file = (array) new Object($id, array('with_meta'=>array('visibility'=>'>0')));
+		$file = (array) new Object($id, array('with_meta'=>array('visibility'=>array('gte'=>0))));
 		
 		$path = get_meta($file, 'full_path');
 		
