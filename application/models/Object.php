@@ -222,6 +222,9 @@ class Object extends CI_Model {
 			if(is_array($this->session->user_roles) && in_array($this->type . '-admin', $this->session->user_roles)){
 				return true;
 			}
+			if($this->session->user_id === $this->user || $this->session->user_id === $this->id){
+				return true;
+			}
 			$users = $this->session->group_ids;
 		}
 		

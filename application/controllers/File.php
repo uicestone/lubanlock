@@ -30,7 +30,7 @@ class File extends LB_Controller{
 		$object = new Object(array(
 			'type'=>'file',
 			'name'=>$file_info['mail_name'],
-			'meta'=>$file_info
+			'meta'=>$file_meta
 		));
 		
 		if(!$this->input->accept('application/json')){
