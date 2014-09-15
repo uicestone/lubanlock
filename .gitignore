@@ -6,3 +6,4 @@
 /web/test.*
 /vendor/
 /public/packages/
+/web/modules
