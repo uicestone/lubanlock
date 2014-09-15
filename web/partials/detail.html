@@ -4,7 +4,7 @@
 		<small>
 			<i class="icon-double-angle-right"></i>
 			<span luban-editable="object.type" object="object" placeholder="类型"></span>
-			<span luban-editable="object.num" ng-if="object.num" object="object" placeholder="编号" class="label"></span>
+			<span luban-editable="object.num" object="object" placeholder="编号"></span>
 		</small>
 		<div class="pull-right text-right">
 			<a class="btn btn-info" ng-if="object.type === '文件'" ng-href="file/download/{{object.id}}">下载</a>
