@@ -4254,9 +4254,10 @@ fieldset[disabled] .btn-light.active {
   border-color: #a0a0a0;
 }
 .label {
-  font-size: 12px;
-  line-height: 1.15;
-  height: 20px;
+	font-size: 12px;
+	height: 18px;
+	line-height: 1.20;
+	vertical-align: bottom;
 }
 .label.arrowed {
   margin-left: 5px;
