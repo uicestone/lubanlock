@@ -11,6 +11,13 @@
 		<button type="submit" class="btn btn-primary icon-save"></button>
 	</form>
 	<a class="btn" ng-if="!inNav" ng-click="toggleNavSaveForm()" ng-class="{'icon-bookmark': !showNavSaveForm, 'icon-chevron-left': showNavSaveForm}"></a>
+	<form class="form-inline" ng-submit="search()" style="display: inline;">
+		<div class="form-group">
+			<input type="text" placeholder="搜索" class="form-control" ng-model="searchKeyword">
+		</div>
+		<button type="submit" class="btn btn-primary icon-search"></button>
+		<button type="reset" class="btn icon-remove-sign" ng-if="searchKeyword" ng-click="cancelSearch()"></button>
+	</form>
 	<span id="paginator" class="pull-right">
 		<span class="dataTables_info">{{objectListStart}} - {{objectListEnd}}, {{totalObjects}}</span>
 		<button class="btn icon-chevron-left" ng-click="previousPage()" ng-disabled="!currentPage || currentPage === 1"></button>

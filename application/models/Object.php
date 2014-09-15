@@ -349,22 +349,33 @@ class Object extends CI_Model {
 			}
 		}
 		
-		//如果参数数组不为空，且全是数字键，则作in处理
-		if(!empty($args) && array_reduce(array_keys($args), function($result, $item){
-			return $result && is_integer($item);
-		}, true)){
-			$args = array('in'=>$args);
+		//如果参数数组不为空，且全是数字键，且全是值，则作in处理
+		
+		if(!empty($args)){
+			
+			$args_as_in = true;
+			
+			foreach($args as $arg_key => $arg_value){
+				if(!is_integer($arg_key) || is_array($arg_value)){
+					$args_as_in = false;
+					break;
+				}
+			}
+			
+			$args_as_in && $args = array('in'=>$args);
 		}
 		
 		$where = array();
 		
 		foreach($args as $arg_name => $arg_value){
 			
-			if($arg_name === 'or'){
-				return $this->_parse_criteria($arg_value, $field, 'OR');
+			if($arg_name === 'and' || is_integer($arg_name)){
+				$where[] = $this->_parse_criteria($arg_value, $field);
 			}
-			
-			if($arg_name === 'gt'){
+			elseif($arg_name === 'or'){
+				$where[] = $this->_parse_criteria($arg_value, $field, 'OR');
+			}
+			elseif($arg_name === 'gt'){
 				$where[] = $field.' > '.$this->db->escape($arg_value);
 			}
 			elseif($arg_name === 'gte'){
@@ -502,6 +513,20 @@ class Object extends CI_Model {
 		}
 		
 		$this->db->where('object.company', get_instance()->company->id);
+		
+		if(array_key_exists('search', $args)){
+			
+			$keywords = preg_split('/\s/', $args['search']);
+			foreach($keywords as $keyword){
+				$args['and'][] = array(
+					'or'=>array(
+						'name'=>array('like'=>$keyword),
+						'num'=>$keyword,
+						'type'=>$keyword,
+					)
+				);
+			}
+		}
 		
 		$this->db->where($this->_parse_criteria($args), null, false);
 		
@@ -919,23 +944,22 @@ class Object extends CI_Model {
 		$save_as = null;
 		
 		foreach($result as $relationship){
-
+			
 			if(array_key_exists('id_only', $args) && $args['id_only']){
 				$save_as[$relationship['relation']][] = $relationship[$get];
 			}
 			else{
 				try{
-					$relative = (array) new Object($relationship[$get], array('with'=>null));
+					$relative = new Object($relationship[$get], array('with'=>null));
 
-					$relative['relationship_id'] = (int) $relationship['id'];
-					$relative['relationship_num'] = $relationship['num'];
-					$relative['is_on'] = (bool) $relationship['is_on'];
+					$relative->relationship_id = (int) $relationship['id'];
+					$relative->relationship_num = $relationship['num'];
+					$relative->is_on = (bool) $relationship['is_on'];
 
 					if(!array_key_exists('with_meta', $args) || $args['with_meta']){
-						$relative['relationship_meta'] = $this->getRelativeMeta($relationship['id']);
+						$relative->relationship_meta = $relative->getRelativeMeta($relationship['id']);
 					}
-
-					$save_as[$relationship['relation']][] = $relative;
+					$save_as[$relationship['relation']][] = (array) $relative;
 				}catch(Exception $e){}
 			}
 			

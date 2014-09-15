@@ -90,6 +90,17 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', 'N
 			});
 		}
 		
+		$scope.searchKeyword = $location.search().search;
+		
+		$scope.search = function(){
+			$location.search('search', $scope.searchKeyword);
+		}
+		
+		$scope.cancelSearch = function(){
+			$scope.searchKeyword = null;
+			$location.search('search', null);
+		}
+		
 	}
 ]);
 
