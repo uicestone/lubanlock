@@ -179,7 +179,19 @@ class Object extends CI_Model {
 		$result = $this->db->where('id', $this->id)->delete('object');
 		
 		if($this->db->error() && strpos($this->db->error()['message'], 'Cannot delete or update a parent row: a foreign key constraint fails') === 0){
-			throw new Exception('存在关联数据，无法删除', 500);
+			$parents = $this->getParents(array('id_only'=>true));
+			try{
+			foreach($parents as $relation => $parent_ids){
+				foreach($parent_ids as $parent_id){
+					$parent = new Object($parent_id);
+					$parent->removeRelative($relation, $this->id);
+				}
+			}
+			}catch(Exception $e){
+				if($e->getMessage() === 'no_permission'){
+					throw new Exception('no_permission_on_parent_object', 403);
+				}
+			}
 		}
 		
 		return $result;
@@ -205,7 +217,9 @@ class Object extends CI_Model {
 	 * 特别的：
 	 *	若对象权限表中没有此对象，则所有用户有读权限
 	 *	若对象权限表中没有此对象，且用户为对象创建者或用户就是对象本身，那么有所有权限
-	 *	TODO 若用户roles包含'对象{type}-admin'，则有全部权限
+	 *	若用户roles包含'对象{type}-admin'，则有全部权限
+	 *	若用户roles包含'对象{type}-viewer'，则有读取权限
+	 *	若用户roles包含'对象{type}-editor'，则有写入权限
 	 * @param string $permission	read | write | grant
 	 * @param array|int $users	默认为$this->session->group_ids，即当前用户和递归所属组
 	 * @return boolean
@@ -217,14 +231,21 @@ class Object extends CI_Model {
 			throw new Exception('permission_name_error', 400);
 		}
 		
+		$this->get($this->id, array('with'=>null), false);
+		
 		if(is_null($users)){
-			$this->get($this->id, array('with'=>null), false);
 			if(is_array($this->session->user_roles) && in_array($this->type . '-admin', $this->session->user_roles)){
 				return true;
 			}
-			if($this->session->user_id === $this->user || $this->session->user_id === $this->id){
+			if($permission === 'read' && is_array($this->session->user_roles) && in_array($this->type . '-viewer', $this->session->user_roles)){
 				return true;
 			}
+			if(in_array($permission, array('read', 'write')) && is_array($this->session->user_roles) && in_array($this->type . '-editor', $this->session->user_roles)){
+				return true;
+			}
+		}
+		
+		if(is_null($users)){
 			$users = $this->session->group_ids;
 		}
 		
@@ -245,17 +266,10 @@ class Object extends CI_Model {
 		elseif($permission === 'read'){
 			return true;
 		}
-		else{
-			$this->get($this->id, array('with'=>null), false);
-			
-			if(in_array($this->user, $users) || (is_null($this->user) && in_array($this->id, $users))){
-				return true;
-			}
-			else{
-				return false;
-			}
+		elseif(in_array($this->user, $users) || (is_null($this->user) && in_array($this->id, $users))){
+			return true;
 		}
-
+		return false;
 	}
 	
 	/**

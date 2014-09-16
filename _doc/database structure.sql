@@ -219,7 +219,7 @@ ALTER TABLE `object_permission`
 
 ALTER TABLE `object_relationship`
   ADD CONSTRAINT `object_relationship_ibfk_1` FOREIGN KEY (`object`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `object_relationship_ibfk_2` FOREIGN KEY (`relative`) REFERENCES `object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `object_relationship_ibfk_2` FOREIGN KEY (`relative`) REFERENCES `object` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   ADD CONSTRAINT `object_relationship_ibfk_3` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `object_relationship_meta`
