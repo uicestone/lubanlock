@@ -8,16 +8,13 @@ lubanlockServices.service('Object', ['$resource',
 	function($resource){
 		
 		var responseInterceptor = function(response){
-			
-			// preventing 'null' response from being parsed as string
-			// angular did right itself because JSON doesn't actually support single value. 
-			// TODO: we need to find a way out to better encode null, empty array and object at backend
-			if(response.data === 'null'){
-				angular.forEach(response.resource, function(value, key){
-					if(!isNaN(key)){
-						delete response.resource[key];
-					}
-				});
+			response.resource.$response = response;
+			try{
+				var data = angular.fromJson(response.data);
+				return angular.isObject(data) || angular.isArray(data) ? response.resource : data;
+			}catch(e){
+				console.log(response.data, e)
+;				return;
 			}
 			response.resource.$response = response;
 			return response.resource;
