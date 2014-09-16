@@ -181,12 +181,13 @@ class Object extends CI_Model {
 		if($this->db->error() && strpos($this->db->error()['message'], 'Cannot delete or update a parent row: a foreign key constraint fails') === 0){
 			$parents = $this->getParents(array('id_only'=>true));
 			try{
-			foreach($parents as $relation => $parent_ids){
-				foreach($parent_ids as $parent_id){
-					$parent = new Object($parent_id);
-					$parent->removeRelative($relation, $this->id);
+				foreach($parents as $relation => $parent_ids){
+					foreach($parent_ids as $parent_id){
+						$parent = new Object($parent_id);
+						$parent->removeRelative($relation, $this->id);
+					}
 				}
-			}
+				$result = $this->db->where('id', $this->id)->delete('object');
 			}catch(Exception $e){
 				if($e->getMessage() === 'no_permission'){
 					throw new Exception('no_permission_on_parent_object', 403);
