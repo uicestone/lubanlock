@@ -7,9 +7,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
 		<link rel="stylesheet" href="css/font-awesome.min.css?v=3.2.1" />
-		
 		<link rel="stylesheet" href="css/bootstrap.min.css?v=3.2.0" />
-
 		<link rel="stylesheet" href="css/ace.css" />
 		
 		<!--[if lt IE 9]>
@@ -26,6 +24,7 @@
 		<![endif]-->
 					
 		<script type="text/javascript" src="js/angular/angular.min.js"></script>
+		<script type="text/javascript" src="js/angular/angular-locale_zh-cn.js"></script>
 		<script type="text/javascript" src="js/angular/angular-route.min.js"></script>
 		<script type="text/javascript" src="js/angular/angular-resource.min.js"></script>
 		<script type="text/javascript" src="js/angular/ui-bootstrap.min.js"></script>

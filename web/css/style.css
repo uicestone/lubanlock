@@ -33,6 +33,14 @@ body {
 	color: #999;
 }
 
+.datepicker {
+	padding: 0;
+}
+
+.datepicker .btn {
+	padding: 2px 8px;
+}
+
 /*page*/
 .page-content {
 	padding-top: 16px;
