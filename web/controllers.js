@@ -17,8 +17,8 @@ lubanlockControllers.controller('AlertCtrl', ['$scope', 'Alert',
 	}
 ]);
 
-lubanlockControllers.controller('NavCtrl', ['$scope', '$location', 'Nav', 'User',
-	function($scope, $location, Nav, User){
+lubanlockControllers.controller('NavCtrl', ['$scope', '$location', '$rootScope', 'Nav', 'User',
+	function($scope, $location, $rootScope, Nav, User){
 		
 		$scope.items = Nav.query();
 		
@@ -44,6 +44,19 @@ lubanlockControllers.controller('NavCtrl', ['$scope', '$location', 'Nav', 'User'
 			event.stopPropagation();
 			Nav.remove(item);
 		}
+		
+		$rootScope.$on('$routeChangeSuccess', function(event, data){
+			$scope.currentUrl = $location.url();
+			$scope.items.map(function(item){
+				var url = '/'  + (item.meta && item.meta.template ? item.meta.template[0] : 'list') + (item.meta && item.meta.params ? '?' + jQuery.param(angular.fromJson(item.meta.params[0])) : '')
+				if(url === $scope.currentUrl){
+					item.isActive = true;
+				}else{
+					item.isActive = false;
+				}
+				return item;
+			});
+		});
 	}
 ]);
 
