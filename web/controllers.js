@@ -60,8 +60,8 @@ lubanlockControllers.controller('NavCtrl', ['$scope', '$location', '$rootScope',
 	}
 ]);
 
-lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', 'Nav', 'objects',
-	function($scope, $location, $route, Nav, objects) {
+lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$modal', 'Nav', 'objects',
+	function($scope, $location, $route, $modal, Nav, objects) {
 		//列表分页
 		$scope.currentPage = $location.search().page || 1;
 		
@@ -90,18 +90,46 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', 'N
 		}
 		
 		//保存为菜单，TODO，需要抽象以便快速应用于其他列表页
-		$scope.showNavSaveForm = false;
-		
-		$scope.toggleNavSaveForm = function(){
-			$scope.showNavSaveForm = !$scope.showNavSaveForm;
-		}
-		
-		$scope.addNavItem = function(){
-			Nav.save({name: $scope.newNavItemName, template: $scope.newNavItemTemplate, params: $location.search()}, function(){
-				$scope.showNavSaveForm = false;
-				$scope.newNavItemName = $scope.newNavItemTemplate = null;
+		$scope.items = ['item1', 'item2', 'item3'];
+		$scope.showNavSaveForm = function(){
+
+			var modalInstance = $modal.open({
+				templateUrl: 'partials/new_nav_modal.html',
+				controller: NewNavItemCtrl,
+				resolve: {
+					items: function() {
+						return $scope.items;
+					}
+				}
 			});
+
+			modalInstance.result.then(function(selectedItem) {
+				$scope.selected = selectedItem;
+			});
+
 		}
+		
+		var NewNavItemCtrl = ['$scope', '$modalInstance', 'Nav', 'User', function($scope, $modalInstance, Nav, User) {
+			
+			$scope.newNavItem = {};
+			
+			$scope.addNavItem = function() {
+				Nav.save({name: $scope.newNavItem.name, template: $scope.newNavItem.template, icon: $scope.newNavItem.icon, user: $scope.newNavItem.user, params: $location.search()}, function() {
+					$modalInstance.close();
+				});
+			}
+			
+			$scope.cancel = function() {
+				$modalInstance.dismiss();
+			};
+			
+			$scope.searchUser = function(name) {
+				// a promise can be parsed by typeahead, no then() wrapping required
+				return User.query({name: {like: name}}).$promise;
+			};
+
+		}];
+		
 		
 		$scope.searchKeyword = $location.search().search;
 		

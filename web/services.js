@@ -173,23 +173,22 @@ lubanlockServices.service('Nav', ['$resource',
 					}
 				});
 				
-				var params = angular.toJson(data.params);
-				
 				var item = new Resource({
 					name: data.name,
 					type: 'nav',
 					meta: {
-						params: params,
-						template: data.template
+						params: angular.toJson(data.params),
+						template: data.template,
+						icon: data.icon
 					},
 					relative: {
-						user: user.id
+						user: data.user ? data.user.id : user.id
 					},
 					permission: 'private'
 				});
 				
 				item.$save({}, function(){
-					items.push(item);
+					items.unshift(item);
 					angular.isFunction(success) && success();
 				});
 				

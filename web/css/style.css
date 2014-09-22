@@ -29,6 +29,10 @@ body {
 	vertical-align: middle;
 }
 
+.table > thead > tr > th {
+	white-space: nowrap;
+}
+
 .text-muted a {
 	color: #999;
 }

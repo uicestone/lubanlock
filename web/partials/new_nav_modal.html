@@ -1,0 +1,35 @@
+<form class="form-horizontal" ng-submit="addNavItem()">
+	<div class="modal-header">
+		<h3 class="modal-title">添加菜单项</h3>
+	</div>
+	<div class="modal-body">
+		<div class="form-group">
+			<label class="control-label col-sm-offset-1 col-sm-3">菜单名称</label>
+			<div class="col-sm-5">
+				<input type="text" placeholder="菜单的显示名称" class="form-control" ng-model="newNavItem.name" required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-offset-1 col-sm-3">用户（组）</label>
+			<div class="col-sm-5">
+				<input type="text" placeholder="显示此菜单的用户，留空为自己" class="form-control" ng-model="newNavItem.user" typeahead="object as object.name for object in searchUser($viewValue)" typeahead-template-url="partials/object_autocomplete.html" typeahead-wait-ms="100">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-offset-1 col-sm-3">模板</label>
+			<div class="col-sm-5">
+				<input type="text" placeholder="菜单的路由模板" class="form-control" ng-model="newNavItem.template">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-offset-1 col-sm-3">图标</label>
+			<div class="col-sm-5">
+				<input type="text" placeholder="显示在菜单左侧的图标" class="form-control" ng-model="newNavItem.icon">
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="submit" class="btn btn-primary"><i class="icon-save"></i>保存</button>
+		<button type="reset" class="btn" ng-click="cancel()"><i class="icon-remove"></i>取消</button>
+	</div>
+</form>

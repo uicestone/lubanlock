@@ -4919,7 +4919,7 @@ label {
   font-size: 14px;
 }
 .form-group > label[class*="col-"] {
-  padding-top: 4px;
+  padding-top: 7px;
   margin-bottom: 4px;
 }
 label,
