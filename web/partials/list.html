@@ -10,9 +10,9 @@
 	</form>
 	<a class="btn btn-purple pull-right icon-bookmark" ng-click="showNavSaveForm()"></a>
 	<span id="paginator" class="pull-right">
-		<span class="dataTables_info">{{objectListStart}} - {{objectListEnd}}, {{totalObjects}}</span>
+		<span class="dataTables_info">{{listStart}} - {{listEnd}}, {{total}}</span>
 		<button class="btn icon-chevron-left" ng-click="previousPage()" ng-disabled="!currentPage || currentPage === 1"></button>
-		<button class="btn icon-chevron-right" ng-click="nextPage()" ng-disabled="objectListEnd >= totalObjects"></button>
+		<button class="btn icon-chevron-right" ng-click="nextPage()" ng-disabled="listEnd >= total"></button>
 	</span>
 </div>
 <hr class="hr-10">

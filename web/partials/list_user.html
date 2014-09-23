@@ -1,5 +1,14 @@
 <div class="clearfix">
 	<a href="#/detail" class="btn btn-primary icon-plus"></a>
+	<button type="button" class="btn icon-refresh" ng-click="reload()"></button>
+	<form class="form-inline" ng-submit="search()" style="display: inline;">
+		<div class="form-group">
+			<input type="text" placeholder="搜索" class="form-control" ng-model="searchKeyword">
+		</div>
+		<button type="submit" class="btn btn-primary icon-search"></button>
+		<button type="reset" class="btn icon-remove" ng-if="searchKeyword" ng-click="cancelSearch()"></button>
+	</form>
+	<a class="btn btn-purple pull-right icon-bookmark" ng-click="showNavSaveForm()"></a>
 	<span id="paginator" class="pull-right">
 		<span class="dataTables_info">{{listStart}} - {{listEnd}}, {{total}}</span>
 		<button class="btn icon-chevron-left" ng-click="previousPage()" ng-disabled="!currentPage || currentPage === 1"></button>

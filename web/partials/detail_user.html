@@ -1,7 +1,7 @@
 <form class="form-horizontal" ng-submit="updateConfig()">
 	<tabset>
 
-		<tab heading="用户信息" id="edit-password">
+		<tab heading="基本信息" id="edit-password">
 			<div class="space-10"></div>
 
 			<div class="form-group">
@@ -9,6 +9,10 @@
 
 				<div class="col-sm-9">
 					<input id="username" type="text" ng-model="$parent.user.name">
+					<span>
+						<i class="icon-hand-right blue"></i>
+						<a ng-href="/#detail/{{$parent.user.id}}">查看对象 {{$parent.user.object_name}}</a>
+					</span>
 				</div>
 			</div>
 
@@ -29,6 +33,7 @@
 
 				<div class="col-sm-9">
 					<input id="new-password" type="password" ng-model="$parent.newPassword">
+					<span class="label">留空则不修改密码</span>
 				</div>
 			</div>
 
@@ -42,6 +47,28 @@
 				</div>
 			</div>
 		</tab>
+		<tab heading="偏好设置">
+			<h1 class="grey lighter smaller">
+				<i class="icon-wrench icon-animated-wrench bigger-125"></i>
+				此功能正在开发
+			</h1>
+
+			<hr>
+
+			<div>
+				<ul class="list-unstyled spaced inline bigger-110 margin-15">
+					<li>
+						<i class="icon-hand-right blue"></i>
+						请您继续试用系统的其他功能
+					</li>
+
+					<li>
+						<i class="icon-hand-right blue"></i>
+						如您急需调整设置，可联系管理员
+					</li>
+				</ul>
+			</div>
+		</tab>
 	</tabset>
 	
 	<div class="clearfix form-actions">
@@ -49,12 +76,6 @@
 			<button type="submit" class="btn btn-info">
 				<i class="icon-ok bigger-110"></i>
 				保存
-			</button>
-
-			&nbsp; &nbsp;
-			<button type="reset" class="btn">
-				<i class="icon-undo bigger-110"></i>
-				重置
 			</button>
 		</div>
 	</div>

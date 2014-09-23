@@ -25,7 +25,19 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 			})
 			.when('/user/:id', {
 				templateUrl: 'partials/detail_user.html',
-				controller: 'UserDetailCtrl'
+				controller: 'UserDetailCtrl',
+				resolve: {
+					user: ['$route', 'User', function($route, User){
+						if($route.current.params.id){
+							return User.get({id: $route.current.params.id}).$promise;
+						}
+					}]
+//					config: ['$route', 'User', function($route, User){
+//						if($route.current.params.id){
+//							return User.getConfig({id: $route.current.params.id}).$promise;
+//						}
+//					}]
+				}
 			})
 			.when('/list', {
 				templateUrl: 'partials/list.html',

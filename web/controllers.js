@@ -60,17 +60,17 @@ lubanlockControllers.controller('NavCtrl', ['$scope', '$location', '$rootScope',
 	}
 ]);
 
-lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$modal', 'Nav', 'objects',
-	function($scope, $location, $route, $modal, Nav, objects) {
+lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$modal', 'objects',
+	function($scope, $location, $route, $modal, objects) {
 		//列表分页
 		$scope.currentPage = $location.search().page || 1;
 		
 		$scope.objects = objects;
 		// get pagination argument from statusText
 		var statusText = $scope.objects.$response.statusText;
-		$scope.totalObjects = Number(statusText.match(/(\d+) Objects in Total/)[1]);
-		$scope.objectListStart = Number(statusText.match(/(\d+)\-/)[1]);
-		$scope.objectListEnd = Number(statusText.match(/\-(\d+)/)[1]);
+		$scope.total = Number(statusText.match(/(\d+) Objects in Total/)[1]);
+		$scope.listStart = Number(statusText.match(/(\d+)\-/)[1]);
+		$scope.listEnd = Number(statusText.match(/\-(\d+)/)[1]);
 
 		$scope.nextPage = function(){
 			$location.search('page', ++$scope.currentPage);
@@ -90,7 +90,6 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$
 		}
 		
 		//保存为菜单，TODO，需要抽象以便快速应用于其他列表页
-		$scope.items = ['item1', 'item2', 'item3'];
 		$scope.showNavSaveForm = function(){
 
 			var modalInstance = $modal.open({
@@ -328,8 +327,8 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 	}
 ]);
 
-lubanlockControllers.controller('UsersCtrl', ['$scope', '$location', 'users',
-	function($scope, $location, users) {
+lubanlockControllers.controller('UsersCtrl', ['$scope', '$location', '$modal', 'users',
+	function($scope, $location, $modal, users) {
 		
 		//列表分页
 		$scope.currentPage = $location.search().page || 1;
@@ -354,21 +353,77 @@ lubanlockControllers.controller('UsersCtrl', ['$scope', '$location', 'users',
 			$location.url('user/' + id);
 		}
 		
+		//保存为菜单，TODO，需要抽象以便快速应用于其他列表页
+		$scope.showNavSaveForm = function(){
+
+			var modalInstance = $modal.open({
+				templateUrl: 'partials/new_nav_modal.html',
+				controller: NewNavItemCtrl,
+				resolve: {
+					items: function() {
+						return $scope.items;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(selectedItem) {
+				$scope.selected = selectedItem;
+			});
+
+		}
+		
+		var NewNavItemCtrl = ['$scope', '$modalInstance', 'Nav', 'User', function($scope, $modalInstance, Nav, User) {
+			
+			$scope.newNavItem = {};
+			
+			$scope.addNavItem = function() {
+				Nav.save({name: $scope.newNavItem.name, template: $scope.newNavItem.template, icon: $scope.newNavItem.icon, user: $scope.newNavItem.user, params: $location.search()}, function() {
+					$modalInstance.close();
+				});
+			}
+			
+			$scope.cancel = function() {
+				$modalInstance.dismiss();
+			};
+			
+			$scope.searchUser = function(name) {
+				// a promise can be parsed by typeahead, no then() wrapping required
+				return User.query({name: {like: name}}).$promise;
+			};
+
+		}];
+		
+		
+		$scope.searchKeyword = $location.search().search;
+		
+		$scope.search = function(){
+			$location.search('search', $scope.searchKeyword);
+		}
+		
+		$scope.cancelSearch = function(){
+			$scope.searchKeyword = null;
+			$location.search('search', null);
+		}
+		
 	}
 ]);
 
-lubanlockControllers.controller('UserDetailCtrl', ['$scope', '$routeParams', 'User',
-	function($scope, $routeParams, User) {
+lubanlockControllers.controller('UserDetailCtrl', ['$scope', 'Alert', 'user',
+	function($scope, Alert, user) {
 		
-		$scope.user = User.get({id: $routeParams.id});
-		
-		$scope.config = User.getConfig();
+		$scope.user = user;
 		
 		$scope.updateConfig = function(){
-			if($scope.newPassword && $scope.newPassword === $scope.newPasswordConfirm){
-				$scope.user.password = $scope.newPassword;
+			if($scope.newPassword){
+				if($scope.newPassword !== $scope.newPasswordConfirm){
+					Alert.add('两次密码输入不一致');
+					return;
+				}else{
+					$scope.user.password = $scope.newPassword;
+				}
 			}
 			$scope.user.$update();
+			Alert.add('用户信息已更新', 'success');
 		}
 	}
 ]);

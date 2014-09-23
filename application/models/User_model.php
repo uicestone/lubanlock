@@ -39,6 +39,7 @@ class User_model extends Object {
 		
 		$this->session->user = $user;
 		$this->session->user_name = $user['name'];
+		$this->session->user_object_name = $user['object_name'];
 		
 		$this->session->user_roles = $this->_parse_roles($user['roles']);
 		
@@ -114,6 +115,8 @@ class User_model extends Object {
 		if(!$user){
 			throw new Exception(lang('user').' '.$id.' '.lang('not_found'), 404);
 		}
+		
+		$user['object_name'] = $object['name'];
 
 		return array_merge($object, $user);
 	}
@@ -154,8 +157,10 @@ class User_model extends Object {
 		return $insert_id;
 	}
 	
-	function update(array $data){
-		parent::update($data);
+	function update(array $data, array $args = array()){
+		if(array_key_exists('include_object', $args)){
+			parent::update($data);
+		}
 		return $this->db->update('user', array_intersect_key($data, self::$fields), array('id'=>$this->id));
 	}
 	
