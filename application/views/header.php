@@ -8,14 +8,12 @@
 		
 		<link rel="stylesheet" href="css/font-awesome.min.css?v=3.2.1" />
 		<link rel="stylesheet" href="css/bootstrap.min.css?v=3.2.0" />
-		<link rel="stylesheet" href="css/ace.css" />
+		<link rel="stylesheet" href="css/ace.css?v=2014-09-24" />
 		
 		<!--[if lt IE 9]>
 		<link rel="stylesheet" href="css/ace-ie.css" />
 		<![endif]-->
 
-		<link rel="stylesheet" href="css/style.css?v=2014-08-18-1" />
-		
 		<!--[if !IE]> -->
 		<script type="text/javascript" src="js/jquery/jquery.min.js?v=2.1.1"></script>
 		<!-- <![endif]-->

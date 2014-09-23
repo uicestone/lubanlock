@@ -21,8 +21,6 @@
 		<link rel="stylesheet" href="css/ace-ie.css" />
 		<![endif]-->
 
-		<link rel="stylesheet" href="css/style.css?v=2014-08-18-1" />
-		
 		<!--[if lt IE 9]>
 		<script src="js/html5shiv.js"></script>
 		<script src="js/respond.min.js"></script>
