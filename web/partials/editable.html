@@ -1,7 +1,7 @@
 <span ng-if="!isEditing" ng-click="edit()" class="value">&nbsp;{{value | plain}}&nbsp;</span>
 <span ng-if="isEditing">
 	<span ng-if="type === undefined || type === 'text'">
-		<input type="text" name="{{name}}" class="editable" ng-model="$parent.$parent.value" ng-change="save()" ng-blur="editCompleted()" luban-enter="editCompleted()" luban-esc="editCanceled()" placeholder="{{placeholder}}">
+		<input type="text" name="{{name}}" class="editable" ng-model="$parent.$parent.value" ng-blur="save(); editCompleted()" luban-enter="save(); editCompleted()" luban-esc="editCanceled()" placeholder="{{placeholder}}">
 	</span>
 	<span ng-if="type === 'radio'">{{}}
 		<label class="radio-inline" ng-repeat="option in $parent.$parent.options">

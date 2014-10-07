@@ -14484,3 +14484,7 @@ form.prop-add .btn{
 .profile-user-info.object-permission .profile-info-value {
 	margin-left: 40px;
 }
+
+input.editable {
+	font: inherit;
+}

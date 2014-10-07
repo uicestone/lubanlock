@@ -10,3 +10,5 @@ $lang['task'] = '任务';
 $lang['project'] = '项目';
 $lang['member'] = '成员';
 $lang['file'] = '文件';
+$lang['dialog'] = '对话';
+$lang['message'] = '消息';

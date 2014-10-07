@@ -118,7 +118,7 @@
 
 						<div class="profile-info-value">
 							<span ng-repeat="(index, value) in values">
-								<span luban-editable="object.meta[key][index]" object="object" key="key" value="value"></span>
+								<span luban-editable="value" model="object.meta[key][index]" object="object" key="key" value="value"></span>
 								<a class="icon-trash pointer-cursur" ng-click="removeMeta(key, value)"></a>
 							</span>
 							<a class="icon-trash pointer-cursur pull-right" ng-click="removeMeta(key)"></a>

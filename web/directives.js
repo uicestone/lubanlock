@@ -12,12 +12,15 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 			object: '=',				//正在编辑的对象
 			value: '=lubanEditable',	//可编辑字段的值
 			name: '@lubanEditable',	//字段的值表达式，用以正则匹配获取属性类型或属性键名
+			model:'@',				//当luban-editable为引用值时，此值为字段表达式
 			type: '@',				//input的类型，可选text, radio, select
 			options: '=',				//input:radio和select的可用选项
 			placeholder: '@',		//input:text的placeholder
 			key:'='					//在模版中手动指定的meta key TODO
 		},
 		link: function(scope, element){
+			
+			scope.name = scope.model || scope.name;
 			
 			//从值表达式中获得属性类型，为.之后[之前的字符串
 			scope.prop = scope.name.match(/\.([^.^\[]*)/)[1];
@@ -69,38 +72,36 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 			
 			scope.editCanceled = function(){
 				scope.isEditing = false;
-				scope.value = scope.oldValue;
-				scope.save();
+				// scope.value = scope.oldValue;
+				// scope.save();
 			}
 			
 			scope.save = function(){
 				
 				//首次添加对象时，不在每次变化时保存，而是在首次失焦时保存
-				if(scope.inAddMode){
+				if(scope.inAddMode && (!scope.object.name || !scope.object.type)){
 					return;
 				}
 				
 				switch(scope.prop){
+					
 					case 'meta':
-						//接受手动传入的键名，没有的话再去键值表达式中匹配
-						var key = scope.key === undefined ? scope.name.match(/\['(.*?)'\]/)[1] : scope.key;
-						Object.updateMeta({object: scope.object.id, key: key}, scope.value);
+						Object.updateMeta({object: scope.object.id, key: scope.key}, scope.value);
 						break;
 
 					case 'status':
-						//TODO
+						Object.updateStatus({object: scope.object.id, name: scope.key}, scope.value);
 						break;
 
 					case 'relative':
-						//TODO
+						Object.saveRelative({object: scope.object.id, relation: scope.key}, scope.value);
 						break;
 
 					case 'tag':
-						//TODO
+						Object.saveTag({object: scope.object.id, taxonomy: scope.key}, scope.value);
 						break;
 
 					default:
-						scope.object[scope.prop] = scope.value;
 						scope.object.$update({with_status: {as_rows: true, order_by: 'date desc'}, with_permission: {with_user_info: true}});
 				}
 			}
