@@ -1,7 +1,4 @@
 <?php $this->view('header');?>
-<a class="menu-toggler" id="menu-toggler" href="">
-	<span class="menu-text"></span>
-</a>
 
 <div class="sidebar sidebar-fixed" id="sidebar" ng-controller="NavCtrl" ng-class="{'menu-min':config.nav_minimized}">
 
