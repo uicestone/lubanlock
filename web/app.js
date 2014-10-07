@@ -14,6 +14,10 @@ var lubanlockApp = angular.module('lubanlockApp', [
 lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 	function($routeProvider, $httpProvider, $parseProvider) {
 		$routeProvider
+			.when('/dashboard', {
+				templateUrl: 'partials/dashboard.html',
+				controller: 'DashboardCtrl'
+			})
 			.when('/user', {
 				templateUrl: 'partials/list_user.html',
 				controller: 'UsersCtrl',
@@ -63,7 +67,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 				}
 			})
 			.otherwise({
-				redirectTo: '/list'
+				redirectTo: '/dashboard'
 			});
 			
 		$httpProvider.interceptors.push('HttpInterceptor');

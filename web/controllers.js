@@ -60,6 +60,12 @@ lubanlockControllers.controller('NavCtrl', ['$scope', '$location', '$rootScope',
 	}
 ]);
 
+lubanlockControllers.controller('DashboardCtrl', [
+	function(){
+		
+	}
+]);
+
 lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$modal', 'objects',
 	function($scope, $location, $route, $modal, objects) {
 		//列表分页
