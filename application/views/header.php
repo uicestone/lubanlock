@@ -24,15 +24,15 @@
 		<script type="text/javascript" src="js/jquery/jquery-1.x.min.js?v=1.11.1"></script>
 		<![endif]-->
 					
-		<script type="text/javascript" src="js/angular/angular.min.js"></script>
+		<script type="text/javascript" src="js/angular/angular.min.js?v=1.2.21"></script>
 		<script type="text/javascript" src="js/angular/angular-locale_zh-cn.js"></script>
-		<script type="text/javascript" src="js/angular/angular-route.min.js"></script>
-		<script type="text/javascript" src="js/angular/angular-resource.min.js"></script>
-		<script type="text/javascript" src="js/angular/ui-bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/angular/angular-route.min.js?v=1.2.21"></script>
+		<script type="text/javascript" src="js/angular/angular-resource.min.js?v=1.2.21"></script>
+		<script type="text/javascript" src="js/angular/ui-bootstrap.min.js?v=0.11.0"></script>
 		
-		<script type="text/javascript" src="app.js"></script>
-		<script type="text/javascript" src="controllers.js"></script>
-		<script type="text/javascript" src="directives.js"></script>
+		<script type="text/javascript" src="app.js?v=2014-10-07"></script>
+		<script type="text/javascript" src="controllers.js?v=2014-10-07"></script>
+		<script type="text/javascript" src="directives.js?v=2014-10-07"></script>
 		<script type="text/javascript" src="filters.js"></script>
 		<script type="text/javascript" src="services.js"></script>
 
