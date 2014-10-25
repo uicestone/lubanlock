@@ -62,7 +62,7 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 				//首次添加时，失焦为首次保存的时间点
 				if(scope.inAddMode && scope.object.name && scope.object.type){
 					
-					Object.save(scope.object, function(value){
+					scope.object.$save(function(value){
 						//保存后跳转到对象编辑页
 						$location.replace().url('detail/' + value.id);
 					});
@@ -101,7 +101,10 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 
 					default:
 						var args = {with_status: {as_rows: true, order_by: 'date desc'}, with_permission: {with_user_info: true}};
-						scope.inAddMode ? scope.object.$save(args) : scope.object.$update(args);
+						if(!scope.inAddMode){
+							scope.object.$update(args);
+						}
+						
 				}
 			}
 			
