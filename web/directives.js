@@ -28,7 +28,7 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 			//如果整个object都是undefined，说明没get过，则需要在首次更改时创建对象
 			if(scope.object === undefined){
 				scope.inAddMode = true;
-				scope.object = {};
+				scope.object = new Object();
 			}
 			
 			scope.isEditing = scope.inAddMode;
@@ -72,8 +72,6 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 			
 			scope.editCanceled = function(){
 				scope.isEditing = false;
-				// scope.value = scope.oldValue;
-				// scope.save();
 			}
 			
 			scope.save = function(){
@@ -102,7 +100,8 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 						break;
 
 					default:
-						scope.object.$update({with_status: {as_rows: true, order_by: 'date desc'}, with_permission: {with_user_info: true}});
+						var args = {with_status: {as_rows: true, order_by: 'date desc'}, with_permission: {with_user_info: true}};
+						scope.inAddMode ? scope.object.$save(args) : scope.object.$update(args);
 				}
 			}
 			
