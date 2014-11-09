@@ -47,6 +47,15 @@ lubanlockControllers.controller('NavCtrl', ['$scope', '$location', '$rootScope',
 		
 		$rootScope.$on('$routeChangeSuccess', function(event, data){
 			$scope.currentUrl = $location.url();
+			$scope.items.map(function(item){
+				var url = '/'  + (item.meta && item.meta.template ? item.meta.template[0] : 'list') + (item.meta && item.meta.params && item.meta.params[0] !== '{}' ? '?' + jQuery.param(angular.fromJson(item.meta.params[0])) : '')
+				if(url === $scope.currentUrl){
+					item.isActive = true;
+				}else{
+					item.isActive = false;
+				}
+				return item;
+			});
 		});
 	}
 ]);
