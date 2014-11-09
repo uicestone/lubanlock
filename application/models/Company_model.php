@@ -54,9 +54,9 @@ class Company_model extends CI_Model {
 
 			$this->config = array_map(function($value){
 				
-				$value = json_decode($value,true);
+				$value_decoded = json_decode($value, JSON_OBJECT_AS_ARRAY);
 				
-				return $value;
+				return $value_decoded === null ? $value : $value_decoded;
 				
 			}, $config);
 			

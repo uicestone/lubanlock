@@ -249,10 +249,8 @@ class User_model extends Object {
 			$config = array_column($this->db->get()->result_array(), 'value', 'key');
 
 			return array_map(function($value){
-				
-				$value = json_decode($value,true);
-				
-				return $value;
+				$value_decoded = json_decode($value, JSON_OBJECT_AS_ARRAY);
+				return $value_decoded === null ? $value : $value_decoded;
 				
 			}, $config);
 			
