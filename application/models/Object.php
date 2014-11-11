@@ -443,7 +443,7 @@ class Object extends CI_Model {
 				}
 			}
 			
-			elseif($arg_name === 'is_relative_of'){
+			elseif($arg_name === 'is_relative_of' || $arg_name === 'parents'){
 				if(is_array($arg_value)){
 					foreach($arg_value as $relation => $relative_args){
 						$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation).' AND ';
@@ -453,7 +453,7 @@ class Object extends CI_Model {
 					$where[] = "$field IN ( \nSELECT `relative` FROM `object_relationship` WHERE ".$this->_parse_criteria($arg_value, '`object_relationship`.`object`')." \n)";
 				}
 			}
-			elseif($arg_name === 'has_relative_like'){
+			elseif($arg_name === 'has_relative_like' || $arg_name === 'children'){
 				if(is_array($arg_value)){
 					foreach($arg_value as $relation => $relative_args){
 						$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation).' AND ';
@@ -533,13 +533,40 @@ class Object extends CI_Model {
 			
 			$keywords = preg_split('/\s/', $args['search']);
 			foreach($keywords as $keyword){
-				$args['and'][] = array(
-					'or'=>array(
-						'name'=>array('like'=>$keyword),
-						'num'=>$keyword,
-						'type'=>$keyword,
-					)
-				);
+				$matches = array();
+				preg_match('/(.*?)\:(.*)/', $keyword, $matches);
+				
+				if($matches){
+					if(in_array($matches[1], array('name'))){
+						$args['and'][] = array(
+							$matches[1]=>array('like'=>$matches[2])
+						);
+					}
+					if(in_array($matches[1], array('num', 'type'))){
+						$args['and'][] = array(
+							$matches[1]=>$matches[2]
+						);
+					}
+					if(in_array($matches[1], array('meta', 'status', 'tag'))){
+						$args['and'][] = array(
+							$matches[1]=>array($matches[2])
+						);
+					}
+					if(in_array($matches[1], array('relative', 'parents'))){
+						$args['and'][] = array(
+							$matches[1]=>array(array('name'=>array('like'=>$matches[2])))
+						);
+					}
+				}
+				else{
+					$args['and'][] = array(
+						'or'=>array(
+							'name'=>array('like'=>$keyword),
+							'num'=>$keyword,
+							'type'=>$keyword,
+						)
+					);
+				}
 			}
 		}
 		

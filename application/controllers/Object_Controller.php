@@ -167,11 +167,20 @@ class Object_Controller extends LB_Controller{
 			
 			case 'PUT':
 				
-				$object->updateStatus($name, 
-					$this->input->data('date') ? $this->input->data('date') : null, 
-					$this->input->data('comment') ? $this->input->data('comment') : null, 
-					$this->input->get('prev_date') ? $this->input->get('prev_date') : null
-				);
+				$data = $this->input->data();
+				
+				if(!is_array($data)){
+					$date = $data;
+					$comment = null;
+				}
+				else{
+					$comment = array_key_exists('comment', $data) ? $data['comment'] : null;
+					$date = array_key_exists('date', $data) ? $data['date'] : null;
+				}
+				
+				$prev_date = $this->input->get('prev_date') ? $this->input->get('prev_date') : null;
+				
+				$object->updateStatus($name, $date, $comment, $prev_date);
 				
 				break;
 			

@@ -9400,7 +9400,7 @@ li.item-default {
   margin-left: -12px;
 }
 .profile-contact-links {
-  padding: 4px 2px 5px;
+  padding: 4px 10px;
   border: 1px solid #E0E2E5;
   background-color: #F8FAFC;
 }
@@ -14446,4 +14446,8 @@ form.prop-add .btn{
 
 input.editable {
 	font-size: inherit;
+}
+
+[luban-editable]>.writable {
+	border-bottom: dotted 1px #ffa830;
 }

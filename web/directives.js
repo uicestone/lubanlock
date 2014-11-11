@@ -16,14 +16,18 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 			type: '@',				//input的类型，可选text, radio, select
 			options: '=',				//input:radio和select的可用选项
 			placeholder: '@',		//input:text的placeholder
-			key:'='					//在模版中手动指定的meta key TODO
+			prop:'@',			//meta, relative, parents, status or tag
+			key:'=',					//在模版中手动指定的meta.key, relative.relation, tag.taxonomy或status.name
+			field:'@'				//field in property: status.comment
 		},
 		link: function(scope, element){
 			
 			scope.name = scope.model || scope.name;
 			
 			//从值表达式中获得属性类型，为.之后[之前的字符串
-			scope.prop = scope.name.match(/\.([^.^\[]*)/)[1];
+			if(!scope.prop){
+				scope.prop = scope.name.match(/\.([^.^\[]*)/)[1];
+			}
 			
 			//如果整个object都是undefined，说明没get过，则需要在首次更改时创建对象
 			if(scope.object === undefined){
@@ -42,6 +46,9 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 			});
 			
 			scope.edit = function(){
+				if(!scope.allow('write')){
+					return;
+				}
 				scope.isEditing = true;
 				scope.oldValue = scope.value;
 				setTimeout(function(){//解决click事件触发之后不能自动focus
@@ -71,6 +78,7 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 			}
 			
 			scope.editCanceled = function(){
+				scope.value = scope.oldValue;
 				scope.isEditing = false;
 			}
 			
@@ -84,15 +92,32 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 				switch(scope.prop){
 					
 					case 'meta':
-						Object.updateMeta({object: scope.object.id, key: scope.key}, scope.value);
+						Object.updateMeta({object: scope.object.id, key: scope.key, prev_value: scope.oldValue}, scope.value, function(metas){
+							scope.object.meta = metas;
+						});
 						break;
 
 					case 'status':
-						Object.updateStatus({object: scope.object.id, name: scope.key}, scope.value);
+						
+						var data = {};
+						
+						if(!scope.field){
+							scope.field = 'date';
+						}
+						
+						data[scope.field] = scope.value;
+						
+						Object.updateStatus({object: scope.object.id, name: scope.key}, data, function(statuses){
+							scope.object.status = statuses;
+						});
 						break;
 
 					case 'relative':
 						Object.saveRelative({object: scope.object.id, relation: scope.key}, scope.value);
+						break;
+
+					case 'parent':
+						Object.saveParent({object: scope.object.id, relation: scope.key}, scope.value);
 						break;
 
 					case 'tag':
@@ -108,6 +133,39 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 				}
 			}
 			
+			/**
+			 * check if the current object is allowed for current user on certain action
+			 * @param {type} permission
+			 * @returns {Boolean}
+			 */
+			scope.allow = function(action){
+
+				if(!scope.object.permission){
+					return false;
+				}
+
+				var users = scope.object.permission[action];
+
+				if(users.length === 0){
+					if(scope.object.permission.read.length === 0 && 
+						scope.object.permission.write.length === 0 && 
+						scope.object.permission.grant.length === 0 && 
+						(
+							user.id === scope.object.user || 
+							(scope.object.user === null && scope.object.id === user.id)
+						)
+					){
+						return true;
+					}
+					return false;
+				}
+				for(var i = 0; i < users.length; i++){
+					if(users[i].id === user.id){
+						return true
+					}
+				}
+				return false;
+			}
 		}
 	}
 }]);

@@ -26,10 +26,11 @@
 						<a class="btn btn-link" ng-if="!object.tag">
 							<i class="light-blue">请添加分类</i>
 						</a>
-						<a class="btn btn-link" ng-repeat="(taxonomy, tag) in object.tag">
+						<span ng-repeat="(taxonomy, tag) in object.tag">
 							<i class="light-blue">{{taxonomy}}</i>
-							<span class="bigger-120 ">{{tag | plain}}</span>
-						</a>
+							<span class="bigger-120 blue" luban-editable="tag" model="object.tag[taxonomy]" object="object" key="taxonomy"></span>
+							<a class="icon-trash pointer-cursur" ng-click="removeTag(taxonomy)" ng-show="allow('write')"></a>
+						</span>
 					</div>
 					
 				</div>
@@ -59,7 +60,7 @@
 						<div class="profile-info-value">
 							<span ng-repeat="user in object.permission.read">
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
-								<a class="icon-trash pointer-cursur" ng-click="prohibit('read', user.id)"></a>
+								<a class="icon-trash pointer-cursur" ng-click="prohibit('read', user.id)" ng-show="allow('grant')"></a>
 							</span>
 							<span ng-if="!object.permission.read.length">所有人</span>
 						</div>
@@ -70,7 +71,7 @@
 						<div class="profile-info-value">
 							<span ng-repeat="user in object.permission.write">
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
-								<a class="icon-trash pointer-cursur" ng-click="prohibit('write', user.id)"></a>
+								<a class="icon-trash pointer-cursur" ng-click="prohibit('write', user.id)" ng-show="allow('grant')"></a>
 							</span>
 							<span ng-if="!object.permission.write.length">添加者</span>
 						</div>
@@ -81,7 +82,7 @@
 						<div class="profile-info-value">
 							<span ng-repeat="user in object.permission.grant">
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
-								<a class="icon-trash pointer-cursur" ng-click="prohibit('grant', user.id)"></a>
+								<a class="icon-trash pointer-cursur" ng-click="prohibit('grant', user.id)" ng-show="allow('grant')"></a>
 							</span>
 							<span ng-if="!object.permission.grant.length">添加者</span>
 						</div>
@@ -119,9 +120,9 @@
 						<div class="profile-info-value">
 							<span ng-repeat="(index, value) in values">
 								<span luban-editable="value" model="object.meta[key][index]" object="object" key="key" value="value"></span>
-								<a class="icon-trash pointer-cursur" ng-click="removeMeta(key, value)"></a>
+								<a class="icon-trash pointer-cursur" ng-click="removeMeta(key, value)" ng-show="allow('write')"></a>
 							</span>
-							<a class="icon-trash pointer-cursur pull-right" ng-click="removeMeta(key)"></a>
+							<a class="icon-trash pointer-cursur pull-right" ng-click="removeMeta(key)" ng-show="allow('write')"></a>
 						</div>
 					</div>
 					
@@ -171,7 +172,7 @@
 						<div class="profile-info-value">
 							<span ng-repeat="relative in relatives">
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{relative.name}}</a>
-								<a class="icon-trash pointer-cursur" ng-click="removeRelative(relation, relative.id)"></a>
+								<a class="icon-trash pointer-cursur" ng-click="removeRelative(relation, relative.id)" ng-show="allow('write')"></a>
 							</span>
 						</div>
 					</div>
@@ -209,10 +210,9 @@
 									<div class="widget-box transparent">
 										<div class="widget-body">
 											<div class="widget-main no-padding">
-												<span class="bigger-110">
-													{{status.name}}
-												</span>
-												<a class="icon-trash pointer-cursur" ng-click="removeStatus(status.name, status.date)"></a>
+												<span>{{status.name}}</span>
+												<a class="icon-trash pointer-cursur pull-right" ng-click="removeStatus(status.name, status.date)" ng-show="allow('write')"></a>
+												<span class="light-grey smaller-90" luban-editable="status.comment" object="object" prop="status" key="status.name" field="comment"></span>
 											</div>
 										</div>
 									</div>
@@ -233,6 +233,9 @@
 					</div>
 					<div class="form-group">
 						<input type="text" class="form-control form-control-xs" placeholder="状态名称" ng-model="new.status.name" />
+					</div>
+					<div class="form-group">
+						<input type="text" class="form-control form-control-xs" placeholder="状态描述" ng-model="new.status.comment" />
 					</div>
 					<button type="submit" class="btn btn-primary btn-xs icon-save"></button>
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('status')"></button>

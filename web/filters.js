@@ -20,7 +20,7 @@ lubanlockFilters.filter('plain', function(){
 			input = input.join(', ');
 		}
 		
-		return input;
+		return input ? input : '-';
 	}
 });
 

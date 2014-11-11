@@ -1,4 +1,4 @@
-<span ng-if="!isEditing" ng-click="edit()" class="value">&nbsp;{{value | plain}}&nbsp;</span>
+<span ng-if="!isEditing" ng-click="edit()" class="value" ng-class="{writable:allow('write')}">&nbsp;{{value | plain}}&nbsp;</span>
 <span ng-if="isEditing">
 	<span ng-if="type === undefined || type === 'text'">
 		<input type="text" name="{{name}}" class="editable" ng-model="$parent.$parent.value" ng-blur="save(); editCompleted()" luban-enter="save(); editCompleted()" luban-esc="editCanceled()" placeholder="{{placeholder}}">

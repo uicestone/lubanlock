@@ -173,7 +173,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 			// auto-select the first input field after expanding property adding
 			// since the form won't expand after above change were applied, we trigger 'select' after a while
 			setTimeout(function(){
-				angular.element($event.target).siblings('form').find(':input:first').trigger('select');
+				angular.element($event.target).siblings('form').find(':input:first').trigger('focus');
 			});
 			if(prop === 'permission'){
 				$scope['new'].permission.permission = 'read';
@@ -201,7 +201,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		}
 		
 		$scope.addStatus = function($event){
-			Object.saveStatus({object: $scope.object.id, name: $scope['new'].status.name, order_by: 'date desc'}, $scope['new'].status.date, function(status){
+			Object.saveStatus({object: $scope.object.id, name: $scope['new'].status.name, order_by: 'date desc'}, {date: $scope['new'].status.date, comment:$scope['new'].status.comment}, function(status){
 				$scope.object.status = status;
 				$scope['new'].status = undefined;
 				angular.element($event.target).find(':input:first').trigger('select');
@@ -261,6 +261,12 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 				$scope.object.tag = tag;
 				$scope['new'].tag = {};
 				angular.element($event.target).find(':input:first').trigger('select');
+			});
+		}
+		
+		$scope.removeTag = function(taxonomy){
+			Object.saveTag({object: $scope.object.id, taxonomy: taxonomy}, null, function(tag){
+				$scope.object.tag = tag;
 			});
 		}
 		
