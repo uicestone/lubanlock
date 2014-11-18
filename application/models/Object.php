@@ -1023,7 +1023,8 @@ class Object extends CI_Model {
 	 * @param string $num optional, 关系的编号
 	 * @param bool $is_on 是否启用关系，若为false，此关系虽然被保存，但默认情况不会被获取
 	 * @param array $args
-	 *	replace_meta
+	 *	replace_meta bool 是否删除不在meta参数内的relationship meta
+	 *	replace_id int 存储关联对象前要删除的关联对象
 	 * @return int|array new meta id(s)
 	 * @throws Exception
 	 */
@@ -1038,6 +1039,14 @@ class Object extends CI_Model {
 		}
 		catch(Exception $e){
 			throw new Exception(lang('invalid_relative') . ': ' . lang($e->getMessage()), 400);
+		}
+		
+		if(array_key_exists('replace_id', $args)){
+			$this->db->delete('object_relationship', array(
+				'object'=>$this->id,
+				'relative'=>$args['replace_id'],
+				'relation'=>$relation
+			));
 		}
 		
 		$return = $this->db->upsert('object_relationship', array(

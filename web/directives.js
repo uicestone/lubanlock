@@ -12,17 +12,16 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 			object: '=',				//正在编辑的对象
 			value: '=lubanEditable',	//可编辑字段的值
 			name: '@lubanEditable',	//字段的值表达式，用以正则匹配获取属性类型或属性键名
-			model:'@',				//当luban-editable为引用值时，此值为字段表达式
 			type: '@',				//input的类型，可选text, radio, select
 			options: '=',				//input:radio和select的可用选项
 			placeholder: '@',		//input:text的placeholder
-			prop:'@',			//meta, relative, parents, status or tag
+			prop:'@',				//meta, relative, parents, status or tag
 			key:'=',					//在模版中手动指定的meta.key, relative.relation, tag.taxonomy或status.name
-			field:'@'				//field in property: status.comment
+			field:'@',				//field in property: status.comment
+			label:'=',				//display label for relative field
+			range:'='					//search object argument for relative field
 		},
 		link: function(scope, element){
-			
-			scope.name = scope.model || scope.name;
 			
 			//从值表达式中获得属性类型，为.之后[之前的字符串
 			if(!scope.prop){
@@ -51,6 +50,9 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 				}
 				scope.isEditing = true;
 				scope.oldValue = scope.value;
+				if(scope.prop === 'relative'){
+					scope.value = scope.label;
+				}
 				setTimeout(function(){//解决click事件触发之后不能自动focus
 					element.find('input').trigger('focus');
 				});
@@ -107,21 +109,28 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 						
 						data[scope.field] = scope.value;
 						
-						Object.updateStatus({object: scope.object.id, name: scope.key}, data, function(statuses){
+						Object.updateStatus({object: scope.object.id, name: scope.key, order_by: 'date desc'}, data, function(statuses){
 							scope.object.status = statuses;
 						});
+						
 						break;
 
 					case 'relative':
-						Object.saveRelative({object: scope.object.id, relation: scope.key}, scope.value);
+						Object.saveRelative({object: scope.object.id, relation: scope.key, replace_id: scope.oldValue}, scope.value, function(relatives){
+							scope.object.relative = relatives;
+						});
 						break;
 
 					case 'parent':
-						Object.saveParent({object: scope.object.id, relation: scope.key}, scope.value);
+						Object.saveParent({object: scope.object.id, relation: scope.key}, scope.value.id, function(parents){
+							scope.object.parents = parents;
+						});
 						break;
 
 					case 'tag':
-						Object.saveTag({object: scope.object.id, taxonomy: scope.key}, scope.value);
+						Object.saveTag({object: scope.object.id, taxonomy: scope.key}, scope.value, function(tags){
+							scope.object.tag = tags;
+						});
 						break;
 
 					default:
@@ -166,6 +175,11 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 				}
 				return false;
 			}
+			
+			scope.search = function(keyword){
+				return Object.query(angular.extend({search: keyword}, scope.range)).$promise;
+			}
+			
 		}
 	}
 }]);

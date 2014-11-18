@@ -1,16 +1,22 @@
-<span ng-if="!isEditing" ng-click="edit()" class="value" ng-class="{writable:allow('write')}">&nbsp;{{value | plain}}&nbsp;</span>
-<span ng-if="isEditing">
-	<span ng-if="type === undefined || type === 'text'">
-		<input type="text" name="{{name}}" class="editable" ng-model="$parent.$parent.value" ng-blur="save(); editCompleted()" luban-enter="save(); editCompleted()" luban-esc="editCanceled()" placeholder="{{placeholder}}">
-	</span>
-	<span ng-if="type === 'radio'">{{}}
-		<label class="radio-inline" ng-repeat="option in $parent.$parent.options">
-			<input type="radio" name="{{name}}" class="ace" ng-value="option" ng-model="$parent.$parent.$parent.value" ng-change="save(); editCompleted()" luban-enter="editCompleted()" luban-esc="editCanceled()">
-			<span class="lbl">{{option}}</span>
-		</label>
-	</span>
-	<span ng-if="type === 'select'">
-		<select name="{{name}}" ng-model="$parent.$parent.value" ng-options="name for name in $parent.$parent.options" ng-change="save(); editCompleted()" ng-blur="editCompleted()"></select>
-	</span>
+<span ng-if="!isEditing" ng-click="edit()" class="value" ng-class="{writable:allow('write')}">&nbsp;{{label || value | plain}}&nbsp;</span>
+
+<span ng-if="isEditing && prop !== 'relative' && (type === undefined || type === 'text')">
+	<input type="text" ng-model="$parent.value" ng-blur="save(); editCompleted()" luban-enter="save(); editCompleted()" luban-esc="editCanceled()" placeholder="{{placeholder}}">
 </span>
+
+<span ng-if="isEditing && prop === 'relative'">
+	<input type="text" ng-model="$parent.value" luban-esc="editCanceled()" placeholder="{{placeholder}}" typeahead="object.id as object.name for object in search($viewValue)" typeahead-template-url="partials/object_autocomplete.html" typeahead-on-select="save(); editCompleted()" typeahead-wait-ms="100">
+</span>
+
+<span ng-if="isEditing && type === 'radio'">
+	<label class="radio-inline" ng-repeat="option in $parent.$parent.options">
+		<input type="radio" name="{{name}}" class="ace" ng-value="option" ng-model="$parent.$parent.value" ng-change="save(); editCompleted()" luban-enter="editCompleted()" luban-esc="editCanceled()">
+		<span class="lbl">{{option}}</span>
+	</label>
+</span>
+
+<span ng-if="isEditing && type === 'select'">
+	<select name="{{name}}" ng-model="$parent.value" ng-options="name for name in $parent.$parent.options" ng-change="save(); editCompleted()" ng-blur="editCompleted()"></select>
+</span>
+
 <span ng-transclude></span>

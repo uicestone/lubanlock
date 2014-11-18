@@ -28,7 +28,7 @@
 						</a>
 						<span ng-repeat="(taxonomy, tag) in object.tag">
 							<i class="light-blue">{{taxonomy}}</i>
-							<span class="bigger-120 blue" luban-editable="tag" model="object.tag[taxonomy]" object="object" key="taxonomy"></span>
+							<span class="bigger-120 blue" luban-editable="tag" object="object" prop="tag" key="taxonomy"></span>
 							<a class="icon-trash pointer-cursur" ng-click="removeTag(taxonomy)" ng-show="allow('write')"></a>
 						</span>
 					</div>
@@ -119,7 +119,7 @@
 
 						<div class="profile-info-value">
 							<span ng-repeat="(index, value) in values">
-								<span luban-editable="value" model="object.meta[key][index]" object="object" key="key" value="value"></span>
+								<span luban-editable="value" object="object" prop="meta" key="key"></span>
 								<a class="icon-trash pointer-cursur" ng-click="removeMeta(key, value)" ng-show="allow('write')"></a>
 							</span>
 							<a class="icon-trash pointer-cursur pull-right" ng-click="removeMeta(key)" ng-show="allow('write')"></a>
@@ -171,7 +171,8 @@
 
 						<div class="profile-info-value">
 							<span ng-repeat="relative in relatives">
-								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{relative.name}}</a>
+								<span luban-editable="relative.id" label="relative.name" object="object" prop="relative" key="relation"></span>
+								<a class="icon-link pointer-cursur" ng-click="showDetail(relative.id, relative.type)"></a>
 								<a class="icon-trash pointer-cursur" ng-click="removeRelative(relation, relative.id)" ng-show="allow('write')"></a>
 							</span>
 						</div>
