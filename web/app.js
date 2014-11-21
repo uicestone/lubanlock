@@ -32,7 +32,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 				controller: 'UserDetailCtrl',
 				resolve: {
 					user: ['$route', 'User', function($route, User){
-						if($route.current.params.id){
+						if($route.current.params.id && $route.current.params.id !== 'add'){
 							return User.get({id: $route.current.params.id}).$promise;
 						}
 					}]

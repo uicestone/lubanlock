@@ -420,10 +420,28 @@ lubanlockControllers.controller('UsersCtrl', ['$scope', '$location', '$modal', '
 	}
 ]);
 
-lubanlockControllers.controller('UserDetailCtrl', ['$scope', 'Alert', 'user',
-	function($scope, Alert, user) {
+lubanlockControllers.controller('UserDetailCtrl', ['$scope', '$location', 'Alert', 'User', 'user',
+	function($scope, $location, Alert, User, user) {
 		
-		$scope.user = user;
+		$scope.user = user || new User();
+		
+		$scope.save = function(){
+			
+			if($scope.newPassword !== $scope.newPasswordConfirm){
+				Alert.add('两次密码输入不一致');
+				return;
+			}else{
+				$scope.user.password = $scope.newPassword;
+			}
+			
+			if($scope.isGroup){
+				$scope.user.type = 'group';
+			}
+			
+			$scope.user.$save(function(user){
+				$location.replace().path('user/' + user.id);
+			});
+		}
 		
 		$scope.updateConfig = function(){
 			if($scope.newPassword){

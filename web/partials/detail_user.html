@@ -1,6 +1,6 @@
-<form class="form-horizontal" ng-submit="updateConfig()">
+<form class="form-horizontal" ng-submit="user.id ? updateConfig() : save()">
 	<tabset>
-
+		
 		<tab heading="基本信息" id="edit-password">
 			<div class="space-10"></div>
 
@@ -8,38 +8,50 @@
 				<label class="col-sm-3 control-label no-padding-right" for="username">用户名</label>
 
 				<div class="col-sm-9">
-					<input id="username" type="text" ng-model="$parent.user.name">
-					<span>
-						<i class="icon-hand-right blue"></i>
-						<a ng-href="/#detail/{{$parent.user.id}}">查看对象 {{$parent.user.object_name}}</a>
-					</span>
+					<input id="username" type="text" ng-model="$parent.user.name" required>
+					&nbsp;
+					<label>
+						<input type="checkbox" ng-model="$parent.user.type" ng-true-value="group" ng-false-value="user">
+						用户组
+					</label>
 				</div>
 			</div>
 
-			<div class="space-4"></div>
+			<div class="space-4" ng-show="$parent.user.id"></div>
 
-			<div class="form-group">
+			<div class="form-group" ng-show="$parent.user.id">
+				<label class="col-sm-3 control-label no-padding-right" for="email">关联对象</label>
+
+				<div class="col-sm-9 form-control-static">
+					{{$parent.user.object_name}}
+					<a class="icon-link" ng-href="#detail/{{$parent.user.id}}"></a>
+				</div>
+			</div>
+
+			<div class="space-4" ng-show="$parent.user.type !== 'group'"></div>
+
+			<div class="form-group" ng-show="$parent.user.type !== 'group'">
 				<label class="col-sm-3 control-label no-padding-right" for="email">电子邮件</label>
 
 				<div class="col-sm-9">
-					<input id="email" type="text" ng-model="$parent.user.email">
+					<input id="email" type="text" ng-model="$parent.user.email" ng-required="$parent.user.type !== 'group'">
 				</div>
 			</div>
 
-			<div class="space-4"></div>
+			<div class="space-4" ng-show="$parent.user.type !== 'group'"></div>
 
-			<div class="form-group">
+			<div class="form-group" ng-show="$parent.user.type !== 'group'">
 				<label class="col-sm-3 control-label no-padding-right" for="new-password">新密码</label>
 
 				<div class="col-sm-9">
 					<input id="new-password" type="password" ng-model="$parent.newPassword">
-					<span class="label">留空则不修改密码</span>
+					<span class="label" ng-show="$parent.user.id">留空则不修改密码</span>
 				</div>
 			</div>
 
-			<div class="space-4"></div>
+			<div class="space-4" ng-show="$parent.user.type !== 'group'"></div>
 
-			<div class="form-group">
+			<div class="form-group" ng-show="$parent.user.type !== 'group'">
 				<label class="col-sm-3 control-label no-padding-right" for="new-password-confirm">重复新密码</label>
 
 				<div class="col-sm-9">

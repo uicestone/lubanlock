@@ -14415,7 +14415,6 @@ textarea, input[type="text"], input[type="password"], input[type="datetime"], in
 
 .form-control-static{
 	font-size: 14px;
-	padding-top: 4px;
 }
 
 /*my_resume dropzone*/
