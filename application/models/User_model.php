@@ -81,7 +81,9 @@ class User_model extends Object {
 
 		$parents = $this->query(array(
 			'has_relative_like'=>array($children),
-			'found_rows'=>false
+			'found_rows'=>false,
+			'limit'=>false,
+			'order_by'=>false
 		), false);
 
 		$this->session->groups = array_merge($this->session->groups, $parents);
