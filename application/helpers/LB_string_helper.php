@@ -1,5 +1,5 @@
 <?php
-function str_getSummary($str,$length=28){
+function str_get_summary($str,$length=28){
 	/**
 	 * $length，宽度计量的长度，1为一个ASCII字符的宽度，汉字为2
 	 * $char_length，字符计量的长度，UTF8的汉字为3

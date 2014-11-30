@@ -140,6 +140,43 @@ class Object_Controller extends LB_Controller{
 		$this->output->set_output($object->getRelative($this->input->get()));
 	}
 	
+	function parents($object_id, $relation = ''){
+		
+		$object = new Object($object_id, array('get_data'=>false));
+		
+		switch ($this->input->method) {
+			case 'GET':
+				break;
+			
+			case 'POST':
+				
+				$data = $this->input->data();
+				
+				$num = '';
+				$meta = array();
+				$is_on = true;
+				
+				if(!is_array($data)){
+					$relative = $data;
+				}
+				else{
+					array_key_exists('relative', $data) && $relative = $data['relative'];
+					array_key_exists('num', $data) && $num = $data['num'];
+					array_key_exists('meta', $data) && $meta = $data['meta'];
+					array_key_exists('is_on', $data) && $is_on = $data['is_on'];
+				}
+				
+				$object->setParent($relation, $relative, $num, $meta, $is_on, $this->input->get());
+				break;
+			
+			case 'DELETE':
+				$object->removeParent($relation, $this->input->get('relative') ? $this->input->get('relative') : null);
+				break;
+		}
+		
+		$this->output->set_output($object->getRelative($this->input->get()));
+	}
+	
 	function status($object_id, $name = null){
 		
 		$object = new Object($object_id, array('get_data'=>false));

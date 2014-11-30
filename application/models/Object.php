@@ -6,13 +6,13 @@ class Object extends CI_Model {
 		$meta, $relative, $parents, $status, $tag, $permission;
 	
 	static $fields=array(
-		'name'=>NULL,
+		'name'=>'',
 		'type'=>'',
 		'num'=>'',
-		'company'=>NULL,
-		'user'=>NULL,
-		'time'=>NULL,
-		'time_insert'=>NULL
+		'company'=>null,
+		'user'=>null,
+		'time'=>null,
+		'time_insert'=>null
 	);
 	
 	/**
@@ -46,6 +46,7 @@ class Object extends CI_Model {
 	 * @param int $id
 	 * @param array $args
 	 *	with 请求的对象是否包含附加属性，默认包含6种附加属性
+	 *	with_user_info
 	 * @param bool $permission_check
 	 * @return array array version of the object
 	 */
@@ -76,9 +77,11 @@ class Object extends CI_Model {
 		$object['type'] = lang($object['type']);
 		!is_null($object['user']) && $object['user'] = intval($object['user']);
 		
-		foreach( array('meta', 'relative', 'parents', 'status', 'tag', 'permission') as $field ){
+		$properties = array('meta', 'relative', 'parents', 'status', 'tag', 'permission');
+		
+		foreach($properties as $field){
 			
-			$property_args = true;
+			$property_args = array_key_exists('with_all_prop', $args) ? $args['with_all_prop'] : true;
 			
 			if(array_key_exists('with_' . $field, $args)){
 				$property_args = $args['with_' . $field];
@@ -87,7 +90,7 @@ class Object extends CI_Model {
 			if(array_key_exists('with', $args)){
 				
 				if(is_array($args['with'])){
-					if(in_array($field, $args['with'])){
+					if(in_array($field, $args['with'], true)){// TODO why do we need this "true"???
 						$property_args = true;
 					}
 
@@ -111,8 +114,14 @@ class Object extends CI_Model {
 			
 		}
 		
+		if(array_key_exists('with_user_info', $args) && $args['with_user_info']){
+			$object['user'] = new User_model($object['user']);
+		}
+		
 		foreach(array_keys(get_object_vars($this)) as $property){
-			$this->$property = array_key_exists($property, $object) ? $object[$property] : null;
+			if(array_key_exists($property, $object)){
+				$this->$property = $object[$property];
+			}
 		}
 		
 		return $object;
@@ -128,14 +137,17 @@ class Object extends CI_Model {
 	function add(array $data){
 		
 		$data['company'] = get_instance()->company->id;
-		$data['user'] = $this->session->user_id;
+		
+		!array_key_exists('user', $data) && $data['user'] = $this->session->user_id;
+		// TODO can add object for other owners now, would that be a problem?
+		
 		$data['time_insert'] = date('Y-m-d H:i:s');
 		
 		$this->db->insert('object', array_merge(self::$fields, array_intersect_key($data, self::$fields)));
 		
 		$this->id = $this->db->insert_id();
 		
-		foreach(array('meta'=>'addMetas', 'relative'=>'setRelatives', 'status'=>'addStatuses', 'tag'=>'addTags', 'permission'=>'authorize') as $property => $function){
+		foreach(array('meta'=>'addMetas', 'relative'=>'setRelatives', 'parents'=>'setParents', 'status'=>'addStatuses', 'tag'=>'addTags', 'permission'=>'authorize') as $property => $function){
 			if(array_key_exists($property, $data)){
 				call_user_func(array($this, $function), $data[$property], false);
 			}
@@ -151,12 +163,13 @@ class Object extends CI_Model {
 	 */
 	function update(array $data){
 
-		$data=array_intersect_key($data, self::$fields);
+		$data = array_intersect_key($data, self::$fields);
 		
 		if(empty($data)){
 			return;
 		}
 		
+		// TODO this means a user can set his own object to someone else
 		if(array_key_exists('user', $data) && !$this->allow('grant')){
 			unset($data['user']);
 		}
@@ -196,21 +209,6 @@ class Object extends CI_Model {
 		}
 		
 		return $result;
-	}
-	
-	/**
-	 * 根据部分名称返回匹配的id、名称和类别列表
-	 * @param $part_of_name
-	 * @return array
-	 */
-	function match($part_of_name){
-		
-		$this->db
-			->from('object')
-			->where('object.company',get_instance()->company->id)
-			->like('object.name', $part_of_name);
-		
-		return $this->db->get()->result_array();
 	}
 	
 	/**
@@ -667,7 +665,7 @@ class Object extends CI_Model {
 			if(array_key_exists('with', $args)){
 				
 				if(is_array($args['with'])){
-					if(in_array($field, $args['with'])){
+					if(in_array($field, $args['with'], true)){// TODO why do we need this "true"???
 						$property_args = true;
 					}
 
@@ -694,6 +692,12 @@ class Object extends CI_Model {
 				}
 			}
 			
+		}
+		
+		if(array_key_exists('with_user_info', $args) && $args['with_user_info']){
+			array_walk($result_array, function(&$row){
+				$row['user'] = new User_model($row['user'], array('with'=>false));
+			});
 		}
 		
 		array_walk($result_array, function(&$row){
@@ -940,12 +944,15 @@ class Object extends CI_Model {
 	/**
 	 * 
 	 * @param array $args
-	 *	as_rows
-	 *	id_only
-	 *	include_disabled
-	 *	with_meta default:true
-	 *	order_by
-	 *	get_parents
+	 *	as_rows retrieve rows in object_relative directly
+	 *	id_only retrieve just relative id
+	 *	include_disabled include relationships which "is_on" is not true
+	 *	with_relationship_meta default:true retrieve meta of relationship (stored in object_relationship_meta)
+	 *	order_by available columns are relationship num, time
+	 *	limit limit the result rows, default is 25
+	 *	get_parents if is true, we are fetching left object in object_relative table, otherwise right one is fetched
+	 *	is_user the relative object should exist in user table
+	 *	is_group the relative object should exist in user table and "is_group" is not 0
 	 * @return array
 	 */
 	function getRelative(array $args = array()){
@@ -973,8 +980,38 @@ class Object extends CI_Model {
 			$this->db->where('object_relationship.is_on', true);
 		}
 		
+		if(array_key_exists('is_user', $args) && $args['is_user']){
+			$this->db->join('user', 'object_relationship.' . $get . ' = user.id', 'inner');
+		}
+		
+		if(array_key_exists('is_group', $args) && $args['is_group']){
+			$args['is_user'] = true;
+			$this->db->join('user', 'object_relationship.' . $get . ' = user.id AND user.is_group > 0', 'inner');
+		}
+		
 		if(array_key_exists('order_by', $args)){
 			$this->db->order_by($args['order_by']);
+		}
+		
+		if(!array_key_exists('limit', $args)){
+			//默认limit
+			$args['limit'] = get_instance()->company->config('relatives_per_page');
+			
+			if(is_null($args['limit'])){
+				$args['limit'] = false;
+			}
+		}
+		
+		if(is_array($args['limit'])){
+			//sql limit方式
+			call_user_func_array(array($this->db,'limit'), $args['limit']);
+		}
+		elseif(count(preg_split('/,\s*/',$args['limit'])) === 2){
+			$args['limit'] = preg_split('/,\s*/', $args['limit']);
+			call_user_func_array(array($this->db,'limit'), $args['limit']);
+		}
+		else{
+			call_user_func(array($this->db, 'limit'), $args['limit']);
 		}
 		
 		$result = $this->db->get()->result_array();
@@ -992,13 +1029,13 @@ class Object extends CI_Model {
 			}
 			else{
 				try{
-					$relative = new Object($relationship[$get], array('with'=>null));
-
+					$relative = (array_key_exists('is_user', $args) && $args['is_user']) ? new User_model($relationship[$get], array_merge($args, array('with_all_prop'=>false))) : new Object($relationship[$get], array_merge($args, array('with_all_prop'=>false)));
 					$relative->relationship_id = (int) $relationship['id'];
 					$relative->relationship_num = $relationship['num'];
-					$relative->is_on = (bool) $relationship['is_on'];
-
-					if(!array_key_exists('with_meta', $args) || $args['with_meta']){
+					$relative->relationship_is_on = (bool) $relationship['is_on'];
+					$relative->relationship_visibility = $relationship['visibility'];
+					
+					if(!array_key_exists('with_relationship_meta', $args) || $args['with_relationship_meta']){
 						$relative->relationship_meta = $relative->getRelativeMeta($relationship['id']);
 					}
 					$save_as[$relationship['relation']][] = (array) $relative;
@@ -1025,13 +1062,36 @@ class Object extends CI_Model {
 	 * @param array $args
 	 *	replace_meta bool 是否删除不在meta参数内的relationship meta
 	 *	replace_id int 存储关联对象前要删除的关联对象
+	 *	as_parent
 	 * @return int|array new meta id(s)
 	 * @throws Exception
 	 */
 	function setRelative($relation, $relative = null, $num = '', array $meta = array(), $is_on = true, array $args = array(), $check_permission = true){
 		
-		if($check_permission && !$this->allow('write')){
-			throw new Exception('no_permission', 403);
+		if(is_null($relative)){
+			return;
+		}
+		
+		!array_key_exists('as_parent', $args) && $args['as_parent'] = false;
+		
+		if($check_permission){
+			if(!$args['as_parent']){
+				if(!$this->allow('write')){
+					throw new Exception('no_permission', 403);
+				}
+			}
+			else{
+				$parent = new Object($relative, array('with'=>null));
+				if(!$parent->allow('write')){
+					throw new Exception('no_permission', 403);
+				}
+			}
+		}
+		
+		if($args['as_parent']){
+			$set = 'object'; $by = 'relative';
+		}else{
+			$set = 'relative'; $by = 'object';
 		}
 		
 		try{
@@ -1043,22 +1103,22 @@ class Object extends CI_Model {
 		
 		if(array_key_exists('replace_id', $args)){
 			$this->db->delete('object_relationship', array(
-				'object'=>$this->id,
-				'relative'=>$args['replace_id'],
+				$by=>$this->id,
+				$set=>$args['replace_id'],
 				'relation'=>$relation
 			));
 		}
 		
 		$return = $this->db->upsert('object_relationship', array(
-			'object'=>$this->id,
-			'relative'=>$relative,
+			$by=>$this->id,
+			$set=>$relative,
 			'relation'=>$relation,
 			'num'=>$num,
 			'is_on'=>$is_on,
 			'user'=>$this->session->user_id
 		));
 		
-		//根据参数，先删除不在此次添加之列的键值对
+		// 根据参数，先删除不在此次添加之列的键值对
 		if(array_key_exists('replace_meta', $args) && $args['replace_meta']){
 			
 			$meta_origin = $this->getRelativeMeta($relation, $relative);
@@ -1077,34 +1137,55 @@ class Object extends CI_Model {
 		return $return;
 	}
 	
-	function setRelatives(array $data, $check_permission = true){
+	function setParent($relation, $relative = null, $num = '', array $meta = array(), $is_on = true, array $args = array(), $check_permission = true){
+		$args['as_parent'] = true;
+		return $this->setRelative($relation, $relative, $num, $meta, $is_on, $args, $check_permission);
+	}
+	
+	function setRelatives(array $data, $as_parent = false, $check_permission = true){
 			
 		$relationship_ids = array();
 
 		foreach($data as $key => $sub_func_args){
 			if(is_array($sub_func_args)){
+				if(array_key_exists('relative', $sub_func_args)){
+					// $sub_func_args is treated as a relationship data row
+					$sub_func_args = array_merge(array(
+						'relation' => '',
+						'relative' => null,
+						'num' => '',
+						'meta' => array(),
+						'is_on' => true,
+						'args' => array(),
+					), $sub_func_args);
 
-				$sub_func_args = array_merge(array(
-					'relation' => null,
-					'relative' => null,
-					'num' => '',
-					'meta' => array(),
-					'is_on' => true,
-					'args' => array(),
-				), $sub_func_args);
-
-				extract($sub_func_args);
-
-				$relationship_ids[] = $this->setRelative($relation, $relative, $num, $meta, $is_on, $args, $check_permission);
+					extract($sub_func_args);
+					
+					$as_parent && $args['as_parent'] = true;
+					
+					$relationship_ids[] = $this->setRelative($relation, $relative, $num, $meta, $is_on, $args, $check_permission);
+				}
+				else{
+					// $sub_func_args is treated as an array of relative IDs
+					foreach($sub_func_args as $relative){
+						$args = $as_parent ? array('as_parent'=>true) : array();
+						$relationship_ids[] = $this->setRelative($key, $relative, '', array(), true, $args, $check_permission);
+					}
+				}
 			}
 			else{
-				$relation = is_int($key) ? '' : $key;
-				$relationship_ids[] = $this->setRelative($relation, $sub_func_args, '', array(), true, array(), $check_permission);
+				$relation = $key;
+				$args = $as_parent ? array('as_parent'=>true) : array();
+				$relationship_ids[] = $this->setRelative($relation, $sub_func_args, '', array(), true, $args, $check_permission);
 			}
 		}
 
 		return $relationship_ids;
 			
+	}
+	
+	function setParents(array $data, $check_permission = true){
+		return $this->setRelatives($data, true, $check_permission);
 	}
 	
 	function removeRelative($relation, $relative){

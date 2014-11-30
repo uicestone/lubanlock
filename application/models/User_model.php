@@ -1,13 +1,14 @@
 <?php
 class User_model extends Object {
 	
-	var $name = '', $email, $password, $roles = array();
+	var $name = '', $email, $password, $roles = array(), $is_group = false;
 	
 	static $fields=array(
 		'name'=>'',
 		'email'=>null,
 		'password'=>'',
 		'roles'=>'',
+		'is_group'=>false,
 		'last_ip'=>'',
 		'last_login'=>null
 	);
@@ -108,9 +109,10 @@ class User_model extends Object {
 		
 		$object = parent::get($id, $args, $permission_check);
 		
-		$user = $this->db->select('user.id, user.name, user.email, user.roles, user.last_ip, user.last_login')->from('user')->where('id', $id)->get()->row_array();
+		$user = $this->db->select('user.id, user.name, user.email, user.roles, user.is_group, user.last_ip, user.last_login')->from('user')->where('id', $id)->get()->row_array();
 		
 		$user['id'] = intval($user['id']);
+		$user['is_group'] = intval($user['is_group']);
 		
 		if(!$user){
 			throw new Exception(lang('user').' '.$id.' '.lang('not_found'), 404);
@@ -121,9 +123,13 @@ class User_model extends Object {
 		return array_merge($object, $user);
 	}
 	
-	function query(array $args=array(), $permission_check = true){
+	function query(array $args = array(), $permission_check = true){
 		
-		$this->db->join('user','user.id = object.id','inner')->select('user.name, user.email, user.roles, user.last_ip, user.last_login');
+		$this->db->join('user','user.id = object.id','inner')->select('user.name, user.email, user.roles, user.is_group, user.last_ip, user.last_login');
+		
+		if(array_key_exists('is_group', $args)){
+			$this->db->where('user.is_group', $args['is_group']);
+		}
 		
 		return parent::query($args, $permission_check);
 	}
@@ -167,6 +173,11 @@ class User_model extends Object {
 	function remove(){
 		$this->db->delete('user', array('id'=>$this->id));
 		parent::remove();
+	}
+	
+	function getRelative(array $args = array()) {
+		$args['is_user'] = true;
+		return parent::getRelative($args);
 	}
 	
 	function verify($username,$password){

@@ -33,10 +33,6 @@ class File extends LB_Controller{
 			'meta'=>$file_meta
 		));
 		
-		$user = new Object($this->session->user_id);
-		$user->setTag('简历已上传', '简历上传状态');
-		$user->setRelative('简历', $object->id);
-		
 		if(!$this->input->accept('application/json')){
 			show_error('文件已经上传，但由于你的浏览器太旧，无法为你正常跳转，请手动<a href="javascript:history.back();">返回</a>', 400);
 		}else{

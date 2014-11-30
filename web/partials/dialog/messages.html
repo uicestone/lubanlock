@@ -1,0 +1,121 @@
+<div class="page-header">
+	<h1>
+		对话 {{dialog.name}}
+		<small><i class="icon-double-angle-right"></i></small>
+		<small ng-repeat="relevant_dialog in relevant_dialogs" ng-show="$index < 25">
+			{{relevant_dialog.user.name}}
+			<span ng-show="$index === 24">等{{relevant_dialogs.length}}人</span>
+		</small>
+	</h1>
+</div>
+<div class="message-container">
+	<div class="message-list-container">
+
+		<form ng-submit="send()">
+			<div class="message-navbar">
+				<h4 class="no-margin blue">
+					新消息
+					<button type="submit" class="btn btn-primary pull-right" style="margin-top:-8px;margin-right:-8px">发送</button>
+				</h4>
+			</div>
+			<div class="message-content clearfix" ng-file-drop="addAttachment($files)">
+				<div class="col-sm-8 col-xs-12">
+					<div class="form-group">
+						<textarea class="form-control col-sm-12" rows="3" ng-model="newMessageContent" required></textarea>
+					</div>
+				</div>
+				<div class="visible-xs space-4" style="clear:both"></div>
+				<div class="col-sm-4 col-xs-12">
+					<div id="form-attachments">
+						<div class="file-input-container" ng-repeat="attachment in attachments">
+							<div class="ace-file-input width-90 inline">
+								<label class="file-label selected" data-title="选择文件">
+									<span class="file-name">
+										{{attachment.name}}
+										<i class="icon-file"></i>
+									</span>
+								</label>
+								<a class="remove pointer-cursur" ng-click="removeAttachment(attachment)"><i class="icon-remove"></i></a>
+							</div>
+						</div>
+					</div>
+					<button type="button" class="btn btn-xs btn-info" ng-file-select="addAttachment($files)">添加附件</button>
+				</div>
+			</div>
+		</form>
+		<div class="message-content" ng-class="dialog.meta" id="id-message-content" ng-show="dialog" ng-repeat="message in messages">
+			<div class="message-header clearfix">
+				<div class="pull-left">
+
+					<span class="sender">{{message.user.name}}</span>
+
+					&nbsp;
+					<i class="icon-time bigger-110 orange middle"></i>
+					<span class="time">{{message.time}}</span>
+				</div>
+
+				<div class="action-buttons pull-right">
+<!--					<a href="#">
+						<i class="icon-reply green icon-only bigger-130"></i>
+					</a>
+
+					<a href="#">
+						<i class="icon-mail-forward blue icon-only bigger-130"></i>
+					</a>-->
+
+					<a ng-click="remove(message)" class="pointer-cursur">
+						<i class="icon-trash red icon-only bigger-130"></i>
+					</a>
+				</div>
+			</div>
+
+			<div class="hr hr-double"></div>
+
+			<div class="slimScrollDiv" style="position: relative; overflow: hidden; width: auto;">
+				<div class="message-body" style="overflow: hidden; width: auto;">
+					{{message.meta.content[0]}}
+				</div>
+				<div class="slimScrollBar ui-draggable" style="width: 7px; position: absolute; top: 0px; opacity: 0.4; display: none; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; z-index: 99; right: 1px; height: 200px; background: rgb(0, 0, 0);"></div><div class="slimScrollRail" style="width: 7px; height: 100%; position: absolute; top: 0px; display: none; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; opacity: 0.2; z-index: 90; right: 1px; background: rgb(51, 51, 51);"></div>
+			</div>
+
+			<div class="hr hr-double"></div>
+
+			<div class="message-attachment clearfix" ng-show="message.relative.attachment">
+				<div class="attachment-title">
+					<span class="blue bolder bigger-110">附件</span>
+					&nbsp;
+					<span class="grey">({{message.relative.attachment.length}} 个文件)</span>
+
+					<div class="inline position-relative">
+						<a data-toggle="dropdown" class="dropdown-toggle">
+							&nbsp;
+							<i class="icon-caret-down bigger-125 middle"></i>
+						</a>
+
+						<ul class="dropdown-menu dropdown-lighter">
+							<li>
+								<a href="#">Download all as zip</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				&nbsp;
+				<ul class="attachment-list pull-left list-unstyled">
+					<li ng-repeat="attachment in message.relative.attachment">
+						<a ng-href="file/download/{{attachment.id}}" class="attached-file inline">
+							<i class="icon-file-alt bigger-110 middle"></i>
+							<span class="attached-name middle">{{attachment.name}}</span>
+						</a>
+
+						<div class="action-buttons inline">
+							<a ng-href="file/download/{{attachment.id}}">
+								<i class="icon-download-alt bigger-125 blue"></i>
+							</a>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

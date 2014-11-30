@@ -1,0 +1,102 @@
+<div class="message-container col-sm-8">
+	<div class="message-list-container">
+		<div id="id-message-new-navbar" class="message-navbar align-right clearfix" style="padding:1px 3px 2px">
+			<button type="button" class="btn btn-sm btn-primary no-border" ng-click="send()">
+				<span class="bigger-110">发送</span>
+			</button>
+		</div>
+		<form id="id-message-form" class="form-horizontal message-form  col-xs-12">
+			<div class="form-group" ng-show="receivers.length">
+				<label class="col-sm-2 control-label no-padding-right">收件人</label>
+
+				<div class="col-sm-8 col-xs-12">
+					<div class="tags col-xs-12">
+						<span class="tag" ng-repeat="receiver in receivers">{{receiver.name}}
+							<button type="button" class="close" ng-click="removeReceiver(receiver)">×</button>
+						</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="hr hr-18 dotted" ng-show="receivers.length"></div>
+
+			<div class="form-group">
+				<label class="col-sm-2 control-label no-padding-right">标题</label>
+
+				<div class="col-sm-8 col-xs-12">
+					<div class="input-icon block col-xs-12 no-padding">
+						<input type="text" class="form-control" ng-model="messageTitle">
+						<i class="icon-comment-alt"></i>
+					</div>
+				</div>
+			</div>
+
+			<div class="hr hr-18 dotted"></div>
+
+			<div class="form-group">
+				<label class="col-sm-2 control-label no-padding-right">
+					<span class="inline space-20 hidden-480"></span>
+					消息
+				</label>
+
+				<div class="col-sm-8">
+					<textarea ng-model="messageContent" class="form-control" rows="8"></textarea>
+				</div>
+			</div>
+
+			<div class="hr hr-18 dotted"></div>
+
+			<div class="form-group no-margin-bottom">
+				<label class="col-sm-2 control-label no-padding-right">附件</label>
+
+				<div class="col-sm-8">
+					<div id="form-attachments">
+						<div class="file-input-container" ng-repeat="attachment in attachments">
+							<div class="ace-file-input width-90 inline">
+								<label class="file-label selected" data-title="选择文件">
+									<span class="file-name">
+										{{attachment.name}}
+										<i class="icon-file"></i>
+									</span>
+								</label>
+								<a class="remove pointer-cursur" ng-click="removeAttachment(attachment)"><i class="icon-remove"></i></a>
+							</div>
+						</div>
+					</div>
+					<button type="button" class="btn btn-xs btn-info" ng-file-select="addAttachment($files)">添加附件</button>
+				</div>
+			</div>
+
+			<div class="space"></div>
+		</form>
+	</div>
+</div>
+
+<div class="col-sm-4">
+	<div class="widget-box">
+
+		<div class="widget-header header-color-blue2">
+			<h4 class="lighter smaller">选择收件人</h4>
+		</div>
+
+		<div class="widget-body">
+			<div class="widget-main padding-8">
+				<input type="text" placeholder="搜索" class="form-control col-sm9" ng-model="receiverKeyword">
+				<div class="tree">
+					<div class="tree-folder" ng-repeat="group in groups" ng-include="'group_tree.html'"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/ng-template" id="group_tree.html">
+	<div class="tree-folder-header" ng-click="expandMembers(group)">
+		<i class="blue icon-minus" ng-show="group.relative.member" ng-click="foldMembers(group, $event)"></i>
+		<i class="blue" ng-class="{'icon-group':group.is_group,'icon-user':!group.is_group}"></i>
+		<div class="tree-folder-name">{{group.name}}</div>
+	</div>
+	<div class="tree-folder-content">
+		<div class="tree-folder" ng-repeat="group in group.relative.member | filter:receiverKeyword" ng-include="'group_tree.html'"></div>
+	</div>
+</script>

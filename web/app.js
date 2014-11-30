@@ -8,7 +8,8 @@ var lubanlockApp = angular.module('lubanlockApp', [
 	'lubanlockDirectives',
 	'lubanlockFilters',
 	'lubanlockServices',
-	'ui.bootstrap'
+	'ui.bootstrap',
+	'angularFileUpload'
 ]);
 
 lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
@@ -63,6 +64,39 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 					}],
 					templateEditable: ['$http', '$templateCache', function($http, $templateCache){
 						$http.get('partials/editable.html', {cache: $templateCache});
+					}]
+				}
+			})
+			.when('/dialog', {
+				templateUrl: 'partials/dialog/list.html',
+				controller: 'DialogListCtrl',
+				resolve: {
+					dialogs: ['Object', '$route', function(Object, $route){
+						if(!$route.current.params.id){
+							return Object.query({type: '对话', user: 'ME', with: {meta: true, relative: {relation: 'message', order_by: 'time desc', limit: 1}}}).$promise;
+						}
+					}]
+				}
+			})
+			.when('/dialog/new', {
+				templateUrl: 'partials/dialog/new_message.html',
+				controller: 'DialogNewCtrl',
+				resolve: {
+				}
+			})
+			.when('/dialog/:id', {
+				templateUrl: 'partials/dialog/messages.html',
+				controller: 'DialogMessageCtrl',
+				resolve: {
+					dialog: ['Object', '$route', function(Object, $route){
+						if($route.current.params.id){
+							return Object.get({id: $route.current.params.id, with: {meta: true}}).$promise;
+						}
+					}],
+					messages: ['Object', '$route', function(Object, $route){
+						if($route.current.params.id){
+							return Object.query({type: '消息', is_relative_of: {'message': $route.current.params.id}, with: {meta: true, relative: {with: {meta: true}}}, with_user_info: true}).$promise;
+						}
 					}]
 				}
 			})

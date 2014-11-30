@@ -1,0 +1,27 @@
+<div class="page-header">
+	<h1>
+		对话
+		<small>
+			<i class="icon-double-angle-right"></i>
+			点击每个对话，查看消息详情
+		</small>
+		<a href="#dialog/new" class="btn btn-primary pull-right">新建消息</a>
+	</h1>
+</div>
+<div class="message-container">
+	<div class="message-list-container">
+		<div class="message-list" id="message-list" ng-show="dialogs">
+			<div class="message-item" ng-class="{'message-unread':dialog.meta.unread_messages[0] > 0}" ng-repeat="dialog in dialogs">
+				
+				<span class="sender" title="{{dialog.name}}">{{dialog.name}}</span>
+				<span class="time">{{dialog.time}}</span>
+
+				<span class="summary">
+					<span class="text">
+						<a ng-href="#dialog/{{dialog.id}}">{{dialog.relative.message[0].name}}</a>
+					</span>
+				</span>
+			</div>
+		</div>
+	</div>
+</div>

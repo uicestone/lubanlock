@@ -72,7 +72,7 @@ body.breadcrumbs-fixed {
   color: #2679b5;
 }
 .page-header h1 small {
-  margin: 0 6px;
+  margin-left: 6px;
   font-size: 14px;
   font-weight: normal;
   color: #8089a0;
@@ -4881,7 +4881,7 @@ label {
   font-size: 14px;
 }
 .form-group > label[class*="col-"] {
-  padding-top: 7px;
+  padding-top: 4px;
   margin-bottom: 4px;
 }
 label,
@@ -5082,7 +5082,7 @@ span.input-icon {
   padding-right: 24px;
 }
 .input-icon > [class*="icon-"] {
-  padding: 0 3px;
+  padding: 2px 3px;
   z-index: 2;
   position: absolute;
   top: 1px;
@@ -5589,9 +5589,8 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .ace-file-input {
   position: relative;
-  height: 38px;
-  line-height: 38px;
-  margin-bottom: 9px;
+  height: 37px;
+  line-height: 37px;
 }
 .ace-file-input input[type=file] {
   position: fixed;
@@ -6890,7 +6889,7 @@ td .lbl:only-child {
   padding: 0;
   -webkit-box-shadow: none;
   box-shadow: none;
-  margin: 3px 0;
+  /*margin: 3px 0;*/
   border-bottom: 1px solid #CCC;
 }
 @media only screen and (max-width: 767px) {
@@ -9642,9 +9641,6 @@ li.item-default {
   position: relative;
   background-color: #FFF;
 }
-.message-item:first-child {
-  border-top-width: 0;
-}
 .message-item:hover {
   border-color: #E2EAF2;
   background-color: #F2F6F9;
@@ -9720,9 +9716,9 @@ li.item-default {
 }
 .message-item .time {
   float: right;
-  width: 60px;
   height: 18px;
   text-overflow: ellipsis;
+  text-align: right;
   overflow: hidden;
   white-space: nowrap;
   color: #666;
@@ -9802,11 +9798,15 @@ li.item-default {
 }
 .message-content {
   padding: 16px 12px;
+  margin-bottom: 10px;
   border: 1px solid #E9E9E9;
   -webkit-box-shadow: 0 0 1px 1px rgba(0,0,0,0.02);
   box-shadow: 0 0 1px 1px rgba(0,0,0,0.02);
   background-color: rgba(255, 255, 255, 0.8);
   border-top-width: 0;
+}
+.message-content.unread {
+	background-color: #FFFFF3;
 }
 .message-item .message-content {
   margin-top: 16px;
@@ -9817,10 +9817,9 @@ li.item-default {
   color: #6A7177;
 }
 .message-navbar {
-  line-height: 24px;
+  line-height: 14px;
   padding: 10px 12px;
   border: 1px solid #D6E1EA;
-  border-color: #D6E1EA transparent;
   background-color: #F1F5FA;
   position: relative;
 }
@@ -14048,12 +14047,12 @@ th[aria-selected=true] .ui-jqgrid-sortable {
 }
 .tags {
   display: inline-block;
-  padding: 4px 6px;
+  padding: 4px 6px 1px;
   color: #777777;
   vertical-align: middle;
   background-color: #FFF;
   border: 1px solid #d5d5d5;
-  width: 206px;
+  /*width: 206px;*/
 }
 .tags:hover {
   border-color: #b5b5b5;
@@ -14415,6 +14414,8 @@ textarea, input[type="text"], input[type="password"], input[type="datetime"], in
 
 .form-control-static{
 	font-size: 14px;
+	padding-top: 4px;
+	padding-bottom: 4px;
 }
 
 /*my_resume dropzone*/

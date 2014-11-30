@@ -24,7 +24,7 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 		link: function(scope, element){
 			
 			//从值表达式中获得属性类型，为.之后[之前的字符串
-			if(!scope.prop){
+			if(!scope.prop && scope.name.match(/\.([^.^\[]*)/)){
 				scope.prop = scope.name.match(/\.([^.^\[]*)/)[1];
 			}
 			
