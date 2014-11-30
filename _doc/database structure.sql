@@ -1,3 +1,7 @@
+DROP DATABASE `lubanlock`;
+CREATE DATABASE `lubanlock`;
+USE `lubanlock`;
+
 CREATE TABLE IF NOT EXISTS `company` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -41,8 +45,7 @@ CREATE TABLE IF NOT EXISTS `object` (
   `company` int(11) NOT NULL,
   `user` int(11) DEFAULT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `time_insert` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `flag` int(11) DEFAULT NULL,
+  `time_insert` timestamp NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `company` (`company`),
   KEY `user` (`user`),
@@ -92,6 +95,7 @@ CREATE TABLE IF NOT EXISTS `object_relationship` (
   `relation` varchar(255) NOT NULL DEFAULT '',
   `is_on` tinyint(1) DEFAULT NULL,
   `num` varchar(255) NOT NULL DEFAULT '',
+  `visibility` TINYINT NOT NULL DEFAULT '1',
   `user` int(11) DEFAULT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -100,7 +104,8 @@ CREATE TABLE IF NOT EXISTS `object_relationship` (
   KEY `time` (`time`),
   KEY `relative` (`relative`),
   KEY `relation` (`relation`),
-  KEY `num` (`num`)
+  KEY `num` (`num`),
+  KEY (`visibility`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `object_relationship_meta` (
@@ -183,6 +188,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `email` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `roles` varchar(255) NOT NULL DEFAULT '',
+  `is_group` tinyint(1) NOT NULL DEFAULT 0,
   `last_ip` char(15) NOT NULL DEFAULT '',
   `last_login` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `company` int(11) NOT NULL,
