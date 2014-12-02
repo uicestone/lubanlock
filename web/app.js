@@ -73,7 +73,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 				resolve: {
 					dialogs: ['Object', '$route', function(Object, $route){
 						if(!$route.current.params.id){
-							return Object.query({type: '对话', user: 'ME', with: {meta: true, relative: {relation: 'message', order_by: 'time desc', limit: 1}}}).$promise;
+							return Object.query({type: '对话', user: 'ME', with: {meta: true, relative: {relation: 'message', order_by: 'time desc', limit: 1, raw_key_name: true}}}).$promise;
 						}
 					}]
 				}
@@ -95,7 +95,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 					}],
 					messages: ['Object', '$route', function(Object, $route){
 						if($route.current.params.id){
-							return Object.query({type: '消息', is_relative_of: {'message': $route.current.params.id}, with: {meta: true, relative: {with: {meta: true}}}, with_user_info: true}).$promise;
+							return Object.query({type: '消息', is_relative_of: {'message': $route.current.params.id}, with: {meta: true, relative: {with: {meta: true}, raw_key_name: true}}, with_user_info: true}).$promise;
 						}
 					}]
 				}

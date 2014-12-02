@@ -9295,6 +9295,10 @@ li.item-default {
 .profile-info-value > span + span.editable-container:before {
   display: none;
 }
+.profile-info-value ul li {
+	float: left;
+	width: 50%;
+}
 .profile-info-row:first-child .profile-info-name {
   border-top: none;
 }

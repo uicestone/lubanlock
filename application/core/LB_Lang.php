@@ -26,6 +26,23 @@ class LB_Lang extends CI_Lang{
 
 		return $value;
 	}
+	
+	public function raw($word, $log_errors = TRUE)
+	{
+		if(is_null($this->raw)){
+			$this->raw = array_flip($this->language);
+		}
+		
+		$value = ($word == '' OR ! isset($this->raw[$word])) ? FALSE : $this->raw[$word];
+
+		if ($value === FALSE && $log_errors === TRUE)
+		{
+			$value = $word;
+			log_message('error', 'Could not find the language line "'.$word.'"');
+		}
+
+		return $value;
+	}
 
 }
 ?>

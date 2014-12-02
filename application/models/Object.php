@@ -953,6 +953,7 @@ class Object extends CI_Model {
 	 *	get_parents if is true, we are fetching left object in object_relative table, otherwise right one is fetched
 	 *	is_user the relative object should exist in user table
 	 *	is_group the relative object should exist in user table and "is_group" is not 0
+	 *	raw_key_name bool|array retrieve some or all relation name without translating
 	 * @return array
 	 */
 	function getRelative(array $args = array()){
@@ -1022,13 +1023,24 @@ class Object extends CI_Model {
 		
 		$save_as = null;
 		
+		!array_key_exists('raw_key_name', $args) && $args['raw_key_name'] = false;
+		
 		foreach($result as $relationship){
 			
+			if(
+				(is_array($args['raw_key_name']) && !in_array($relationship['relation'], $args['raw_key_name']))
+				||
+				(!is_array($args['raw_key_name']) && !$args['raw_key_name'])
+			){
+				$relationship['relation'] = $this->lang->line($relationship['relation']);
+			}
+
 			if(array_key_exists('id_only', $args) && $args['id_only']){
 				$save_as[$relationship['relation']][] = $relationship[$get];
 			}
 			else{
 				try{
+					
 					$relative = (array_key_exists('is_user', $args) && $args['is_user']) ? new User_model($relationship[$get], array_merge($args, array('with_all_prop'=>false))) : new Object($relationship[$get], array_merge($args, array('with_all_prop'=>false)));
 					$relative->relationship_id = (int) $relationship['id'];
 					$relative->relationship_num = $relationship['num'];
@@ -1039,6 +1051,7 @@ class Object extends CI_Model {
 						$relative->relationship_meta = $relative->getRelativeMeta($relationship['id']);
 					}
 					$save_as[$relationship['relation']][] = (array) $relative;
+					
 				}catch(Exception $e){}
 			}
 			
@@ -1105,7 +1118,7 @@ class Object extends CI_Model {
 			$this->db->delete('object_relationship', array(
 				$by=>$this->id,
 				$set=>$args['replace_id'],
-				'relation'=>$relation
+				'relation'=>$this->lang->raw($relation)
 			));
 		}
 		
@@ -1192,7 +1205,7 @@ class Object extends CI_Model {
 		if(!$this->allow('write')){
 			throw new Exception('no_permission', 403);
 		}
-		return $this->db->delete('object_relationship', array('object'=>$this->id, 'relation'=>$relation, 'relative'=>$relative));
+		return $this->db->delete('object_relationship', array('object'=>$this->id, 'relation'=>$this->lang->raw($relation), 'relative'=>$relative));
 	}
 	
 	function _getRelationshipID($relation, $relative){

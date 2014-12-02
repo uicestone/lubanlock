@@ -155,7 +155,7 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$
 			
 			$scope.searchUser = function(name) {
 				// a promise can be parsed by typeahead, no then() wrapping required
-				return User.query({name: {like: name}}).$promise;
+				return User.query({name: {like: name}, limit: false}).$promise;
 			};
 
 		}];
@@ -267,9 +267,9 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		}
 		
 		// used in typeahead for relative name auto complete
-		$scope.search = function(name){
+		$scope.search = function(keyword){
 			// a promise can be parsed by typeahead, no then() wrapping required
-			return Object.query({name: {like: name}}).$promise;
+			return Object.query({search: keyword, limit: false}).$promise;
 		};
 		
 		$scope.searchUser = function(name){
@@ -295,8 +295,8 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 			});
 		}
 		
-		$scope.showDetail = function(id, type){
-			$location.url('detail/' + id);
+		$scope.urlTo = function(object){
+			return '#detail/' + object.id;
 		}
 		
 		$scope.authorize = function(permission, users){
@@ -559,7 +559,7 @@ lubanlockControllers.controller('DialogMessageCtrl', ['$scope', '$interval', '$u
 		}
 		
 		$scope.remove = function(message){
-			Object.removeRelative({object: $scope.dialog.id, relation: 'message', relative: message.id});
+			Object.removeRelative({object: $scope.dialog.id, relation: 'message', relative: message.id, raw_key_name: true});
 		}
 	}
 ]);

@@ -56,7 +56,7 @@ select 'account', account, '资金', name, company, uid, from_unixtime(time), fr
 from account where account.company = @company group by account;
 
 insert into lubanlock.object (prev_table, prev_id, type, name, company, user, time, time_insert)
-select 'document', id, '文档', name, company, uid, from_unixtime(time), from_unixtime(time_insert)
+select 'document', id, '文件', name, company, uid, from_unixtime(time), from_unixtime(time_insert)
 from document where document.company = @company and name != '' and name is not null;
 
 insert into lubanlock.object (prev_table, prev_id, type, num, name, company, user, time, time_insert)
@@ -427,13 +427,13 @@ where staff is not null;
 
 -- people_relationship
 insert ignore into lubanlock.object_relationship (object, relative, relation, is_on, user, time)
-select people_object.id, relative_object.id, if(relation is null or relation = '', '成员', relation), is_on, uid, people_object.time from people_relationship
+select people_object.id, relative_object.id, if(relation is null or relation = '', 'member', relation), is_on, uid, people_object.time from people_relationship
 inner join lubanlock.object people_object on people_object.prev_id = people and people_object.prev_table = 'people'
 inner join lubanlock.object relative_object on relative_object.prev_id = relative and relative_object.prev_table = 'people';
 
 -- project_document
 insert into lubanlock.object_relationship (object, relative, relation, is_on, user, time)
-select project_object.id, document_object.id, '文档', 1, uid, project_object.time from project_document
+select project_object.id, document_object.id, '文件', 1, uid, project_object.time from project_document
 inner join lubanlock.object project_object on project_object.prev_id = project and project_object.prev_table = 'project'
 inner join lubanlock.object document_object on document_object.prev_id = document and document_object.prev_table = 'document';
 

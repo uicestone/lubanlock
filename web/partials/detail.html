@@ -37,7 +37,7 @@
 
 				<div class="space-2"></div>
 				
-				<form class="form-inline row row-compact" ng-show="adding.tag" ng-submit="addTag($event)">
+				<form class="form-inline row row-compact" ng-show="adding.tag" ng-submit="addTag($event)" luban-esc="closePropAddForm('tag')" ng-if="allow('write')">
 					<div class="form-group col-sm-4">
 						<input class="form-control form-control-xs form-control-justify" type="text" class="form-control form-control-xs" placeholder="分类方式" ng-model="new.tag.taxonomy" />
 					</div>
@@ -48,7 +48,7 @@
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('tag')"></button>
 				</form>
 				
-				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个分类标签 " ng-click="openPropAddForm('tag', $event)" ng-hide="adding.tag"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个分类标签 " ng-click="openPropAddForm('tag', $event)" ng-hide="adding.tag" ng-if="allow('write')"></button>
 				
 				<div class="hr hr16 dotted"></div>
 				
@@ -89,7 +89,7 @@
 					</div>
 				</div>
 				
-				<form class="form-inline row row-compact" ng-show="adding.permission" ng-submit="authorize()">
+				<form class="form-inline row row-compact" ng-show="adding.permission" ng-submit="authorize()" luban-esc="closePropAddForm('permission')" ng-if="allow('grant')">
 					<div class="form-group col-sm-3">
 						<select ng-model="new.permission.permission" ng-options="item.name as item.label for item in [{name:'read',label:'查看'},{name:'write',label:'修改'},{name:'grant',label:'授权'}]" class="form-control-xs"></select>
 					</div>
@@ -100,7 +100,7 @@
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('permission')"></button>
 				</form>
 				
-				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加授权用户 / 组 " ng-click="openPropAddForm('permission', $event)" ng-hide="adding.permission"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加授权用户 / 组 " ng-click="openPropAddForm('permission', $event)" ng-hide="adding.permission" ng-if="allow('grant')"></button>
 				
 				<hr>
 
@@ -128,7 +128,7 @@
 					
 				</div>
 
-				<form class="form-inline" ng-show="adding.meta" ng-submit="addMeta($event)">
+				<form class="form-inline" ng-show="adding.meta" ng-submit="addMeta($event)" luban-esc="closePropAddForm('meta')" ng-if="allow('write')">
 					<div class="form-group">
 						<input type="text" class="form-control form-control-xs" placeholder="属性名称" ng-model="new.meta.key" />
 					</div>
@@ -139,7 +139,7 @@
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('meta')"></button>
 				</form>
 				
-				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个元数据" ng-click="openPropAddForm('meta', $event)" ng-hide="adding.meta"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个元数据" ng-click="openPropAddForm('meta', $event)" ng-hide="adding.meta" ng-if="allow('write')"></button>
 				
 				<hr>
 
@@ -166,19 +166,18 @@
 				<div class="space-4"></div>
 				<div class="profile-user-info">
 					<div class="profile-info-row" ng-repeat="(relation, relatives) in object.relative">
-						<div class="profile-info-name"> {{relation}} </div>
+						<div class="profile-info-name pointer-cursur" ng-click="openPropAddForm('relative', $event);new.relative.relation = relation"> {{relation}} </div>
 
-						<div class="profile-info-value">
-							<span ng-repeat="relative in relatives">
-								<span luban-editable="relative.id" label="relative.name" object="object" prop="relative" key="relation"></span>
-								<a class="icon-link pointer-cursur" ng-click="showDetail(relative.id, relative.type)"></a>
+						<ul class="profile-info-value list-unstyled row">
+							<li class=" col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="relative in relatives" luban-editable="relative.id" label="relative.name" object="object" prop="relative" key="relation">
+								<a class="icon-link pointer-cursur" ng-href="{{urlTo(relative)}}"></a>
 								<a class="icon-trash pointer-cursur" ng-click="removeRelative(relation, relative.id)" ng-show="allow('write')"></a>
-							</span>
-						</div>
+							</li>
+						</ul>
 					</div>
 				</div>
 				
-				<form class="form-inline" ng-show="adding.relative" ng-submit="addRelative($event)">
+				<form class="form-inline" ng-show="adding.relative" ng-submit="addRelative($event)" luban-esc="closePropAddForm('relative')" ng-if="allow('write')">
 					<div class="form-group">
 						<input type="text" class="form-control form-control-xs" placeholder="关系" ng-model="new.relative.relation" />
 					</div>
@@ -189,7 +188,7 @@
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('relative')"></button>
 				</form>
 
-				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个关联对象" ng-click="openPropAddForm('relative', $event)" ng-hide="adding.relative"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个关联对象" ng-click="openPropAddForm('relative', $event)" ng-hide="adding.relative" ng-if="allow('write')"></button>
 				
 				<hr>
 
@@ -222,10 +221,10 @@
 					</div>
 				</div>
 				
-				<form class="form-inline" ng-show="adding.status" ng-submit="addStatus($event)">
+				<form class="form-inline" ng-show="adding.status" ng-submit="addStatus($event)" luban-esc="closePropAddForm('status')" ng-if="allow('write')">
 					<div class="form-group">
 						<div class="input-group">
-							<input class="form-control form-control-xs" type="text" placeholder="日期时间" ng-model="new.status.date" datepicker-popup is-open="new.status.isDatepickerOpen" style="width:auto">
+							<input class="form-control form-control-xs" type="text" placeholder="日期时间" ng-model="new.status.date" datepicker-popup is-open="new.status.isDatepickerOpen" luban-esc="closePropAddForm('status')" style="width:auto">
 							<span class="input-group-btn" style="width:auto">
 								<button type="button" class="btn btn-xs icon-calendar" ng-click="toggleStatusDatepicker($event)"></button>
 							</span>
@@ -241,7 +240,7 @@
 					<button type="button" class="btn btn-xs icon-chevron-left" ng-click="closePropAddForm('status')"></button>
 				</form>
 
-				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个状态" ng-click="openPropAddForm('status', $event)" ng-hide="adding.status"></button>
+				<button class="btn btn-info btn-xs icon-chevron-right" tooltip="为 {{object.name}} 添加一个状态" ng-click="openPropAddForm('status', $event)" ng-hide="adding.status" ng-if="allow('write')"></button>
 				
 			</div>
 		</div>
