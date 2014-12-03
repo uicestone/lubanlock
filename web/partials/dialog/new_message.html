@@ -81,7 +81,7 @@
 
 		<div class="widget-body">
 			<div class="widget-main padding-8">
-				<input type="text" placeholder="搜索" class="form-control col-sm9" ng-model="receiverKeyword">
+				<input type="text" placeholder="搜索" class="form-control col-sm9" ng-model="newReceiver" typeahead="receiver.id as receiver.name for receiver in searchReceiver($viewValue)" typeahead-template-url="partials/object_autocomplete.html" typeahead-on-select="addReceiver($item);newReceiver=null" typeahead-wait-ms="100">
 				<div class="tree">
 					<div class="tree-folder" ng-repeat="group in groups" ng-include="'group_tree.html'"></div>
 				</div>
@@ -97,6 +97,6 @@
 		<div class="tree-folder-name">{{group.name}}</div>
 	</div>
 	<div class="tree-folder-content">
-		<div class="tree-folder" ng-repeat="group in group.relative.member | filter:receiverKeyword" ng-include="'group_tree.html'"></div>
+		<div class="tree-folder" ng-repeat="group in group.relative.member" ng-include="'group_tree.html'"></div>
 	</div>
 </script>
