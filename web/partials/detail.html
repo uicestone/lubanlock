@@ -151,7 +151,7 @@
 							<div class="profile-info-row" ng-repeat="parent in parents">
 								<div class="profile-info-name">{{parent.type}}</div>
 								<div class="profile-info-value">
-									<a class="pointer-cursur" ng-click="showDetail(parent.id, parent.type)">{{parent.name}}</a>
+									<a class="pointer-cursur" ng-href="{{urlTo(parent)}}">{{parent.name}}</a>
 									{{relation ? '的' + relation : ''}}
 								</div>
 							</div>
