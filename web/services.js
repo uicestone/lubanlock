@@ -121,8 +121,10 @@ lubanlockServices.service('HttpInterceptor', ['$q', '$timeout', 'Alert', functio
 			Alert.close(rejection.config.alert.normal.id);
 			Alert.close(rejection.config.alert.slow.id);
 			
-			rejection.statusText = angular.fromJson('"' + rejection.statusText + '"');
-			Alert.add(rejection.statusText, 'danger', true);
+			if(rejection.status > 0){
+				rejection.statusText = angular.fromJson('"' + rejection.statusText + '"');
+				Alert.add(rejection.statusText, 'danger', true);
+			}
 			
 			return $q.reject(rejection);
 		}
