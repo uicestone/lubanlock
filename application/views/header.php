@@ -11,7 +11,7 @@
 		
 		<link rel="stylesheet" href="css/font-awesome.min.css?v=3.2.1" />
 		<link rel="stylesheet" href="css/bootstrap.min.css?v=3.2.0" />
-		<link rel="stylesheet" href="css/ace.css?v=2014-09-24" />
+		<link rel="stylesheet" href="css/ace.css?v=2014-12-3" />
 		
 		<!--[if lt IE 9]>
 		<link rel="stylesheet" href="css/ace-ie.css" />
@@ -28,22 +28,22 @@
 		<script type="text/javascript" src="js/jquery/jquery-1.x.min.js?v=1.11.1"></script>
 		<![endif]-->
 					
-		<script type="text/javascript" src="js/angular/angular.min.js?v=1.2.21"></script>
-		<script type="text/javascript" src="js/angular/angular-locale_zh-cn.js"></script>
-		<script type="text/javascript" src="js/angular/angular-route.min.js?v=1.2.21"></script>
-		<script type="text/javascript" src="js/angular/angular-resource.min.js?v=1.2.21"></script>
-		<script type="text/javascript" src="js/angular/ui-bootstrap.min.js?v=0.11.0"></script>
+		<script type="text/javascript" src="js/angular/angular.min.js?v=1.2.27"></script>
+		<script type="text/javascript" src="js/angular/angular-locale_zh-cn.js?v=1.2.27"></script>
+		<script type="text/javascript" src="js/angular/angular-route.min.js?v=1.2.27"></script>
+		<script type="text/javascript" src="js/angular/angular-resource.min.js?v=1.2.27"></script>
+		<script type="text/javascript" src="js/angular/ui-bootstrap.min.js?v=0.12.0"></script>
 		<script type="text/javascript" src="js/angular/angular-file-upload.min.js?v=1.6.12"></script>
 		
-		<script type="text/javascript" src="app.js?v=2014-10-07"></script>
-		<script type="text/javascript" src="controllers.js?v=2014-10-07"></script>
-		<script type="text/javascript" src="directives.js?v=2014-10-07"></script>
-		<script type="text/javascript" src="filters.js"></script>
-		<script type="text/javascript" src="services.js"></script>
+		<script type="text/javascript" src="app.js?v=2014-12-03"></script>
+		<script type="text/javascript" src="controllers.js?v=2014-12-03"></script>
+		<script type="text/javascript" src="directives.js?v=2014-12-03"></script>
+		<script type="text/javascript" src="filters.js?v=2014-12-03"></script>
+		<script type="text/javascript" src="services.js?v=2014-12-03"></script>
 
 		<!--[if lt IE 9]>
-		<script type="text/javascript" src="js/html5shiv.js"></script>
-		<script type="text/javascript" src="js/respond.min.js"></script>
+		<script type="text/javascript" src="js/html5shiv.min.js?v=3.7.2"></script>
+		<script type="text/javascript" src="js/respond.min.js?v=1.4.2"></script>
 		<![endif]-->
 		
 		<?php if($this->company->config('modules')): foreach($this->company->config('modules') as $module): ?>
