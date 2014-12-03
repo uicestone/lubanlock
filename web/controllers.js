@@ -179,10 +179,8 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$
  * This is a common controller for detail page of any object.
  * We can view and modify Tags, Metas, Relatives and Statuses if we are permitted
  */
-lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 'User', 'Alert', 'object',
-	function($scope, $location, Object, User, Alert, object) {
-		
-		$scope.angular = angular; // we need call angular.equal() in template
+lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Alert', 'object',
+	function($scope, Object, User, Alert, object) {
 		
 		// objectResponse are resolved before route in routeProvider. So page is redirected after data ready.
 		$scope.object = object;
@@ -192,6 +190,8 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		
 		// collection of new property models. 'new' are wrapped in '[]' here because it's a reserved word in ECMA Script 3.
 		$scope['new'] = {meta: {}, relative: {}, status: {}, tag: {}, permission: {}};
+		
+		$scope.permissionTypes = [{name:'read',label:'查看'},{name:'write',label:'修改'},{name:'grant',label:'授权'}];
 		
 		$scope.openPropAddForm = function(prop, $event){
 			$scope.adding[prop] = true;
@@ -334,7 +334,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', '$location', 'Object', 
 		 */
 		$scope.allow = function(action){
 			
-			if(!$scope.object.permission){
+			if(!$scope.object || !$scope.object.permission){
 				return false;
 			}
 			
@@ -564,8 +564,8 @@ lubanlockControllers.controller('DialogMessageCtrl', ['$scope', '$interval', '$u
 	}
 ]);
 
-lubanlockControllers.controller('DialogNewCtrl', ['$scope', '$upload', '$http', '$location', 'User', 'Object',
-	function($scope, $upload, $http, $location, User, Object){
+lubanlockControllers.controller('DialogNewCtrl', ['$scope', '$upload', '$http', 'User', 'Object',
+	function($scope, $upload, $http, User, Object){
 		
 		$scope.groups = User.query({is_group: 1, limit: false, parents: {member: {num: 'root'}}});
 		
@@ -586,6 +586,10 @@ lubanlockControllers.controller('DialogNewCtrl', ['$scope', '$upload', '$http', 
 		$scope.foldMembers = function(group, $event){
 			$event.stopPropagation();
 			group.relative.member = null;
+		}
+		
+		$scope.searchReceiver = function(keyword){
+			return User.query({search: keyword}).$promise;
 		}
 		
 		$scope.addReceiver = function(user){
