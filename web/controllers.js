@@ -108,7 +108,8 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$
 		}
 		
 		$scope.previousPage = function(){
-			$location.search('page', --$scope.currentPage);
+			$scope.currentPage--;
+			$location.search('page', $scope.currentPage === 1 ? null : $scope.currentPage);
 		}
 		
 		$scope.reload = function(){
@@ -155,7 +156,7 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$
 			
 			$scope.searchUser = function(name) {
 				// a promise can be parsed by typeahead, no then() wrapping required
-				return User.query({name: {like: name}, limit: false}).$promise;
+				return User.query({name: {like: name}}).$promise;
 			};
 
 		}];
@@ -269,7 +270,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Aler
 		// used in typeahead for relative name auto complete
 		$scope.search = function(keyword){
 			// a promise can be parsed by typeahead, no then() wrapping required
-			return Object.query({search: keyword, limit: false}).$promise;
+			return Object.query({search: keyword}).$promise;
 		};
 		
 		$scope.searchUser = function(name){
