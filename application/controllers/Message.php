@@ -31,7 +31,7 @@ class Message extends LB_Controller {
 		foreach($data['receivers'] as $receiver_id){
 			$dialogs[] = new Object(array(
 				'type'=>'对话',
-				'num'=>$dialogs[0]->num,
+				'num'=>$dialogs[0]->id,
 				'user'=>$receiver_id,
 				'name'=>$data['title']
 			));
