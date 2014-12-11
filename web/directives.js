@@ -1,7 +1,8 @@
+(function(){
+
 'use strict';
 
 /* Directives */
-var lubanlockDirectives = angular.module('lubanlockDirectives', []);
 
 lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function($location, Object){
 	return {
@@ -211,3 +212,5 @@ lubanlockDirectives.directive('lubanEsc', function () {
         });
     };
 });
+
+})();

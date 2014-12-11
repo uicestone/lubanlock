@@ -1,7 +1,3 @@
-'use strict';
-
-/* App Module */
-
 var lubanlockApp = angular.module('lubanlockApp', [
 	'ngRoute',
 	'lubanlockControllers',
@@ -12,6 +8,17 @@ var lubanlockApp = angular.module('lubanlockApp', [
 	'angularFileUpload'
 ]);
 
+var lubanlockControllers = angular.module('lubanlockControllers', []);
+var lubanlockDirectives = angular.module('lubanlockDirectives', []);
+var lubanlockFilters = angular.module('lubanlockFilters', []);
+var lubanlockServices = angular.module('lubanlockServices', ['ngResource']);
+
+(function(){
+
+'use strict';
+
+/* App Module */
+
 lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 	function($routeProvider, $httpProvider, $parseProvider) {
 		$routeProvider
@@ -20,7 +27,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 				controller: 'DashboardCtrl'
 			})
 			.when('/user', {
-				templateUrl: 'partials/list_user.html',
+				templateUrl: 'partials/user/list.html',
 				controller: 'UsersCtrl',
 				resolve: {
 					users: ['User', '$route', function(User, $route){
@@ -29,7 +36,7 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 				}
 			})
 			.when('/user/:id', {
-				templateUrl: 'partials/detail_user.html',
+				templateUrl: 'partials/user/detail.html',
 				controller: 'UserDetailCtrl',
 				resolve: {
 					user: ['$route', 'User', function($route, User){
@@ -111,3 +118,5 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 	}
 	
 ]);
+
+})();

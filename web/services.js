@@ -1,10 +1,10 @@
+(function(){
+
 'use strict';
 
 /* Services */
 
-var lubanlockServices = angular.module('lubanlockServices', ['ngResource']);
-
-lubanlockServices.service('Object', ['$resource',
+angular.module('lubanlockServices').service('Object', ['$resource',
 	function($resource){
 		
 		var responseInterceptor = function(response){
@@ -46,7 +46,7 @@ lubanlockServices.service('Object', ['$resource',
 	}
 ]);
 
-lubanlockServices.service('User', ['$resource',
+angular.module('lubanlockServices').service('User', ['$resource',
 	function($resource){
 		
 		var responseInterceptor = function(response){
@@ -66,7 +66,7 @@ lubanlockServices.service('User', ['$resource',
 	}
 ]);
 
-lubanlockServices.service('Company', ['$resource',
+angular.module('lubanlockServices').service('Company', ['$resource',
 	function($resource){
 		return $resource('company/:id', {id: '@id'}, {
 			update: {method: 'PUT'},
@@ -77,7 +77,7 @@ lubanlockServices.service('Company', ['$resource',
 ]);
 
 // register the interceptor as a service
-lubanlockServices.service('HttpInterceptor', ['$q', '$timeout', 'Alert', function($q, $timeout, Alert) {
+angular.module('lubanlockServices').service('HttpInterceptor', ['$q', '$timeout', 'Alert', function($q, $timeout, Alert) {
 	
 	return {
 		request: function(config) {
@@ -131,7 +131,7 @@ lubanlockServices.service('HttpInterceptor', ['$q', '$timeout', 'Alert', functio
 	};
 }]);
 
-lubanlockServices.service('Alert', [function(){
+angular.module('lubanlockServices').service('Alert', [function(){
 	
 	var items = [];
 		
@@ -159,7 +159,7 @@ lubanlockServices.service('Alert', [function(){
 		
 }]);
 
-lubanlockServices.service('Nav', ['$resource',
+angular.module('lubanlockServices').service('Nav', ['$resource',
 	function($resource){
 		
 		var Resource = $resource('object/:id', {id: '@id'}, {query: {method: 'GET', isArray: true, params: {type:'nav', has_relative_like: 'MY_GROUPS', 'with': ['meta']}}});
@@ -213,3 +213,5 @@ lubanlockServices.service('Nav', ['$resource',
 		
 	}
 ]);
+
+})();

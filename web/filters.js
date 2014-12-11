@@ -1,8 +1,8 @@
+(function(){
+
 'use strict';
 
 /* Filters */
-
-var lubanlockFilters = angular.module('lubanlockFilters', []);
 
 /**
  * convert an array or an object to a human friendly string
@@ -41,3 +41,5 @@ lubanlockFilters.filter('select', function(){
 		return input;
 	}
 });
+
+})();

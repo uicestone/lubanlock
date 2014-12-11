@@ -182,7 +182,7 @@
 											<div class="space-6"></div>
 											<p> 请输入注册信息： </p>
 
-											<form method="post">
+											<form id="register" method="post">
 												<fieldset>
 													<label class="block clearfix">
 														<span class="block input-icon input-icon-right">
@@ -212,14 +212,14 @@
 														</span>
 													</label>
 
-													<label class="block">
+<!--													<label class="block">
 														<input type="checkbox" name="agree" class="ace">
 														<span class="lbl">
 															我同意
 															<a href="#">使用协议</a>
 														</span>
 													</label>
-
+-->
 													<div class="space-24"></div>
 
 													<div class="clearfix">
@@ -254,9 +254,18 @@
 
 		<script type="text/javascript">
 			function show_box(id) {
-			 jQuery('.widget-box.visible').removeClass('visible');
-			 jQuery('#'+id).addClass('visible');
+				jQuery('.widget-box.visible').removeClass('visible');
+				jQuery('#'+id).addClass('visible');
 			}
+			
+			jQuery(function($){
+				$('form#register').on('submit', function(){
+					if($(this).find('[name="password"]').val() !== $(this).find('[name="password_confirm"]').val()){
+						alert('两次密码输入不一致');
+						return false;
+					}
+				});
+			});
 		</script>
 	</body>
 </html>

@@ -36,7 +36,10 @@
 		<script type="text/javascript" src="js/angular/angular-file-upload.min.js?v=1.6.12"></script>
 		
 		<script type="text/javascript" src="app.js?v=2014-12-03"></script>
-		<script type="text/javascript" src="controllers.js?v=2014-12-03"></script>
+		<script type="text/javascript" src="controllers/component.js?v=2014-12-03"></script>
+		<script type="text/javascript" src="controllers/dialog.js?v=2014-12-03"></script>
+		<script type="text/javascript" src="controllers/object.js?v=2014-12-03"></script>
+		<script type="text/javascript" src="controllers/user.js?v=2014-12-03"></script>
 		<script type="text/javascript" src="directives.js?v=2014-12-03"></script>
 		<script type="text/javascript" src="filters.js?v=2014-12-03"></script>
 		<script type="text/javascript" src="services.js?v=2014-12-03"></script>
