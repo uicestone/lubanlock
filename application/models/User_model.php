@@ -114,7 +114,7 @@ class User_model extends Object {
 		$user = $this->db->select('user.id, user.name, user.email, user.roles, user.is_group, user.last_ip, user.last_login')->from('user')->where('id', $id)->get()->row_array();
 		
 		$user['id'] = intval($user['id']);
-		$user['is_group'] = intval($user['is_group']);
+		$user['is_group'] = boolval($user['is_group']);
 		
 		if(!$user){
 			throw new Exception(lang('user').' '.$id.' '.lang('not_found'), 404);

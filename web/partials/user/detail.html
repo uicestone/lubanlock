@@ -11,7 +11,7 @@
 					<input id="username" type="text" ng-model="$parent.user.name" required>
 					&nbsp;
 					<label>
-						<input type="checkbox" ng-model="$parent.user.type" ng-true-value="group" ng-false-value="user">
+						<input type="checkbox" ng-model="$parent.user.is_group">
 						用户组
 					</label>
 				</div>
@@ -28,34 +28,34 @@
 				</div>
 			</div>
 
-			<div class="space-4" ng-show="$parent.user.type !== 'group'"></div>
+			<div class="space-4" ng-show="!$parent.user.is_group"></div>
 
-			<div class="form-group" ng-show="$parent.user.type !== 'group'">
+			<div class="form-group" ng-show="!$parent.user.is_group">
 				<label class="col-sm-3 control-label no-padding-right" for="email">电子邮件</label>
 
 				<div class="col-sm-9">
-					<input id="email" type="text" ng-model="$parent.user.email" ng-required="$parent.user.type !== 'group'">
+					<input id="email" type="text" ng-model="$parent.user.email" ng-required="!$parent.user.is_group">
 				</div>
 			</div>
 
-			<div class="space-4" ng-show="$parent.user.type !== 'group'"></div>
+			<div class="space-4" ng-show="!$parent.user.is_group"></div>
 
-			<div class="form-group" ng-show="$parent.user.type !== 'group'">
+			<div class="form-group" ng-show="!$parent.user.is_group">
 				<label class="col-sm-3 control-label no-padding-right" for="new-password">新密码</label>
 
 				<div class="col-sm-9">
-					<input id="new-password" type="password" ng-model="$parent.newPassword">
+					<input id="new-password" type="password" ng-model="$parent.user.password">
 					<span class="label" ng-show="$parent.user.id">留空则不修改密码</span>
 				</div>
 			</div>
 
-			<div class="space-4" ng-show="$parent.user.type !== 'group'"></div>
+			<div class="space-4" ng-show="!$parent.user.is_group"></div>
 
-			<div class="form-group" ng-show="$parent.user.type !== 'group'">
+			<div class="form-group" ng-show="!$parent.user.is_group">
 				<label class="col-sm-3 control-label no-padding-right" for="new-password-confirm">重复新密码</label>
 
 				<div class="col-sm-9">
-					<input id="new-password-confirm" type="password" ng-model="$parent.newPasswordConfirm">
+					<input id="new-password-confirm" type="password" ng-model="$parent.user.passwordConfirm">
 				</div>
 			</div>
 		</tab>

@@ -92,6 +92,10 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 					return;
 				}
 				
+				if(scope.oldValue === scope.value){
+					return;
+				}
+				
 				switch(scope.prop){
 					
 					case 'meta':
