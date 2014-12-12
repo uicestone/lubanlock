@@ -79,6 +79,12 @@ lubanlockControllers.controller('NavCtrl', ['$scope', '$location', '$rootScope',
 	}
 ]);
 
+lubanlockControllers.controller('headCtrl', ['$scope', 'Head',
+	function($scope, Head){
+		$scope.title = Head.title;
+	}
+]);
+
 lubanlockControllers.controller('DashboardCtrl', [
 	function(){
 		

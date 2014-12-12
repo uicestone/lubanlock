@@ -119,4 +119,12 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 	
 ]);
 
+lubanlockApp.run(['Head', '$rootScope',
+	function(Head, $rootScope){
+		$rootScope.$on('$routeChangeSuccess', function (event, current, previous){
+			Head.title('');
+		});
+	}
+]);
+
 })();

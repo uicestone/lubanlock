@@ -2,8 +2,11 @@
 
 'use strict';
 
-lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$modal', 'objects',
-	function($scope, $location, $route, $modal, objects) {
+lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$modal', 'Head', 'objects',
+	function($scope, $location, $route, $modal, Head, objects) {
+		
+		Head.title('列表');
+		
 		//列表分页
 		$scope.currentPage = $location.search().page || 1;
 		
@@ -95,8 +98,10 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$
  * This is a common controller for detail page of any object.
  * We can view and modify Tags, Metas, Relatives and Statuses if we are permitted
  */
-lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Alert', 'object',
-	function($scope, Object, User, Alert, object) {
+lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Alert', 'Head', 'object',
+	function($scope, Object, User, Alert, Head, object) {
+		
+		object && Head.title(object.name);
 		
 		// objectResponse are resolved before route in routeProvider. So page is redirected after data ready.
 		$scope.object = object;

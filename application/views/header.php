@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html ng-app="lubanlockApp">
-	<head>
+	<head ng-controller="headCtrl">
 		<meta charset="utf-8" />
 		<meta name="renderer" content="webkit" />
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
 		
-		<title><?=$this->company->sysname?></title>
+		<title ng-bind="(title() ? title() + ' - ' : '') + '<?=$this->session->user_name?> - <?=$this->company->sysname?>'"><?=$this->session->user_name?> - <?=$this->company->sysname?></title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
