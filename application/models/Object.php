@@ -143,6 +143,8 @@ class Object extends CI_Model {
 		
 		$data['time_insert'] = date('Y-m-d H:i:s');
 		
+		array_key_exists('type', $data) && $data['type'] = $this->lang->raw($data['type']);
+		
 		$this->db->insert('object', array_merge(self::$fields, array_intersect_key($data, self::$fields)));
 		
 		$this->id = $this->db->insert_id();
@@ -168,6 +170,8 @@ class Object extends CI_Model {
 		if(empty($data)){
 			return;
 		}
+		
+		array_key_exists('type', $data) && $data['type'] = $this->lang->raw($data['type']);
 		
 		// TODO this means a user can set his own object to someone else
 		if(array_key_exists('user', $data) && !$this->allow('grant')){
@@ -786,6 +790,17 @@ class Object extends CI_Model {
 		}
 		
 		return $this->meta;
+		
+	}
+	
+	function getMetaKeys(array $args = array()){
+		
+		$this->db->from('object_meta')
+			->where('`object_meta`.`object` IN ( SELECT id FROM `object` WHERE `company` = ' . $this->session->company_id . ' AND ' . $this->_parse_criteria($args) . ' )', null, false)
+			->group_by('object_meta.key')
+			->select('key');
+			
+		return array_column($this->db->get()->result_array(), 'key');
 		
 	}
 	
