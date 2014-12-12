@@ -1,5 +1,8 @@
 <?php
 class LB_Lang extends CI_Lang{
+	
+	protected $raw;
+	
 	function __construct() {
 		parent::__construct();
 	}

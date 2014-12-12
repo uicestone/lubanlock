@@ -5,7 +5,7 @@ class Object_Controller extends LB_Controller{
 		parent::__construct();
 	}
 	
-	function index($id = NULL){
+	function index($id = null){
 		
 		switch ($this->input->method) {
 			case 'GET':
