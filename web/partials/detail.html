@@ -130,7 +130,7 @@
 
 				<form class="form-inline" ng-show="adding.meta" ng-submit="addMeta($event)" luban-esc="closePropAddForm('meta')" ng-if="allow('write')">
 					<div class="form-group">
-						<input type="text" class="form-control form-control-xs" placeholder="属性名称" ng-model="new.meta.key" />
+						<input type="text" class="form-control form-control-xs" placeholder="属性名称" ng-model="new.meta.key" typeahead="key.key as key.key + ' (' + key.count + ')' for key in metaKeys | filter:$viewValue" />
 					</div>
 					<div class="form-group">
 						<input type="text" class="form-control form-control-xs" placeholder="属性值" ng-model="new.meta.value" />

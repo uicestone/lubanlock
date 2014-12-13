@@ -98,8 +98,8 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$
  * This is a common controller for detail page of any object.
  * We can view and modify Tags, Metas, Relatives and Statuses if we are permitted
  */
-lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Alert', 'Head', 'object',
-	function($scope, Object, User, Alert, Head, object) {
+lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Meta', 'Alert', 'Head', 'object',
+	function($scope, Object, User, Meta, Alert, Head, object) {
 		
 		object && Head.title(object.name);
 		
@@ -113,6 +113,8 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Aler
 		$scope['new'] = {meta: {}, relative: {}, status: {}, tag: {}, permission: {}};
 		
 		$scope.permissionTypes = [{name:'read',label:'查看'},{name:'write',label:'修改'},{name:'grant',label:'授权'}];
+		
+		$scope.metaKeys = Meta.getKeys();
 		
 		$scope.openPropAddForm = function(prop, $event){
 			$scope.adding[prop] = true;
@@ -132,6 +134,11 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Aler
 		}
 		
 		$scope.addMeta = function($event){
+			
+			if(!$scope['new'].meta.key){
+				return;
+			}
+			
 			Object.saveMeta({object: $scope.object.id, key: $scope['new'].meta.key}, $scope['new'].meta.value, function(meta){
 				$scope.object.meta = meta;
 				$scope['new'].meta.value = undefined;
@@ -147,6 +154,11 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Aler
 		}
 		
 		$scope.addStatus = function($event){
+			
+			if(!$scope['new'].status.name){
+				return;
+			}
+			
 			Object.saveStatus({object: $scope.object.id, name: $scope['new'].status.name, order_by: 'date desc'}, {date: $scope['new'].status.date, comment:$scope['new'].status.comment}, function(status){
 				$scope.object.status = status;
 				$scope['new'].status = undefined;
@@ -168,6 +180,10 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Aler
 		}
 		
 		$scope.addRelative = function($event){
+			
+			if(!$scope['new'].relative.relation){
+				return;
+			}
 			
 			if($scope['new'].relative === undefined || $scope['new'].relative.id === undefined){
 				Alert.addAlert('请选择关联对象');
@@ -203,6 +219,11 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Aler
 		}
 		
 		$scope.addTag = function($event){
+			
+			if(!$scope['new'].tag.taxonomy){
+				return;
+			}
+			
 			Object.saveTag({object: $scope.object.id, taxonomy: $scope['new'].tag.taxonomy}, $scope['new'].tag.term, function(tag){
 				$scope.object.tag = tag;
 				$scope['new'].tag = {};

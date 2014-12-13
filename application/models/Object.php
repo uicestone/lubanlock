@@ -798,9 +798,16 @@ class Object extends CI_Model {
 		$this->db->from('object_meta')
 			->where('`object_meta`.`object` IN ( SELECT id FROM `object` WHERE `company` = ' . $this->session->company_id . ' AND ' . $this->_parse_criteria($args) . ' )', null, false)
 			->group_by('object_meta.key')
-			->select('key');
+			->order_by('COUNT(*) DESC')
+			->select('key, COUNT(*) count');
 			
-		return array_column($this->db->get()->result_array(), 'key');
+		$result = $this->db->get()->result();
+		
+		foreach($result as &$item){
+			$item->count = intval($item->count);
+		}
+		
+		return $result;
 		
 	}
 	

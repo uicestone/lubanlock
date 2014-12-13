@@ -66,6 +66,14 @@ lubanlockServices.service('User', ['$resource',
 	}
 ]);
 
+lubanlockServices.service('Meta', ['$resource', 
+	function($resource){
+		return $resource('', {}, {
+			getKeys: {method: 'GET', url: 'meta/keys/:type?', isArray: true}
+		});
+	}
+]);
+
 lubanlockServices.service('Company', ['$resource',
 	function($resource){
 		return $resource('company/:id', {id: '@id'}, {
