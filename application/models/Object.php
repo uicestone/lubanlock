@@ -448,7 +448,7 @@ class Object extends CI_Model {
 			elseif($arg_name === 'is_relative_of' || $arg_name === 'parents'){
 				if(is_array($arg_value)){
 					foreach($arg_value as $relation => $relative_args){
-						$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation).' AND ';
+						$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($this->lang->raw($relation)).' AND ';
 						$where[] = "$field IN ( \nSELECT `relative` FROM `object_relationship` WHERE $relation_criteria".$this->_parse_criteria($relative_args, '`object_relationship`.`object`')." \n)";
 					}
 				}else{
@@ -458,7 +458,7 @@ class Object extends CI_Model {
 			elseif($arg_name === 'has_relative_like' || $arg_name === 'children'){
 				if(is_array($arg_value)){
 					foreach($arg_value as $relation => $relative_args){
-						$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($relation).' AND ';
+						$relation_criteria = is_integer($relation) ? '' : '`relation` = '.$this->db->escape($this->lang->raw($relation)).' AND ';
 						$where[] = "$field IN ( \nSELECT `object` FROM `object_relationship` WHERE $relation_criteria".$this->_parse_criteria($relative_args, '`object_relationship`.`relative`')." \n)";
 					}
 				}else{
@@ -500,9 +500,9 @@ class Object extends CI_Model {
 	 *			[taxonomy => ]tag
 	 *				recursive args
 	 * 
-	 *		is_relative_of
+	 *		is_relative_of / parents
 	 *			[role => ]recursive args
-	 *		has_relative_like
+	 *		has_relative_like / children
 	 *			[role => ]recursive args
 	 * 
 	 *		and, or

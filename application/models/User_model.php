@@ -48,13 +48,6 @@ class User_model extends Object {
 		
 		$this->_get_parent_group(array($this->session->user_id));
 		
-		$groups = $this->session->groups;
-		$this->session->groups = array();
-		
-		foreach($groups as $value){
-			$this->session->groups[$value['id']] = $value;
-		}
-		
 	}
 	
 	function _parse_roles($roles){

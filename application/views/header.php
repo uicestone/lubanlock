@@ -56,6 +56,7 @@
 		<script type="text/javascript">
 			var company = <?=json_encode($this->company)?>;
 			var user = <?=json_encode($this->session->user)?>;
+			var groups = <?=json_encode($this->session->groups)?>;
 		</script>
 		
 	</head>
