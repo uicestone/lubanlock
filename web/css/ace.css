@@ -13039,9 +13039,9 @@ th[aria-selected=true] .ui-jqgrid-sortable {
   min-height: 38px;
   margin: 5px 0;
   padding: 8px 12px;
-  background: #F8FAFF;
-  border: 1px solid #DAE2EA;
-  color: #7C9EB2;
+  background: #FCFCFC;
+  border: 1px solid #C4DCF5;
+  color: #438eb9;
   text-decoration: none;
   font-weight: bold;
   -webkit-box-sizing: border-box;
