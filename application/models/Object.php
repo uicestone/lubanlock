@@ -1147,7 +1147,7 @@ class Object extends CI_Model {
 		$return = $this->db->upsert('object_relationship', array(
 			$by=>$this->id,
 			$set=>$relative,
-			'relation'=>$relation,
+			'relation'=>$this->lang->raw($relation),
 			'num'=>$num,
 			'is_on'=>$is_on,
 			'user'=>$this->session->user_id
@@ -1156,17 +1156,17 @@ class Object extends CI_Model {
 		// 根据参数，先删除不在此次添加之列的键值对
 		if(array_key_exists('replace_meta', $args) && $args['replace_meta']){
 			
-			$meta_origin = $this->getRelativeMeta($relation, $relative);
+			$meta_origin = $this->getRelativeMeta($this->lang->raw($relation), $relative);
 			
 			foreach($meta_origin as $key => $value){
 				if(!array_key_exists($key, $meta)){
-					$this->removeRelativeMeta($relation, $relative, $key);
+					$this->removeRelativeMeta($this->lang->raw($relation), $relative, $key);
 				}
 			}
 		}
 		
 		foreach($meta as $key => $value){
-			$this->setRelativeMeta($relation, $relative, $key, $value);
+			$this->setRelativeMeta($this->lang->raw($relation), $relative, $key, $value);
 		}
 		
 		return $return;
