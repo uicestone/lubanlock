@@ -177,6 +177,11 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 					if(users[i].id === user.id){
 						return true
 					}
+					for(var j = 0; j < groups.length; j++){
+						if(users[i].id === groups[j].id){
+							return true;
+						}
+					}
 				}
 				return false;
 			}
