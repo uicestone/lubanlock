@@ -28,9 +28,9 @@
 	<tbody>
 		<tr class="pointer-cursur" ng-repeat="object in objects" ng-click="showDetail(object.id, object.type)">
 			<td>{{object.type}}</td>
-			<td style="width:50%">
-				{{object.name}}
-				<span class="text-muted smaller-80 pull-right">{{object.meta | plain}}</span>
+			<td class="text-right">
+				<span class="pull-left">{{object.name}}</span>
+				<span class="text-muted smaller-80">{{object.meta | plain:{placeholder:false} }}</span>
 			</td>
 			<td>{{object.status | orderBy:'date':true | limitTo:1 | select:'name' | plain}}</td>
 			<td>{{object.tag | plain}}</td>

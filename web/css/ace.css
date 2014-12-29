@@ -1201,10 +1201,9 @@ blockquote.pull-right {
 }
 .ace-nav > li > a > .badge {
   position: relative;
-  top: -4px;
+  top: -1px;
   left: 2px;
-  padding-right: 5px;
-  padding-left: 5px;
+  padding: 1px 3px;
 }
 .ace-nav > li > a:hover,
 .ace-nav > li > a:focus {

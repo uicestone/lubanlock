@@ -8,7 +8,11 @@
  * convert an array or an object to a human friendly string
  */
 lubanlockFilters.filter('plain', function(){
-	return function(input){
+	return function(input, args){
+		
+		if(args === undefined){
+			args = {};
+		}
 		
 		if(angular.isObject(input)){
 			var array = [];
@@ -22,7 +26,13 @@ lubanlockFilters.filter('plain', function(){
 			input = input.join(', ');
 		}
 		
-		return input ? input : '-';
+		var output = input;
+		
+		if(!output && (args.placeholder === undefined || args.placeholder)){
+			output = '-';
+		}
+		
+		return output;
 	}
 });
 
