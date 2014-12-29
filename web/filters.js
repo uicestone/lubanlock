@@ -11,9 +11,11 @@ lubanlockFilters.filter('plain', function(){
 	return function(input){
 		
 		if(angular.isObject(input)){
-			input = angular.element.map(input, function(value){
-				return value;
-			});
+			var array = [];
+			for(var key in input){
+				array.push(key + ': ' + input[key]);
+			}
+			input = array;
 		}
 		
 		if(angular.isArray(input)){
