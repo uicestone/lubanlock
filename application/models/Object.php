@@ -519,6 +519,7 @@ class Object extends CI_Model {
 	 *		page int
 	 *		perpage int
 	 *		found_rows boolean
+	 *		human_time_format boolean
 	 * @return array
 	 */
 	function query(array $args=array(), $permission_check = true){
@@ -704,9 +705,11 @@ class Object extends CI_Model {
 			});
 		}
 		
-		array_walk($result_array, function(&$row){
+		array_walk($result_array, function(&$row) use($args){
 			$row['id'] = intval($row['id']);
 			$row['type'] = lang($row['type']);
+			$row['time_human'] = str_replace(' ', '', timespan(strtotime($row['time']), time(), 1) . lang('before'));
+			$row['time_insert_human'] = str_replace(' ', '', timespan(strtotime($row['time_insert']), time(), 1) . lang('before'));
 		});
 
 		if(array_key_exists('limit', $args) && $args['limit'] === 1){

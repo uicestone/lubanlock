@@ -14,7 +14,7 @@
 			<div class="message-item" ng-class="{'message-unread':dialog.meta.unread_messages[0] > 0}" ng-repeat="dialog in dialogs">
 				
 				<span class="sender" title="{{dialog.name}}">{{dialog.name}}</span>
-				<span class="time">{{dialog.time}}</span>
+				<span class="time" title="{{dialog.time}}">{{dialog.time_human}}</span>
 
 				<span class="summary">
 					<span class="text">
