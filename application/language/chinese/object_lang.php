@@ -14,3 +14,8 @@ $lang['content'] = '内容';
 $lang['file'] = '文件';
 $lang['dialog'] = '对话';
 $lang['message'] = '消息';
+$lang['size'] = '大小';
+$lang['filename'] = '文件名';
+$lang['extension'] = '扩展名';
+$lang['content'] = '内容';
+

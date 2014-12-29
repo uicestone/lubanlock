@@ -758,6 +758,7 @@ class Object extends CI_Model {
 	 * 返回一个对象的资料项列表
 	 * $args array
 	 *	visibility
+	 *	raw_key_name bool
 	 * @return array
 	 */
 	function getMeta(array $args = array()){
@@ -786,6 +787,9 @@ class Object extends CI_Model {
 		$this->meta = null;
 		
 		foreach($result as $row){
+			if(!array_key_exists('raw_key_name', $args) || !$args['raw_key_name']){
+				$row['key'] = $this->lang->line($row['key']);
+			}
 			$this->meta[$row['key']][] = $row['value'];
 		}
 		
@@ -845,6 +849,8 @@ class Object extends CI_Model {
 		}
 		
 		$metas = $this->getMeta();
+		
+		$key = $this->lang->raw($key);
 		
 		if($unique){
 			if(is_array($metas) && array_key_exists($key, $metas)){
@@ -921,6 +927,8 @@ class Object extends CI_Model {
 				throw new Exception('argument_error', 400);
 			}
 		}
+		
+		$key = $this->lang->raw($key);
 		
 		if(!array_key_exists($key, $metas)){
 			return $this->addMeta($key, $value);
