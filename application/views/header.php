@@ -9,48 +9,48 @@
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
-		<link rel="stylesheet" href="css/font-awesome.min.css?v=3.2.1" />
-		<link rel="stylesheet" href="css/bootstrap.min.css?v=3.2.0" />
-		<link rel="stylesheet" href="css/ace.css?v=2014-12-3" />
+		<?=$this->stylesheet('css/font-awesome.min')?>
+		<?=$this->stylesheet('css/bootstrap.min')?>
+		<?=$this->stylesheet('css/ace')?>
 		
 		<!--[if lt IE 9]>
-		<link rel="stylesheet" href="css/ace-ie.css" />
+		<?=$this->stylesheet('css/ace-ie')?>
 		<![endif]-->
 
 		<!--[if lt IE 9]>
-		<script type="text/javascript" src="js/es5-shim.min.js"></script>
+		<?=$this->javascript('js/es5-shim.min')?>
 		<![endif]-->
 		
 		<!--[if !IE]> -->
-		<script type="text/javascript" src="js/jquery/jquery.min.js?v=2.1.1"></script>
+		<?=$this->javascript('js/jquery/jquery.min')?>
 		<!-- <![endif]-->
 		<!--[if IE]>
-		<script type="text/javascript" src="js/jquery/jquery-1.x.min.js?v=1.11.1"></script>
+		<?=$this->javascript('js/jquery/jquery-1.x.min')?>
 		<![endif]-->
-					
-		<script type="text/javascript" src="js/angular/angular.min.js?v=1.2.27"></script>
-		<script type="text/javascript" src="js/angular/angular-locale_zh-cn.js?v=1.2.27"></script>
-		<script type="text/javascript" src="js/angular/angular-route.min.js?v=1.2.27"></script>
-		<script type="text/javascript" src="js/angular/angular-resource.min.js?v=1.2.27"></script>
-		<script type="text/javascript" src="js/angular/ui-bootstrap.min.js?v=0.12.0"></script>
-		<script type="text/javascript" src="js/angular/angular-file-upload.min.js?v=1.6.12"></script>
 		
-		<script type="text/javascript" src="app.js?v=2014-12-03"></script>
-		<script type="text/javascript" src="controllers/component.js?v=2014-12-03"></script>
-		<script type="text/javascript" src="controllers/dialog.js?v=2014-12-03"></script>
-		<script type="text/javascript" src="controllers/object.js?v=2014-12-03"></script>
-		<script type="text/javascript" src="controllers/user.js?v=2014-12-03"></script>
-		<script type="text/javascript" src="directives.js?v=2014-12-03"></script>
-		<script type="text/javascript" src="filters.js?v=2014-12-03"></script>
-		<script type="text/javascript" src="services.js?v=2014-12-03"></script>
+		<?=$this->javascript('js/angular/angular.min')?>
+		<?=$this->javascript('js/angular/angular-locale_zh-cn')?>
+		<?=$this->javascript('js/angular/angular-route.min')?>
+		<?=$this->javascript('js/angular/angular-resource.min')?>
+		<?=$this->javascript('js/angular/ui-bootstrap.min')?>
+		<?=$this->javascript('js/angular/angular-file-upload.min')?>
+		
+		<?=$this->javascript('app')?>
+		<?=$this->javascript('controllers/component')?>
+		<?=$this->javascript('controllers/dialog')?>
+		<?=$this->javascript('controllers/object')?>
+		<?=$this->javascript('controllers/user')?>
+		<?=$this->javascript('directives')?>
+		<?=$this->javascript('filters')?>
+		<?=$this->javascript('services')?>
 
 		<!--[if lt IE 9]>
-		<script type="text/javascript" src="js/html5shiv.min.js?v=3.7.2"></script>
-		<script type="text/javascript" src="js/respond.min.js?v=1.4.2"></script>
+		<?=$this->javascript('js/html5shiv.min')?>
+		<?=$this->javascript('js/respond.min')?>
 		<![endif]-->
 		
 		<?php if($this->company->config('modules')): foreach($this->company->config('modules') as $module): ?>
-		<script type="text/javascript" src="modules/<?=$module?>/index.js"></script>
+		<?=$this->javascript('modules/' . $module . '/index')?>
 		<?php endforeach; endif; ?>
 
 		<script type="text/javascript">
