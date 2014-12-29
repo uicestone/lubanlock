@@ -19,16 +19,19 @@
 <table class="table table-bordered table-striped table-hover">
 	<thead>
 		<tr>
-			<th>名称</th>
 			<th>类型</th>
+			<th>标题</th>
 			<th>状态</th>
 			<th>标签</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr class="pointer-cursur" ng-repeat="object in objects" ng-click="showDetail(object.id, object.type)">
-			<td>{{object.name}}</td>
 			<td>{{object.type}}</td>
+			<td style="width:50%">
+				{{object.name}}
+				<span class="text-muted smaller-80 pull-right">{{object.meta | plain}}</span>
+			</td>
 			<td>{{object.status | orderBy:'date':true | limitTo:1 | select:'name' | plain}}</td>
 			<td>{{object.tag | plain}}</td>
 		</tr>
