@@ -14,7 +14,7 @@ lubanlockFilters.filter('plain', function(){
 			args = {};
 		}
 		
-		if(angular.isObject(input)){
+		if(angular.isObject(input) && !angular.isArray(input)){
 			var array = [];
 			for(var key in input){
 				array.push(key + ': ' + input[key]);
