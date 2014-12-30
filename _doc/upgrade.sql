@@ -397,6 +397,14 @@ drop table if exists taxonomy_count ;
 create temporary table taxonomy_count select tag_taxonomy, count(*) count from lubanlock.object_tag group by tag_taxonomy;
 update lubanlock.tag_taxonomy inner join taxonomy_count on taxonomy_count.tag_taxonomy = tag_taxonomy.id
 set tag_taxonomy.count = taxonomy_count.count;
+update tax_taxonomy set taxonomy = '类型' where taxonomy = '';
+update tag_taxonomy inner join tag on tag.id = tag_taxonomy.tag
+set tag_taxonomy.name = concat(tag_taxonomy.taxonomy, ' - ', tag.name);
+delete from tag_taxonomy where count = 0;
+delete from tag where id not in (select tag from tag_taxonomy);
+delete from object_tag where tag_taxonomy in (select id from tag_taxonomy where tag in (select id from tag where name = ''));
+delete from tag_taxonomy where tag in (select id from tag where name = '');
+delete from tag where name = '';
 -- -------------------------------------------------------------------------------------------------
 -- 导入object_relationship
 -- account
