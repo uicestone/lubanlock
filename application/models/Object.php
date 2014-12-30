@@ -922,13 +922,12 @@ class Object extends CI_Model {
 		
 		$metas = $this->getMeta();
 		
-		if(is_array($value)){
-			if(array_key_exists('value', $value)){
-				$value = $value['value'];
-			}
-			else{
-				throw new Exception('argument_error', 400);
-			}
+		if(is_object($prev_value) || is_array($prev_value)){
+			$prev_value = json_encode($prev_value, JSON_UNESCAPED_UNICODE);
+		}
+		
+		if(is_object($value) || is_array($value)){
+			$value = json_encode($value, JSON_UNESCAPED_UNICODE);
 		}
 		
 		$key = $this->lang->raw($key);
