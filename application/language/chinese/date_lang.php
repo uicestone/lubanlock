@@ -2,12 +2,12 @@
 
 $lang['date_year'] = "年";
 $lang['date_years'] = "年";
-$lang['date_month'] = "月";
-$lang['date_months'] = "月";
+$lang['date_month'] = "个月";
+$lang['date_months'] = "个月";
 $lang['date_week'] = "周";
 $lang['date_weeks'] = "周";
-$lang['date_day'] = "日";
-$lang['date_days'] = "日";
+$lang['date_day'] = "天";
+$lang['date_days'] = "天";
 $lang['date_hour'] = "小时";
 $lang['date_hours'] = "小时";
 $lang['date_minute'] = "分钟";
