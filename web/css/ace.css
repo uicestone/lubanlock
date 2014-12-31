@@ -14371,6 +14371,14 @@ th[aria-selected=true] .ui-jqgrid-sortable {
 	margin: 0 2px 2px 0;
 	text-align: left;
 	position: relative;
+	border-radius: 0 0 2px 2px;
+	box-shadow: 0 2px 5px #888;
+}
+
+.alert-warning {
+	background-color: #f9edbe;
+	border-color: #f0c36d;
+	color: #80663b;
 }
 
 .alert-navigator {
