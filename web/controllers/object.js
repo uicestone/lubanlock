@@ -114,7 +114,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Meta
 		
 		$scope.permissionTypes = [{name:'read',label:'查看'},{name:'write',label:'修改'},{name:'grant',label:'授权'}];
 		
-		$scope.metaKeys = Meta.getKeys();
+		$scope.metaKeys = Meta.getKeys({type: $scope.object.type});
 		
 		$scope.openPropAddForm = function(prop, $event){
 			$scope.adding[prop] = true;
