@@ -72,7 +72,11 @@ lubanlockControllers.controller('DialogMessageCtrl', ['$scope', '$interval', '$u
 		}
 		
 		$scope.remove = function(message){
-			Object.removeRelative({object: $scope.dialog.id, relation: 'message', relative: message.id, raw_key_name: true});
+			Object.removeRelative({object: $scope.dialog.id, relation: 'message', relative: message.id, raw_key_name: true, id_only: true}, function(){
+				$scope.messages = $scope.messages.filter(function(item){
+					return item.id !== message.id;
+				});
+			});
 		}
 	}
 ]);

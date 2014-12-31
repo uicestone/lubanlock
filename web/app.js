@@ -97,12 +97,12 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 				resolve: {
 					dialog: ['Object', '$route', function(Object, $route){
 						if($route.current.params.id){
-							return Object.get({id: $route.current.params.id, with: {meta: true}}).$promise;
+							return Object.get({id: $route.current.params.id, with: {meta: true, relative: false}}).$promise;
 						}
 					}],
 					messages: ['Object', '$route', function(Object, $route){
 						if($route.current.params.id){
-							return Object.query({type: '消息', is_relative_of: {'message': $route.current.params.id}, with: {meta: true, relative: {with: {meta: true}, raw_key_name: true}}, with_user_info: true}).$promise;
+							return Object.query({type: '消息', parents: {'message': $route.current.params.id}, with: {meta: true, relative: {with: {meta: true}, raw_key_name: true}}, with_user_info: true}).$promise;
 						}
 					}]
 				}
