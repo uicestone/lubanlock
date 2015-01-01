@@ -7,3 +7,5 @@
 /vendor/
 /public/packages/
 /web/modules
+/application/config/production/
+
