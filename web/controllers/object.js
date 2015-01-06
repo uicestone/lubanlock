@@ -276,12 +276,24 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Meta
 		 */
 		$scope.allow = function(action){
 			
-			if(!$scope.object || !$scope.object.permission){
+			if(!$scope.object.permission){
 				return false;
 			}
-			
+
+			if(user.roles.indexOf($scope.object.type + '-admin')){
+				return true;
+			}
+
+			if(action === 'write' && user.roles.indexOf($scope.object.type + '-editor')){
+				return true;
+			}
+
+			if(action === 'view' && user.roles.indexOf($scope.object.type + '-viewer')){
+				return true;
+			}
+
 			var users = $scope.object.permission[action];
-			
+
 			if(users.length === 0){
 				if($scope.object.permission.read.length === 0 && 
 					$scope.object.permission.write.length === 0 && 
@@ -295,11 +307,18 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Meta
 				}
 				return false;
 			}
+
 			for(var i = 0; i < users.length; i++){
 				if(users[i].id === user.id){
 					return true
 				}
+				for(var j = 0; j < groups.length; j++){
+					if(users[i].id === groups[j].id){
+						return true;
+					}
+				}
 			}
+
 			return false;
 		}
 		

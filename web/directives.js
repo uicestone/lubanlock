@@ -153,11 +153,23 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 			 * @returns {Boolean}
 			 */
 			scope.allow = function(action){
-
+				
 				if(!scope.object.permission){
 					return false;
 				}
+				
+				if(user.roles.indexOf(scope.object.type + '-admin')){
+					return true;
+				}
+				
+				if(action === 'write' && user.roles.indexOf(scope.object.type + '-editor')){
+					return true;
+				}
 
+				if(action === 'view' && user.roles.indexOf(scope.object.type + '-viewer')){
+					return true;
+				}
+				
 				var users = scope.object.permission[action];
 
 				if(users.length === 0){
@@ -173,6 +185,7 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 					}
 					return false;
 				}
+				
 				for(var i = 0; i < users.length; i++){
 					if(users[i].id === user.id){
 						return true
@@ -183,6 +196,7 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 						}
 					}
 				}
+				
 				return false;
 			}
 			

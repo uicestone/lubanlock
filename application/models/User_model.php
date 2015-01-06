@@ -38,11 +38,13 @@ class User_model extends Object {
 			}
 		}
 		
+		$user['roles'] = $this->_parse_roles($user['roles']);
+		
 		$this->session->user = $user;
 		$this->session->user_name = $user['name'];
 		$this->session->user_object_name = $user['object_name'];
 		
-		$this->session->user_roles = $this->_parse_roles($user['roles']);
+		$this->session->user_roles = $user['roles'];
 		
 		array_push($this->session->group_ids, $this->session->user_id);
 		
