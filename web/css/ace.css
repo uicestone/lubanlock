@@ -14353,6 +14353,7 @@ th[aria-selected=true] .ui-jqgrid-sortable {
 
 .navbar {
 	height: 45px;
+	border-bottom: 2px solid #2e6589;
 }
 
 .alert-container {

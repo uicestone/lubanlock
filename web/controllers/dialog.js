@@ -15,7 +15,7 @@ lubanlockControllers.controller('DialogMessageCtrl', ['$scope', '$interval', '$u
 			Object.query({
 				type: '消息',
 				is_relative_of: {'message': dialog.id},
-				with: {meta: true, relative: {with: {meta: true}}},
+				'with': {meta: true, relative: {'with': {meta: true}}},
 				with_user_info: true
 			}, function(messages){
 				if($scope.messages.$response.statusText !== messages.$response.statusText){
