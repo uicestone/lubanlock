@@ -325,4 +325,21 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Meta
 	}
 ]);
 
+lubanlockControllers.controller('NewCtrl', ['$scope', '$location', 'Object',
+	function($scope, $location, Object){
+		
+		$scope.types = Object.getTypes();
+		
+		$scope.submit = function(){
+			$scope.object = new Object();
+			$scope.object.name = $scope.name;
+			$scope.object.type = $scope.type;
+			$scope.object.num = $scope.num;
+			$scope.object.$save(function(object){
+				$location.replace().url('detail/' + object.id);
+			});
+		}
+	}
+]);
+
 })();

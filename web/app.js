@@ -60,6 +60,10 @@ lubanlockApp.config(['$routeProvider', '$httpProvider', '$parseProvider',
 					}]
 				}
 			})
+			.when('/new', {
+				templateUrl: 'partials/new.html',
+				controller: 'NewCtrl'
+			})
 			.when('/detail/:id?', {
 				templateUrl: 'partials/detail.html',
 				controller: 'DetailCtrl',

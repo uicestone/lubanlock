@@ -29,13 +29,7 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 				scope.prop = scope.name.match(/\.([^.^\[]*)/)[1];
 			}
 			
-			//如果整个object都是undefined，说明没get过，则需要在首次更改时创建对象
-			if(scope.object === undefined){
-				scope.inAddMode = true;
-				scope.object = new Object();
-			}
-			
-			scope.isEditing = scope.inAddMode;
+			scope.isEditing = false;
 			
 			//监控对象资源的请求状态
 			scope.$watch('object.$resolved', function($resolved){
@@ -68,16 +62,6 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 				}
 				
 				scope.isEditing = false;
-				
-				//首次添加时，失焦为首次保存的时间点
-				if(scope.inAddMode && scope.object.name && scope.object.type){
-					
-					scope.object.$save(function(value){
-						//保存后跳转到对象编辑页
-						$location.replace().url('detail/' + value.id);
-					});
-				}
-				
 			}
 			
 			scope.editCanceled = function(){
@@ -86,11 +70,6 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 			}
 			
 			scope.save = function(){
-				
-				//首次添加对象时，不在每次变化时保存，而是在首次失焦时保存
-				if(scope.inAddMode && (!scope.object.name || !scope.object.type)){
-					return;
-				}
 				
 				if(scope.oldValue === scope.value){
 					return;
@@ -140,10 +119,7 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 
 					default:
 						var args = {with_status: {as_rows: true, order_by: 'date desc'}, with_permission: {with_user_info: true}};
-						if(!scope.inAddMode){
-							scope.object.$update(args);
-						}
-						
+						scope.object.$update(args);
 				}
 			}
 			
