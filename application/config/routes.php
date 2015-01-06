@@ -92,6 +92,7 @@ $route['object/(:num)/tag']='Object_Controller/tag/$1';
 $route['object/(:num)/tag/(:any)']='Object_Controller/tag/$1/$2';
 $route['object/(:num)/permission']='Object_Controller/permission/$1';
 $route['object/(:num)/(authorize|prohibit)/(read|write|grant)']='Object_Controller/permission/$1/$2/$3';
+$route['object/type']='Object_Controller/type';
 
 $route['(login|logout|profile|signup)']='user/$1';
 $route['user/(:num)']='user/index/$1';

@@ -54,6 +54,12 @@ class Object_Controller extends LB_Controller{
 		
 	}
 	
+	function type(){
+		$object = new Object();
+		$types = $object->getTypes();
+		$this->output->set_output($types);
+	}
+	
 	function update($id){
 		$object = new Object($id, array('get_data'=>false));
 		$object->update($this->input->data());

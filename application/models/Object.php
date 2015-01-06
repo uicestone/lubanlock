@@ -735,6 +735,22 @@ class Object extends CI_Model {
 		return $this->query($args);
 	}
 	
+	function getTypes()
+	{
+		$this->db->select('type value, COUNT(*) count')
+				->from('object')
+				->group_by('type')
+				->order_by('COUNT(*) DESC');
+		
+		$result = $this->db->get()->result();
+		
+		foreach($result as &$item){
+			$item->count = intval($item->count);
+		}
+		
+		return $result;
+	}
+	
 	/**
 	 * @param array $args
 	 *	with_user_info: whether we return user info, if is false, only user id is returned. default is false
