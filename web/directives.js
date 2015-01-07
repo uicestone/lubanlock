@@ -134,15 +134,15 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 					return false;
 				}
 				
-				if(user.roles.indexOf(scope.object.type + '-admin')){
+				if(user.roles.indexOf(scope.object.type + '-admin') !== -1){
 					return true;
 				}
 				
-				if(action === 'write' && user.roles.indexOf(scope.object.type + '-editor')){
+				if(action === 'write' && user.roles.indexOf(scope.object.type + '-editor') !== -1){
 					return true;
 				}
 
-				if(action === 'view' && user.roles.indexOf(scope.object.type + '-viewer')){
+				if(action === 'view' && user.roles.indexOf(scope.object.type + '-viewer') !== -1){
 					return true;
 				}
 				
