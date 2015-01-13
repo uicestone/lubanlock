@@ -1213,7 +1213,7 @@ class Object extends CI_Model {
 			$this->setRelativeMeta($this->lang->raw($relation), $relative, $key, $value);
 		}
 		
-		$this->log('set object meta', $relation  . ' ' . $relative);
+		$this->log('set object relationship', $relation  . ' ' . $relative);
 		
 		return $return;
 	}
@@ -1274,7 +1274,7 @@ class Object extends CI_Model {
 			throw new Exception('no_permission', 403);
 		}
 		
-		$this->log('remove object', $relation  . ' ' . $relative);
+		$this->log('remove object relationship', $relation  . ' ' . $relative);
 		
 		return $this->db->delete('object_relationship', array('object'=>$this->id, 'relation'=>$this->lang->raw($relation), 'relative'=>$relative));
 	}

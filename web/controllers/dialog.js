@@ -2,8 +2,8 @@
 
 'use strict';
 
-lubanlockControllers.controller('DialogMessageCtrl', ['$scope', '$interval', '$upload', 'Object', 'dialog', 'messages',
-	function($scope, $interval, $upload, Object, dialog, messages){
+lubanlockControllers.controller('DialogMessageCtrl', ['$scope', '$interval', '$upload', '$filter', 'Object', 'dialog', 'messages',
+	function($scope, $interval, $upload, $filter, Object, dialog, messages){
 		
 		$scope.dialog = dialog;
 		$scope.messages = messages;
@@ -73,9 +73,7 @@ lubanlockControllers.controller('DialogMessageCtrl', ['$scope', '$interval', '$u
 		
 		$scope.remove = function(message){
 			Object.removeRelative({object: $scope.dialog.id, relation: 'message', relative: message.id, raw_key_name: true, id_only: true}, function(){
-				$scope.messages = $scope.messages.filter(function(item){
-					return item.id !== message.id;
-				});
+				$scope.messages = $filter('filter')($scope.messages, {id: '!' + message.id});
 			});
 		}
 	}
