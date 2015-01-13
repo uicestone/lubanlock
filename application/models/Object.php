@@ -155,6 +155,8 @@ class Object extends CI_Model {
 			}
 		}
 		
+		$this->log('add object', $data);
+		
 		return $this->id;
 	}
 	
@@ -184,6 +186,8 @@ class Object extends CI_Model {
 		
 		$this->db->set($data)->where('id', $this->id)->update('object');
 		
+		log_message('debug', '[update object] ' . ($this->session->user_name ? $this->session->user_name : 'guest') . ' ' . $this->id . ' ' . json_encode($data));
+		
 		return $this->db->affected_rows();
 	}
 	
@@ -211,6 +215,8 @@ class Object extends CI_Model {
 				}
 			}
 		}
+		
+		$this->log('remove object');
 		
 		return $result;
 	}
@@ -889,6 +895,8 @@ class Object extends CI_Model {
 			'user'=>$this->session->user_id
 		));
 		
+		$this->log('add object meta', $key  . ': '. $value);
+		
 		$meta_id = $this->db->insert_id();
 		
 		return $meta_id;
@@ -930,7 +938,7 @@ class Object extends CI_Model {
 	 * @param string $prev_value optional 如果不为null，则只更新原来值为$prev_value的记录
 	 * @return boolean
 	 */
-	function updateMeta($key, $value, $prev_value = null, $visibility = 1){
+	function updateMeta($key, $value, $prev_value = null, $visibility = null){
 		
 		if(!$this->allow('write')){
 			throw new Exception('no_permission', 403);
@@ -962,7 +970,15 @@ class Object extends CI_Model {
 			$condition += array('value'=>$prev_value);
 		}
 		
-		return $this->db->order_by('time')->limit(1)->update('object_meta', array('value'=>$value), $condition);
+		$set = array('value'=>$value);
+		
+		if(!is_null($visibility)){
+			$set['visibility'] = $visibility;
+		}
+		
+		$this->log('update object meta', $key  . ': '. $value);
+		
+		return $this->db->order_by('time')->limit(1)->update('object_meta', $set, $condition);
 	}
 	
 	/**
@@ -985,6 +1001,8 @@ class Object extends CI_Model {
 			}
 			$condition += array('value'=>$value);
 		}
+		
+		$this->log('remove object meta', $key  . ' ' . $value);
 		
 		return $this->db->delete('object_meta', $condition);
 	}
@@ -1195,6 +1213,8 @@ class Object extends CI_Model {
 			$this->setRelativeMeta($this->lang->raw($relation), $relative, $key, $value);
 		}
 		
+		$this->log('set object meta', $relation  . ' ' . $relative);
+		
 		return $return;
 	}
 	
@@ -1253,6 +1273,9 @@ class Object extends CI_Model {
 		if(!$this->allow('write')){
 			throw new Exception('no_permission', 403);
 		}
+		
+		$this->log('remove object', $relation  . ' ' . $relative);
+		
 		return $this->db->delete('object_relationship', array('object'=>$this->id, 'relation'=>$this->lang->raw($relation), 'relative'=>$relative));
 	}
 	
@@ -1281,6 +1304,8 @@ class Object extends CI_Model {
 			throw new Exception('no_permission', 403);
 		}
 		
+		$this->log('set object relationship meta', $relation . ' ' . $relative . ' ' . $key . ' ' . $value);
+		
 		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
 		if(is_null($value)){
 			return $this->db->delete('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key));
@@ -1295,6 +1320,9 @@ class Object extends CI_Model {
 			throw new Exception('no_permission', 403);
 		}
 		$relationship_id = is_null($relative) ? $relation : $this->_getRelationshipID($relation, $relative);
+		
+		$this->log('remove object relationship meta', $relation . ' ' . $relative . ' ' . $key);
+		
 		return $this->db->delete('object_relationship_meta', array('relationship'=>$relationship_id, 'key'=>$key));
 	}
 	
@@ -1379,6 +1407,8 @@ class Object extends CI_Model {
 			'user'=>$this->session->user_id
 		));
 		
+		$this->log('add object status', $name . ': ' . $date . ' ' . $comment);
+		
 		return $this->db->insert_id();
 	}
 	
@@ -1439,6 +1469,8 @@ class Object extends CI_Model {
 			$this->db->order_by('date desc')->limit(1);
 		}
 		
+		$this->log('update object status', $name . ': ' . $date . ' ' . $comment);
+		
 		$this->db->update('object_status', $set, $where);
 	}
 	
@@ -1456,6 +1488,8 @@ class Object extends CI_Model {
 		if(!is_null($date)){
 			$where['date'] = $this->_parse_date($date);
 		}
+		
+		$this->log('remove object status', $name . ' ' . $date);
 		
 		return $this->db->delete('object_status', $where);
 	}
@@ -1555,6 +1589,13 @@ class Object extends CI_Model {
 		foreach($data as $taxonomy => $tags){
 			$this->setTag($tags, $taxonomy, true, $check_permission);
 		}
+	}
+	
+	function log($operation, $message, $level = 'error'){
+		log_message($level, '[' . $operation . '] '
+			. ($this->session->user_name ? $this->session->user_name : 'guest')
+			. ' ' . $this->id . ' ' . $this->type . ' ' . $this->name
+			. ' ' . (is_string($message) ? $message : json_encode($message, JSON_UNESCAPED_UNICODE)));
 	}
 	
 }

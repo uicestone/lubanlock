@@ -24,7 +24,6 @@ class LB_Lang extends CI_Lang{
 		if ($value === FALSE && $log_errors === TRUE)
 		{
 			$value = $line;
-			log_message('error', 'Could not find the language line "'.$line.'"');
 		}
 
 		return $value;
@@ -41,7 +40,6 @@ class LB_Lang extends CI_Lang{
 		if ($value === FALSE && $log_errors === TRUE)
 		{
 			$value = $word;
-			log_message('error', 'Could not find the language line "'.$word.'"');
 		}
 
 		return $value;
