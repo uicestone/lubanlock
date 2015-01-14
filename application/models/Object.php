@@ -993,7 +993,7 @@ class Object extends CI_Model {
 			throw new Exception('no_permission', 403);
 		}
 		
-		$condition = array('key'=>$key);
+		$condition = array('object'=>$this->id, 'key'=>$key);
 		
 		if(!is_null($value)){
 			if(is_object($value) || is_array($value)){
@@ -1591,7 +1591,7 @@ class Object extends CI_Model {
 		}
 	}
 	
-	function log($operation, $message, $level = 'error'){
+	function log($operation, $message = '', $level = 'error'){
 		log_message($level, '[' . $operation . '] '
 			. ($this->session->user_name ? $this->session->user_name : 'guest')
 			. ' ' . $this->id . ' ' . $this->type . ' ' . $this->name
