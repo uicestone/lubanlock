@@ -5,7 +5,7 @@ class Object extends CI_Model {
 		$name, $type, $num, $company, $user, $time, $time_insert,
 		$meta, $relative, $parents, $status, $tag, $permission;
 	
-	static $fields=array(
+	static $fields = array(
 		'name'=>'',
 		'type'=>'',
 		'num'=>'',
@@ -51,7 +51,7 @@ class Object extends CI_Model {
 	 * @return array array version of the object
 	 */
 	function get($id = null, array $args = array(), $permission_check = true){
-
+		
 		if(!is_null($id)){
 			$this->id = intval($id);
 		}
@@ -115,7 +115,7 @@ class Object extends CI_Model {
 		}
 		
 		if(array_key_exists('with_user_info', $args) && $args['with_user_info']){
-			$object['user'] = new User_model($object['user']);
+			$object['user'] = new User_model($object['user'], array('with'=>null));
 		}
 		
 		foreach(array_keys(get_object_vars($this)) as $property){
@@ -225,6 +225,7 @@ class Object extends CI_Model {
 	 * 判断一个对象对于一些用户或组来说是否具有某种权限
 	 * 特别的：
 	 *	若对象权限表中没有此对象，则所有用户有读权限
+	 *	若权限表中，此对象某权限无人拥有，那么对象创建者拥有此权限，如果对象创建者是空，与对象id相同的用户拥有此权限
 	 *	若对象权限表中没有此对象，且用户为对象创建者或用户就是对象本身，那么有所有权限
 	 *	若用户roles包含'对象{type}-admin'，则有全部权限
 	 *	若用户roles包含'对象{type}-viewer'，则有读取权限
@@ -240,22 +241,30 @@ class Object extends CI_Model {
 			throw new Exception('permission_name_error', 400);
 		}
 		
-		$this->get($this->id, array('with'=>null), false);
-		
-		if(is_null($users)){
-			if(is_array($this->session->user_roles) && in_array($this->type . '-admin', $this->session->user_roles)){
-				return true;
-			}
-			if($permission === 'read' && is_array($this->session->user_roles) && in_array($this->type . '-viewer', $this->session->user_roles)){
-				return true;
-			}
-			if(in_array($permission, array('read', 'write')) && is_array($this->session->user_roles) && in_array($this->type . '-editor', $this->session->user_roles)){
-				return true;
-			}
+		// type 和 user 字段被用来判断下面的权限，如果还没有，先尝试获得一下
+		if(is_null($this->type) || is_null($this->user)){
+			$this->get($this->id, array('with'=>null), false);
 		}
 		
 		if(is_null($users)){
+			
+			// 对于自己或所在组包含{type}-admin role的用户，有所有权限
+			if(is_array($this->session->user_roles) && in_array($this->type . '-admin', $this->session->user_roles)){
+				return true;
+			}
+			
+			// 对于自己或所在组包含{type}-viewer role的用户，有读取权限
+			if($permission === 'read' && is_array($this->session->user_roles) && in_array($this->type . '-viewer', $this->session->user_roles)){
+				return true;
+			}
+			
+			// 对于自己或所在组包含{type}-editor role的用户，有写入权限
+			if(in_array($permission, array('read', 'write')) && is_array($this->session->user_roles) && in_array($this->type . '-editor', $this->session->user_roles)){
+				return true;
+			}
+			
 			$users = $this->session->group_ids;
+
 		}
 		
 		if(!is_array($users)){
@@ -264,21 +273,36 @@ class Object extends CI_Model {
 		
 		$result = $this->db->from('object_permission')->where('object', $this->id)->get()->result_array();
 		
-		if($result){
-			foreach($result as $row){
-				if(in_array($row['user'], $users) && $row[$permission]){
-					return true;
-				}
+		$allowed_users = array(
+			'read'=>array(),
+			'write'=>array(),
+			'grant'=>array()
+		);
+		
+		foreach($result as $row){
+			foreach(array('read', 'write', 'grant') as $p){
+				$row[$p] && $allowed_users[$p][] = $row['user'];
 			}
-			return false;
 		}
-		elseif($permission === 'read'){
+		
+		// 常规权限判断。对象没有作者的时候，将对象视为作者本身
+		if(array_intersect($allowed_users[$permission], $users) || (is_null($this->user) && in_array($this->id, $users))){
 			return true;
 		}
-		elseif(in_array($this->user, $users) || (is_null($this->user) && in_array($this->id, $users))){
+		
+		// 没有任何权限记录的对象是公开对象，所有人都可以读取
+		if(empty($allowed_users['read']) && empty($allowed_users['write']) && empty($allowed_users['grant'])
+			&& $permission === 'read'){
 			return true;
 		}
+		
+		// 某项权限无记录，则作者有此项权限。对象没有作者的时候，将对象视为作者本身
+		if(empty($allowed_users[$permission]) && (in_array($this->user, $users) || (is_null($this->user) && in_array($this->id, $users)))){
+			return true;
+		}
+		
 		return false;
+		
 	}
 	
 	/**

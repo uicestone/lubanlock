@@ -58,10 +58,11 @@
 
 						<div class="profile-info-value">
 							<span ng-repeat="user in object.permission.read">
-								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
+								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.object_name}}</a>
 								<a class="icon-trash pointer-cursur" ng-click="prohibit('read', user.id)" ng-show="allow('grant')"></a>
 							</span>
-							<span ng-if="!object.permission.read.length">所有人</span>
+							<span ng-if="!(object.permission.read.length || object.permission.write.length || object.permission.grant.length)">所有人</span>
+							<span ng-if="!object.permission.read.length && (object.permission.write.length || object.permission.grant.length)">{{object.user.object_name}}</span>
 						</div>
 					</div>
 					<div class="profile-info-row">
@@ -69,10 +70,10 @@
 
 						<div class="profile-info-value">
 							<span ng-repeat="user in object.permission.write">
-								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
+								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.object_name}}</a>
 								<a class="icon-trash pointer-cursur" ng-click="prohibit('write', user.id)" ng-show="allow('grant')"></a>
 							</span>
-							<span ng-if="!object.permission.write.length">添加者</span>
+							<span ng-if="!object.permission.write.length">{{object.user.object_name}}</span>
 						</div>
 					</div>
 					<div class="profile-info-row">
@@ -80,10 +81,10 @@
 
 						<div class="profile-info-value">
 							<span ng-repeat="user in object.permission.grant">
-								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.name}}</a>
+								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.object_name}}</a>
 								<a class="icon-trash pointer-cursur" ng-click="prohibit('grant', user.id)" ng-show="allow('grant')"></a>
 							</span>
-							<span ng-if="!object.permission.grant.length">添加者</span>
+							<span ng-if="!object.permission.grant.length">{{object.user.object_name}}</span>
 						</div>
 					</div>
 				</div>

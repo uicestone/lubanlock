@@ -114,10 +114,13 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Meta
 		
 		$scope.permissionTypes = [{name:'read',label:'查看'},{name:'write',label:'修改'},{name:'grant',label:'授权'}];
 		
-		$scope.metaKeys = Meta.getKeys({type: $scope.object.type});
-		
 		$scope.openPropAddForm = function(prop, $event){
 			$scope.adding[prop] = true;
+			
+			if(prop === 'meta'){
+				$scope.metaKeys = Meta.getKeys({type: $scope.object.type});
+			}
+			
 			// auto-select the first input field after expanding property adding
 			// since the form won't expand after above change were applied, we trigger 'select' after a while
 			setTimeout(function(){
@@ -264,7 +267,7 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Meta
 		}
 		
 		$scope.remove = function(){
-			$scope.object.$remove({}, function(){
+			Object.remove({id: $scope.object.id}, {}, function(){
 				history.back();
 			});
 		}
@@ -295,11 +298,9 @@ lubanlockControllers.controller('DetailCtrl', ['$scope', 'Object', 'User', 'Meta
 			var users = $scope.object.permission[action];
 
 			if(users.length === 0){
-				if($scope.object.permission.read.length === 0 && 
-					$scope.object.permission.write.length === 0 && 
-					$scope.object.permission.grant.length === 0 && 
+				if($scope.object.permission[action].length === 0 && 
 					(
-						user.id === $scope.object.user || 
+						user.id === ($scope.object.user.id || $scope.object.user) || 
 						($scope.object.user === null && $scope.object.id === user.id)
 					)
 				){
