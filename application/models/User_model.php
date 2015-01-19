@@ -1,9 +1,9 @@
 <?php
 class User_model extends Object {
 	
-	var $name = '', $email, $password, $roles = array(), $is_group = false;
+	var $name = '', $email, $password, $roles = array(), $is_group = false, $object_name;
 	
-	static $fields=array(
+	static $fields = array(
 		'name'=>'',
 		'email'=>null,
 		'password'=>'',
@@ -50,6 +50,8 @@ class User_model extends Object {
 		
 		$this->_get_parent_group(array($this->session->user_id));
 		
+		$this->session->user['roles'] = $this->session->user_roles;
+		
 	}
 	
 	function _parse_roles($roles){
@@ -75,7 +77,7 @@ class User_model extends Object {
 	function _get_parent_group($children = array()){
 
 		$parents = $this->query(array(
-			'has_relative_like'=>array($children),
+			'children'=>array($children),
 			'found_rows'=>false,
 			'limit'=>false,
 			'order_by'=>false
@@ -150,7 +152,7 @@ class User_model extends Object {
 			$insert_id = parent::add($data);
 		}
 
-		$data = array_merge(self::$fields, array_intersect_key($data,self::$fields));
+		$data = array_merge(self::$fields, array_intersect_key($data, self::$fields));
 		
 		$data['id'] = $insert_id;
 		$data['company'] = get_instance()->company->id;

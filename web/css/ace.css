@@ -1202,8 +1202,6 @@ blockquote.pull-right {
 .ace-nav > li > a > .badge {
   position: relative;
   top: -1px;
-  left: 2px;
-  padding: 1px 3px;
 }
 .ace-nav > li > a:hover,
 .ace-nav > li > a:focus {
@@ -3940,15 +3938,6 @@ fieldset[disabled] .btn-light.active {
   .badge:empty {
     display: inline-block;
   }
-}
-.badge {
-  text-shadow: none;
-  font-size: 12px;
-  padding-top: 1px;
-  padding-bottom: 3px;
-  font-weight: normal;
-  line-height: 15px;
-  background-color: #abbac3 !important;
 }
 .badge.no-radius {
   border-radius: 0;
@@ -9697,9 +9686,6 @@ li.item-default {
   overflow: hidden;
   white-space: nowrap;
   cursor: pointer;
-}
-.message-item .summary .text:hover {
-  text-decoration: underline;
 }
 .message-item .summary .message-flags {
   display: block;

@@ -11,14 +11,14 @@
 <div class="message-container">
 	<div class="message-list-container">
 		<div class="message-list" id="message-list" ng-show="dialogs">
-			<div class="message-item" ng-class="{'message-unread':dialog.meta.unread_messages[0] > 0}" ng-repeat="dialog in dialogs">
+			<div class="message-item pointer-cursur" ng-class="{'message-unread':dialog.meta.unread_messages[0] > 0}" ng-repeat="dialog in dialogs" ng-click="enterDialog(dialog)">
 				
 				<span class="sender" title="{{dialog.name}}">{{dialog.name}}</span>
 				<span class="time" title="{{dialog.time}}">{{dialog.time_human}}</span>
 
 				<span class="summary">
 					<span class="text">
-						<a ng-href="#dialog/{{dialog.id}}">{{dialog.relative.message[0].name}}</a>
+						{{dialog.relative.message[0].name}}
 					</span>
 				</span>
 			</div>

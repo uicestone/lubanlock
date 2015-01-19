@@ -73,7 +73,12 @@ lubanlockControllers.controller('DialogMessageCtrl', ['$scope', '$interval', '$u
 		
 		$scope.remove = function(message){
 			Object.removeRelative({object: $scope.dialog.id, relation: 'message', relative: message.id, raw_key_name: true, id_only: true}, function(){
-				$scope.messages = $filter('filter')($scope.messages, {id: '!' + message.id});
+				for(var i = 0; i < $scope.messages.length; i++){
+					if($scope.messages[i].id === message.id){
+						$scope.messages.splice(i, 1);
+						break;
+					}
+				}
 			});
 		}
 	}
@@ -157,9 +162,12 @@ lubanlockControllers.controller('DialogNewCtrl', ['$scope', '$upload', '$http', 
 	}
 ]);
 
-lubanlockControllers.controller('DialogListCtrl', ['$scope', 'dialogs',
-	function($scope, dialogs){
+lubanlockControllers.controller('DialogListCtrl', ['$scope', '$location', 'dialogs',
+	function($scope, $location, dialogs){
 		$scope.dialogs = dialogs;
+		$scope.enterDialog = function(dialog){
+			$location.path('dialog/' + dialog.id);
+		};
 	}
 ]);
 

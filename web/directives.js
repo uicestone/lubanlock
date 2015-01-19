@@ -149,11 +149,9 @@ lubanlockDirectives.directive('lubanEditable', ['$location', 'Object', function(
 				var users = scope.object.permission[action];
 
 				if(users.length === 0){
-					if(scope.object.permission.read.length === 0 && 
-						scope.object.permission.write.length === 0 && 
-						scope.object.permission.grant.length === 0 && 
+					if(scope.object.permission[action].length === 0 &&
 						(
-							user.id === scope.object.user || 
+							user.id === (scope.object.user.id || scope.object.user) || 
 							(scope.object.user === null && scope.object.id === user.id)
 						)
 					){

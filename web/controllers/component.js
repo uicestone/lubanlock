@@ -25,7 +25,7 @@ lubanlockControllers.controller('TopBarCtrl', ['$scope', '$interval', 'Object',
 			Object.query({type: '对话', user: 'ME', meta: {unread_messages: {gt: 0}}, with_meta: true}, function(response){
 				$scope.dialog_unread = response;
 			});
-		}, 10000);
+		}, 60000);
 		
 		$scope.$watch('dialog_unread', function(){
 			$scope.unread_messages = 0;
