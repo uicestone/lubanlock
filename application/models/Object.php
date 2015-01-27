@@ -173,6 +173,10 @@ class Object extends CI_Model {
 			return;
 		}
 		
+		if(is_array($data['user'])){
+			$data['user'] = $data['user']['id'];
+		}
+		
 		array_key_exists('type', $data) && $data['type'] = $this->lang->raw($data['type']);
 		
 		// TODO this means a user can set his own object to someone else
@@ -597,6 +601,7 @@ class Object extends CI_Model {
 							'name'=>array('like'=>$keyword),
 							'num'=>$keyword,
 							'type'=>$keyword,
+							'parents'=>array(0=>array('name'=>array('like'=>$keyword)))
 						)
 					);
 				}
@@ -1034,6 +1039,8 @@ class Object extends CI_Model {
 	/**
 	 * 
 	 * @param array $args
+	 *	relation
+	 *	type
 	 *	as_rows retrieve rows in object_relative directly
 	 *	id_only retrieve just relative id
 	 *	include_disabled include relationships which "is_on" is not true
@@ -1131,7 +1138,12 @@ class Object extends CI_Model {
 			else{
 				try{
 					
-					$relative = (array_key_exists('is_user', $args) && $args['is_user']) ? new User_model($relationship[$get], array_merge($args, array('with_all_prop'=>false))) : new Object($relationship[$get], array_merge($args, array('with_all_prop'=>false)));
+					$relative = (array_key_exists('is_user', $args) && $args['is_user']) ? new User_model($relationship[$get], array_merge($args, array('with_all_prop'=>false))) : new Object($relationship[$get], array_merge(array('with_all_prop'=>false), $args));
+					
+					if(array_key_exists('type', $args) && $args['type'] !== $relative->type){
+						continue;
+					}
+					
 					$relative->relationship_id = (int) $relationship['id'];
 					$relative->relationship_num = $relationship['num'];
 					$relative->relationship_is_on = (bool) $relationship['is_on'];
