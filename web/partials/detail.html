@@ -73,7 +73,7 @@
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.object_name}}</a>
 								<a class="icon-trash pointer-cursur" ng-click="prohibit('write', user.id)" ng-show="allow('grant')"></a>
 							</span>
-							<span ng-if="!object.permission.write.length">{{object.user.object_name}}</span>
+							<span ng-if="!object.permission.write.length">{{object.user.object_name || object.name}}</span>
 						</div>
 					</div>
 					<div class="profile-info-row">
@@ -84,7 +84,7 @@
 								<a class="pointer-cursur" ng-click="showDetail(relative.id, relative.type)">{{user.object_name}}</a>
 								<a class="icon-trash pointer-cursur" ng-click="prohibit('grant', user.id)" ng-show="allow('grant')"></a>
 							</span>
-							<span ng-if="!object.permission.grant.length">{{object.user.object_name}}</span>
+							<span ng-if="!object.permission.grant.length">{{object.user.object_name || object.name}}</span>
 						</div>
 					</div>
 				</div>

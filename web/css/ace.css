@@ -9274,7 +9274,7 @@ li.item-default {
   /* for a list of values (such as location city & country) put a comma between them */
 
   display: inline;
-  content: ",";
+  /*content: ",";*/
   margin-left: 1px;
   margin-right: 3px;
   color: #666;
@@ -14444,4 +14444,17 @@ input.editable {
 
 [luban-editable]>.writable {
 	border-bottom: dotted 1px #ffa830;
+}
+
+.form-control::-moz-placeholder{
+	color: #AAA;
+	opacity: 1;
+}
+
+.form-control:-ms-input-placeholder{
+	color: #AAA;
+}
+
+.form-control::-webkit-input-placeholder{
+	color: #AAA;
 }
