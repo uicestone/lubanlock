@@ -46,6 +46,9 @@ class Object_Controller extends LB_Controller{
 
 		if(is_array($result) && array_key_exists('data', $result) && array_key_exists('info', $result)){
 			$this->output->set_output($result['data']);
+			$this->output->set_header('List-Total: ' . $result['info']['total']);
+			$this->output->set_header('List-From: ' . $result['info']['from']);
+			$this->output->set_header('List-To: ' . $result['info']['to']);
 			$this->output->set_status_header(200, 'OK, '.$result['info']['total'].' Objects in Total, '.$result['info']['from'].'-'.$result['info']['to'].' Listed');
 		}
 		else{

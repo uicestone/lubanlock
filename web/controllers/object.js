@@ -9,13 +9,13 @@ lubanlockControllers.controller('ListCtrl', ['$scope', '$location', '$route', '$
 		
 		//列表分页
 		$scope.currentPage = $location.search().page || 1;
-		
+
 		$scope.objects = objects;
-		// get pagination argument from statusText
-		var statusText = $scope.objects.$response.statusText;
-		$scope.total = Number(statusText.match(/(\d+) Objects in Total/)[1]);
-		$scope.listStart = Number(statusText.match(/(\d+)\-/)[1]);
-		$scope.listEnd = Number(statusText.match(/\-(\d+)/)[1]);
+		// get pagination argument from Headers
+		var headers = $scope.objects.$response.headers();
+		$scope.total = Number(headers['list-total']);
+		$scope.listStart = Number(headers['list-from']);
+		$scope.listEnd = Number(headers['list-to']);
 		
 		if($scope.listStart > $scope.listEnd){
 			$location.search(angular.extend($location.search(), {page: 1}));

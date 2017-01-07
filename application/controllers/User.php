@@ -47,6 +47,9 @@ class User extends LB_Controller{
 		$result = $this->user->query($args);
 
 		$this->output->set_output($result['data']);
+		$this->output->set_header('List-Total: ' . $result['info']['total']);
+		$this->output->set_header('List-From: ' . $result['info']['from']);
+		$this->output->set_header('List-To: ' . $result['info']['to']);
 		$this->output->set_status_header(200, 'OK, '.$result['info']['total'].' Users in Total, '.$result['info']['from'].'-'.$result['info']['to'].' Listed');
 	}
 	

@@ -9,11 +9,11 @@ lubanlockControllers.controller('UsersCtrl', ['$scope', '$location', '$modal', '
 		$scope.currentPage = $location.search().page || 1;
 		
 		$scope.users = users;
-		// get pagination argument from statusText
-		var statusText = $scope.users.$response.statusText;
-		$scope.total = Number(statusText.match(/(\d+) Users in Total/)[1]);
-		$scope.listStart = Number(statusText.match(/(\d+)\-/)[1]);
-		$scope.listEnd = Number(statusText.match(/\-(\d+)/)[1]);
+		// get pagination argument from Headers
+		var headers = $scope.objects.$response.headers();
+		$scope.total = Number(headers['list-total']);
+		$scope.listStart = Number(headers['list-from']);
+		$scope.listEnd = Number(headers['list-to']);
 
 		$scope.nextPage = function(){
 			$location.search('page', ++$scope.currentPage);
