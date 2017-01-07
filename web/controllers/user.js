@@ -10,7 +10,7 @@ lubanlockControllers.controller('UsersCtrl', ['$scope', '$location', '$modal', '
 		
 		$scope.users = users;
 		// get pagination argument from Headers
-		var headers = $scope.objects.$response.headers();
+		var headers = $scope.users.$response.headers();
 		$scope.total = Number(headers['list-total']);
 		$scope.listStart = Number(headers['list-from']);
 		$scope.listEnd = Number(headers['list-to']);
